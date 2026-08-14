@@ -57,79 +57,205 @@ function()
                 height:'auto',
 
                 events:
-                [
+[
 
-                    @foreach($bookings as $booking)
+    {{-- ================= SPOT BOOKINGS ================= --}}
 
-                    {
+    @foreach($bookings as $booking)
 
-                        title:
-                        '{{ $booking->spot->name }} - {{ $booking->user->name }}',
+    {
 
-                        start:
-                        '{{ $booking->booking_date }}',
+        title:
+        '📍 {{ $booking->spot->name }}',
 
-                        color:
+        start:
+        '{{ $booking->booking_date }}',
 
-                        @if($booking->status == 'approved')
+        color:
 
-                        '#22c55e'
+        @if($booking->status=='approved')
 
-                        @elseif($booking->status == 'pending')
+        '#22c55e'
 
-                        '#f59e0b'
+        @elseif($booking->status=='pending')
 
-                        @else
+        '#f59e0b'
 
-                        '#ef4444'
+        @else
 
-                        @endif,
+        '#ef4444'
 
-                        extendedProps:
-                        {
-                            user:
-                            '{{ $booking->user->name }}',
+        @endif,
 
-                            spot:
-                            '{{ $booking->spot->name }}',
+        extendedProps:
+        {
+            type:'Spot',
 
-                            qty:
-                            '{{ $booking->quantity }}',
+            user:'{{ $booking->user->name }}',
 
-                            total:
-                            '{{ number_format($booking->total_price,2) }}',
+            place:'{{ $booking->spot->name }}',
 
-                            status:
-                            '{{ ucfirst($booking->status) }}'
-                        }
+            quantity:'{{ $booking->quantity }}',
 
-                    },
+            total:'{{ number_format($booking->total_price,2) }}',
 
-                    @endforeach
+            status:'{{ ucfirst($booking->status) }}'
+        }
 
-                ],
+    },
+
+    @endforeach
+
+
+
+    {{-- ================= HOTEL BOOKINGS ================= --}}
+
+    @foreach($hotelBookings as $booking)
+
+    {
+
+        title:
+        '🏨 {{ $booking->hotel->name }}',
+
+        start:
+        '{{ $booking->check_in }}',
+
+        end:
+        '{{ $booking->check_out }}',
+
+        color:
+
+        @if($booking->status=='approved')
+
+        '#3b82f6'
+
+        @elseif($booking->status=='pending')
+
+        '#f59e0b'
+
+        @else
+
+        '#ef4444'
+
+        @endif,
+
+        extendedProps:
+        {
+            type:'Hotel',
+
+            user:'{{ $booking->user->name }}',
+
+            place:'{{ $booking->hotel->name }}',
+
+            rooms:'{{ $booking->rooms }}',
+
+            total:'{{ number_format($booking->total_price,2) }}',
+
+            status:'{{ ucfirst($booking->status) }}'
+        }
+
+    },
+
+    @endforeach
+
+
+
+    {{-- ================= RESTAURANT BOOKINGS ================= --}}
+
+    @foreach($foodBookings as $booking)
+
+    {
+
+        title:
+        '🍽 {{ $booking->food->name }}',
+
+        start:
+        '{{ $booking->reservation_date }}',
+
+        color:
+
+        @if($booking->status=='approved')
+
+        '#ec4899'
+
+        @elseif($booking->status=='pending')
+
+        '#f59e0b'
+
+        @else
+
+        '#ef4444'
+
+        @endif,
+
+        extendedProps:
+        {
+            type:'Restaurant',
+
+            user:'{{ $booking->user->name }}',
+
+            place:'{{ $booking->food->name }}',
+
+            guests:'{{ $booking->guests }}',
+
+            time:'{{ $booking->reservation_time }}',
+
+            status:'{{ ucfirst($booking->status) }}'
+        }
+
+    },
+
+    @endforeach
+
+],
 
                 eventClick:function(info)
-                {
-                    alert(
+{
+    let details =
 
-                        'Spot: '
-                        + info.event.extendedProps.spot +
+        'Type: ' + info.event.extendedProps.type +
 
-                        '\nUser: '
-                        + info.event.extendedProps.user +
+        '\nName: ' + info.event.extendedProps.place +
 
-                        '\nQuantity: '
-                        + info.event.extendedProps.qty +
+        '\nUser: ' + info.event.extendedProps.user +
 
-                        '\nTotal: ₱'
-                        + info.event.extendedProps.total +
+        '\nStatus: ' + info.event.extendedProps.status;
 
-                        '\nStatus: '
-                        + info.event.extendedProps.status
+    if(info.event.extendedProps.type == 'Spot')
+    {
+        details +=
 
-                    );
-                }
+        '\nQuantity: ' +
+        info.event.extendedProps.quantity +
+
+        '\nTotal: ₱' +
+        info.event.extendedProps.total;
+    }
+
+    if(info.event.extendedProps.type == 'Hotel')
+    {
+        details +=
+
+        '\nRooms: ' +
+        info.event.extendedProps.rooms +
+
+        '\nTotal: ₱' +
+        info.event.extendedProps.total;
+    }
+
+    if(info.event.extendedProps.type == 'Restaurant')
+    {
+        details +=
+
+        '\nGuests: ' +
+        info.event.extendedProps.guests +
+
+        '\nTime: ' +
+        info.event.extendedProps.time;
+    }
+
+    alert(details);
+}
 
             }
         );

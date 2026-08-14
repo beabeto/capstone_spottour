@@ -1,9 +1,10 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
@@ -26,7 +27,7 @@ href="{{ asset('css/style.css') }}">
 
 <h1>🔖 My Bookmarks</h1>
 
-{{-- SPOT BOOKMARKS --}}
+{{-- ================= SPOT BOOKMARKS ================= --}}
 
 @if($bookmarks->count())
 
@@ -96,7 +97,7 @@ href="{{ asset('css/style.css') }}">
 @endif
 
 
-{{-- HOTEL BOOKMARKS --}}
+{{-- ================= HOTEL BOOKMARKS ================= --}}
 
 @if($hotelBookmarks->count())
 
@@ -166,9 +167,82 @@ href="{{ asset('css/style.css') }}">
 @endif
 
 
+{{-- ================= FOOD BOOKMARKS ================= --}}
+
+@if($foodBookmarks->count())
+
+<h2 class="section-title">
+
+    🍽 Restaurants
+
+</h2>
+
+@foreach($foodBookmarks as $bookmark)
+
+<div class="favorite-card">
+
+    <img
+    src="{{ asset('uploads/foods/'.$bookmark->food->image) }}"
+    class="favorite-image">
+
+    <div class="favorite-content">
+
+        <h3>
+
+            {{ $bookmark->food->name }}
+
+        </h3>
+
+        <p>
+
+            📍 {{ $bookmark->food->location }}
+
+        </p>
+
+        <div class="favorite-rating">
+
+            ⭐ {{ number_format(
+                $bookmark->food->ratings->avg('rating') ?? 0,
+                1
+            ) }}
+
+        </div>
+
+        <div class="favorite-actions">
+
+            <a
+            href="/foods/{{ $bookmark->food->id }}"
+            class="view-btn">
+
+                View Restaurant
+
+            </a>
+
+            <a
+            href="/food/bookmark/{{ $bookmark->food->id }}"
+            class="remove-btn">
+
+                Remove
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endforeach
+
+@endif
+
+
+{{-- ================= EMPTY STATE ================= --}}
+
 @if(
     $bookmarks->count() == 0 &&
-    $hotelBookmarks->count() == 0
+    $hotelBookmarks->count() == 0 &&
+    $foodBookmarks->count() == 0
 )
 
 <div class="empty-card">
@@ -181,8 +255,9 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        Save your favorite spots and hotels
-        to access them quickly later.
+        Save your favorite tourist spots,
+        hotels, and restaurants to
+        access them quickly later.
 
     </p>
 
@@ -195,4 +270,3 @@ href="{{ asset('css/style.css') }}">
 </body>
 
 </html>
-```

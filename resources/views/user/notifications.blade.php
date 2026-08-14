@@ -41,20 +41,28 @@ href="{{ asset('css/style.css') }}">
     <a
 
     href="
-    @if($notification->hotel_id)
+@if($notification->food_id)
 
-        /hotels/{{ $notification->hotel_id }}
+    /foods/{{ $notification->food_id }}
 
-    @elseif($notification->spot_id)
+@elseif($notification->hotel_id)
 
-        /spots/{{ $notification->spot_id }}
+    /hotels/{{ $notification->hotel_id }}
 
-    @else
+@elseif($notification->spot_id)
 
-        #
+    /spots/{{ $notification->spot_id }}
 
-    @endif
-    "
+@elseif(str_contains(strtolower($notification->message), 'feedback'))
+
+    /user/feedback
+
+@else
+
+    #
+
+@endif
+"
 
     class="notification-link">
 
@@ -74,19 +82,27 @@ href="{{ asset('css/style.css') }}">
 
             <div class="notification-badge">
 
-                @if($notification->hotel_id)
+                @if($notification->food_id)
 
-                    🏨 Hotel Notification
+    🍽 Restaurant Notification
 
-                @elseif($notification->spot_id)
+@elseif($notification->hotel_id)
 
-                    📍 Spot Notification
+    🏨 Hotel Notification
 
-                @else
+@elseif($notification->spot_id)
 
-                    🔔 Notification
+    📍 Spot Notification
 
-                @endif
+@elseif(str_contains(strtolower($notification->message), 'feedback'))
+
+    💬 Feedback Reply
+
+@else
+
+    🔔 Notification
+
+@endif
 
             </div>
 

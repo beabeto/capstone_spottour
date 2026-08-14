@@ -93,36 +93,7 @@ href="{{ asset('css/style.css') }}">
 
     </div>
 
-    <!-- ADMIN STATS -->
-
-    <div class="profile-stats">
-
-        <div class="stat-card">
-    <h3>Total Users</h3>
-    <p>
-        {{ \App\Models\User::where('role','user')->count() }}
-    </p>
-</div>
-
-       <div class="stat-card">
-    <h3>Total Owners</h3>
-    <p>
-        {{ \App\Models\User::where('role','owner')->count() }}
-    </p>
-</div>
-
-        <div class="admin-stat-box">
-            <h3>Total Bookings</h3>
-            <span>0</span>
-        </div>
-
-        <div class="admin-stat-box">
-            <h3>Feedback</h3>
-            <span>0</span>
-        </div>
-
-    </div>
-
+    
     <!-- SYSTEM INFO -->
 
     <div class="system-card">
@@ -160,13 +131,7 @@ href="{{ asset('css/style.css') }}">
 
     </div>
 
-    <div class="back-btn">
-
-        <a href="/admin">
-            ← Back to Dashboard
-        </a>
-
-    </div>
+    
 
 </div>
 

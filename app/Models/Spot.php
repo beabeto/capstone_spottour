@@ -47,5 +47,9 @@ public function comments()
     );
 }
 
+public function bookings()
+{
+    return $this->hasMany(Booking::class);
+}
 
 }

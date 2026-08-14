@@ -170,6 +170,66 @@ href="{{ asset('css/style.css') }}">
 
 @endif
 
+{{-- FOOD FAVORITES --}}
+
+@forelse($foodFavorites as $favorite)
+
+<div class="favorite-card">
+
+    <img
+    src="{{ asset('uploads/foods/'.$favorite->food->image) }}"
+    class="favorite-image">
+
+    <div class="favorite-content">
+
+        <h3>
+
+            🍽 {{ $favorite->food->name }}
+
+        </h3>
+
+        <p>
+
+            {{ $favorite->food->location }}
+
+        </p>
+
+        <div class="favorite-rating">
+
+            ⭐ {{ number_format(
+                $favorite->food->ratings->avg('rating') ?? 0,
+                1
+            ) }}
+
+        </div>
+
+        <div class="favorite-actions">
+
+            <a
+            href="/foods/{{ $favorite->food->id }}"
+            class="view-btn">
+
+                View Restaurant
+
+            </a>
+
+            <a
+            href="/food/favorite/{{ $favorite->food->id }}"
+            class="remove-btn">
+
+                Remove
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+@empty
+@endforelse
+
 </div>
 
 </body>

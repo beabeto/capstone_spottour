@@ -1,4 +1,4 @@
-
+```blade
 <!DOCTYPE html>
 
 <html>
@@ -162,41 +162,34 @@ href="{{ asset('css/style.css') }}">
 
     </div>
 
-    <form
-    method="POST"
-    action="/hotel/booking/store">
+<form
+method="POST"
+action="/hotel/payment">
 
-        @csrf
+    @csrf
 
-        <input
-        type="hidden"
-        name="hotel_id"
-        value="{{ $hotel->id }}">
+    <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
 
-        <input
-        type="hidden"
-        name="check_in"
-        value="{{ request('check_in') }}">
+<input type="hidden" name="check_in" value="{{ request('check_in') }}">
 
-        <input
-        type="hidden"
-        name="check_out"
-        value="{{ request('check_out') }}">
+<input type="hidden" name="check_out" value="{{ request('check_out') }}">
 
-        <input
-        type="hidden"
-        name="rooms"
-        value="{{ request('rooms') }}">
+<input type="hidden" name="rooms" value="{{ request('rooms') }}">
 
-        <button
-        type="submit"
-        class="payment-btn">
+<input
+type="hidden"
+name="total_price"
+value="{{ $total }}">
 
-            🏨 Confirm Reservation
+    <button
+    type="submit"
+    class="payment-btn">
 
-        </button>
+        💳 Proceed To Payment
 
-    </form>
+    </button>
+
+</form>
 
 </div>
 

@@ -201,6 +201,22 @@ href="{{ asset('css/style.css') }}">
 
         <div class="profile-box">
 
+    <h3>
+
+        ✅ Checklist
+
+    </h3>
+
+    <span>
+
+        {{ $checklists ?? 0 }}
+
+    </span>
+
+</div>
+
+        <div class="profile-box">
+
             <h3>
 
                 ⭐ Reviews

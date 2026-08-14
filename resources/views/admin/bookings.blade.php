@@ -3,7 +3,7 @@
 <html>
 <head>
 
-<title> Booking Monitoring</title>
+<title>Booking Monitoring</title>
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
@@ -11,162 +11,139 @@ href="{{ asset('css/style.css') }}">
 </head>
 
 <body class="dashboard-body">
+
 <div class="back-btn">
     <button onclick="history.back()">
-        ← 
+        ←
     </button>
 </div>
 
-
-
 <div class="page-container">
 
-<br>
-<h1>
+<h2 class="section-title">
 
-        Booking Monitoring
+📍 Spot Bookings
 
-</h1>
-</br>
-<div class="booking-stats">
+</h2>
 
-
-<div class="stat-card">
-
-    <h2>
-
-       {{ $totalBookings }}
-
-    </h2>
-
-    <p>
-
-        Total Bookings
-
-    </p>
-
-</div>
-
-<div class="stat-card approved">
-
-    <h2>
-
-       {{ $approvedBookings }}
-
-    </h2>
-
-    <p>
-
-        Approved
-
-    </p>
-
-</div>
-
-<div class="stat-card pending">
-
-    <h2>
-
-        {{ $pendingBookings }}
-
-    </h2>
-
-    <p>
-
-        Pending
-
-    </p>
-
-</div>
-
-<div class="stat-card rejected">
-
-    <h2>
-
-        {{ $rejectedBookings }}
-
-    </h2>
-
-    <p>
-
-        Rejected
-
-    </p>
-
-</div>
-
-<div class="stat-card cancelled">
-
-    <h2>
-
-        {{ $cancelledBookings }}
-    </h2>
-
-    <p>
-
-        Cancelled
-
-    </p>
-
-</div>
-
-
-</div>
-
-<br>
-
-@forelse($bookings as $booking)
+@forelse($spotBookings as $booking)
 
 <div class="admin-booking-card">
 
-```
-<div class="booking-header">
-
-    <div>
+    <div class="booking-header">
 
         <h2>
 
-            🏖️ {{ $booking->spot->name ?? 'Deleted Spot' }}
+            🏖 {{ $booking->spot->name ?? 'Deleted Spot' }}
 
         </h2>
 
-       
-
-    </div>
-
-    <div>
-
         @if($booking->status == 'approved')
 
-        <span class="status-approved">
-
-            Approved
-
-        </span>
+            <span class="status-approved">
+                Approved
+            </span>
 
         @elseif($booking->status == 'pending')
 
-        <span class="status-pending">
-
-            Pending
-
-        </span>
+            <span class="status-pending">
+                Pending
+            </span>
 
         @elseif($booking->status == 'cancelled')
 
-        <span class="status-cancelled">
-
-            Cancelled
-
-        </span>
+            <span class="status-cancelled">
+                Cancelled
+            </span>
 
         @else
 
-        <span class="status-rejected">
+            <span class="status-rejected">
+                Rejected
+            </span>
 
-            Rejected
+        @endif
 
-        </span>
+    </div>
+
+    <div class="booking-grid">
+
+        <div>
+
+            <strong>👤 User</strong>
+
+            <p>{{ $booking->user->name }}</p>
+
+        </div>
+
+        <div>
+
+            <strong>📅 Booking Date</strong>
+
+            <p>{{ \Carbon\Carbon::parse($booking->booking_date)->format('F d, Y') }}</p>
+
+        </div>
+
+        <div>
+
+            <strong>🎫 Quantity</strong>
+
+            <p>{{ $booking->quantity }}</p>
+
+        </div>
+
+        <div>
+
+            <strong>💰 Total</strong>
+
+            <p>₱{{ number_format($booking->total_price,2) }}</p>
+
+        </div>
+
+        @if($booking->payer_name)
+
+        <div>
+
+            <strong>👤 Payer</strong>
+
+            <p>{{ $booking->payer_name }}</p>
+
+        </div>
+
+        @endif
+
+        @if($booking->payer_number)
+
+        <div>
+
+            <strong>📱 Contact</strong>
+
+            <p>{{ $booking->payer_number }}</p>
+
+        </div>
+
+        @endif
+
+        @if($booking->receipt)
+
+        <div>
+
+            <strong>📄 Receipt</strong>
+
+            <p>
+
+                <a
+                href="{{ asset('uploads/receipts/'.$booking->receipt) }}"
+                target="_blank"
+                class="view-btn">
+
+                    View Receipt
+
+                </a>
+
+            </p>
+
+        </div>
 
         @endif
 
@@ -174,144 +151,357 @@ href="{{ asset('css/style.css') }}">
 
 </div>
 
-<div class="booking-grid">
+@empty
 
-    <div>
+<div class="empty-card">
 
-        <strong>
+    No Spot Bookings Found.
 
-            👤 User
+</div>
 
-        </strong>
+@endforelse
 
-        <p>
+<h2 class="section-title">
 
-            {{ $booking->user->name }}
+🏨 Hotel Bookings
 
-        </p>
+</h2>
 
-    </div>
+@forelse($hotelBookings as $booking)
 
-    <div>
+<div class="admin-booking-card">
 
-        <strong>
+    <div class="booking-header">
 
-            📅 Booking Date
+        <h2>
 
-        </strong>
+            🏨 {{ $booking->hotel->name ?? 'Deleted Hotel' }}
 
-        <p>
+        </h2>
 
-            {{ \Carbon\Carbon::parse($booking->booking_date)->format('F d, Y') }}
+        @if($booking->status == 'approved')
 
-        </p>
+            <span class="status-approved">
+                Approved
+            </span>
 
-    </div>
+        @elseif($booking->status == 'pending')
 
-    <div>
+            <span class="status-pending">
+                Pending
+            </span>
 
-        <strong>
+        @elseif($booking->status == 'cancelled')
 
-            🏠 Quantity
+            <span class="status-cancelled">
+                Cancelled
+            </span>
 
-        </strong>
+        @else
 
-        <p>
+            <span class="status-rejected">
+                Rejected
+            </span>
 
-            {{ $booking->quantity }}
-
-        </p>
-
-    </div>
-
-    <div>
-
-        <strong>
-
-            💰 Total
-
-        </strong>
-
-        <p>
-
-            ₱{{ number_format($booking->total_price,2) }}
-
-        </p>
+        @endif
 
     </div>
 
-    <div>
+    <div class="booking-grid">
 
-        <strong>
+        <div>
 
-            👤 Payer Name
+            <strong>👤 User</strong>
 
-        </strong>
+            <p>{{ $booking->user->name }}</p>
 
-        <p>
+        </div>
 
-            {{ $booking->payer_name ?? 'N/A' }}
+        <div>
 
-        </p>
+            <strong>📅 Check In</strong>
 
-    </div>
+            <p>{{ \Carbon\Carbon::parse($booking->check_in)->format('F d, Y') }}</p>
 
-    <div>
+        </div>
 
-        <strong>
+        <div>
 
-            📱 GCash Number
+            <strong>📅 Check Out</strong>
 
-        </strong>
+            <p>{{ \Carbon\Carbon::parse($booking->check_out)->format('F d, Y') }}</p>
 
-        <p>
+        </div>
 
-            {{ $booking->payer_number ?? 'N/A' }}
+        <div>
 
-        </p>
+            <strong>🚪 Rooms</strong>
+
+            <p>{{ $booking->rooms }}</p>
+
+        </div>
+
+        <div>
+
+            <strong>💰 Total Price</strong>
+
+            <p>₱{{ number_format($booking->total_price,2) }}</p>
+
+        </div>
+
+        @if($booking->payer_name)
+
+        <div>
+
+            <strong>👤 Payer</strong>
+
+            <p>{{ $booking->payer_name }}</p>
+
+        </div>
+
+        @endif
+
+        @if($booking->payer_number)
+
+        <div>
+
+            <strong>📱 Contact</strong>
+
+            <p>{{ $booking->payer_number }}</p>
+
+        </div>
+
+        @endif
+
+        @if($booking->receipt)
+
+        <div>
+
+            <strong>📄 Receipt</strong>
+
+            <p>
+
+                <a
+                href="{{ asset('uploads/receipts/'.$booking->receipt) }}"
+                target="_blank"
+                class="view-btn">
+
+                    View Receipt
+
+                </a>
+
+            </p>
+
+        </div>
+
+        @endif
 
     </div>
 
 </div>
-
-@if($booking->receipt)
-
-<div class="receipt-section">
-
-    <strong>
-
-        🧾 Payment Receipt
-
-    </strong>
-
-    <br><br>
-
-    <a
-    href="{{ asset('uploads/receipts/'.$booking->receipt) }}"
-    target="_blank">
-
-        <img
-        src="{{ asset('uploads/receipts/'.$booking->receipt) }}"
-        class="admin-receipt">
-
-    </a>
-
-</div>
-
-@endif
-```
-
-</div>
-
-<br>
 
 @empty
 
 <div class="empty-card">
 
-```
-No bookings found.
-```
+    No Hotel Bookings Found.
+
+</div>
+
+@endforelse
+
+<h2 class="section-title">
+
+🍽 Restaurant Bookings
+
+</h2>
+
+@forelse($foodBookings as $booking)
+
+<div class="admin-booking-card">
+
+    <div class="booking-header">
+
+        <h2>
+
+            🍽 {{ $booking->food->name ?? 'Deleted Restaurant' }}
+
+        </h2>
+
+        @if($booking->status == 'approved')
+
+            <span class="status-approved">
+
+                Approved
+
+            </span>
+
+        @elseif($booking->status == 'pending')
+
+            <span class="status-pending">
+
+                Pending
+
+            </span>
+
+        @elseif($booking->status == 'cancelled')
+
+            <span class="status-cancelled">
+
+                Cancelled
+
+            </span>
+
+        @else
+
+            <span class="status-rejected">
+
+                Rejected
+
+            </span>
+
+        @endif
+
+    </div>
+
+    <div class="booking-grid">
+
+        <div>
+
+            <strong>👤 User</strong>
+
+            <p>{{ $booking->user->name }}</p>
+
+        </div>
+
+        <div>
+
+            <strong>📅 Reservation Date</strong>
+
+            <p>
+
+                {{ \Carbon\Carbon::parse($booking->reservation_date)->format('F d, Y') }}
+
+            </p>
+
+        </div>
+
+        <div>
+
+            <strong>🕒 Reservation Time</strong>
+
+            <p>
+
+                {{ \Carbon\Carbon::parse($booking->reservation_time)->format('h:i A') }}
+
+            </p>
+
+        </div>
+
+        <div>
+
+            <strong>👥 Guests</strong>
+
+            <p>
+
+                {{ $booking->guests }}
+
+            </p>
+
+        </div>
+
+        <div>
+
+            <strong>💰 Total Payment</strong>
+
+            <p>
+
+                ₱{{ number_format($booking->total_price,2) }}
+
+            </p>
+
+        </div>
+
+        @if($booking->special_request)
+
+        <div>
+
+            <strong>📝 Special Request</strong>
+
+            <p>
+
+                {{ $booking->special_request }}
+
+            </p>
+
+        </div>
+
+        @endif
+
+        @if($booking->payer_name)
+
+        <div>
+
+            <strong>👤 Payer</strong>
+
+            <p>
+
+                {{ $booking->payer_name }}
+
+            </p>
+
+        </div>
+
+        @endif
+
+        @if($booking->payer_number)
+
+        <div>
+
+            <strong>📱 Contact</strong>
+
+            <p>
+
+                {{ $booking->payer_number }}
+
+            </p>
+
+        </div>
+
+        @endif
+
+        @if($booking->receipt)
+
+        <div>
+
+            <strong>📄 Receipt</strong>
+
+            <p>
+
+                <a
+                href="{{ asset('uploads/receipts/'.$booking->receipt) }}"
+                target="_blank"
+                class="view-btn">
+
+                    View Receipt
+
+                </a>
+
+            </p>
+
+        </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+@empty
+
+<div class="empty-card">
+
+    No Restaurant Bookings Found.
 
 </div>
 
@@ -320,5 +510,4 @@ No bookings found.
 </div>
 
 </body>
-
 </html>

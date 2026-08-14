@@ -22,6 +22,8 @@ return new class extends Migration
 
     $table->integer('rooms');
 
+    $table->decimal('total_price',10,2)->default(0);
+
     $table->enum(
         'status',
         [

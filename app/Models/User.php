@@ -21,6 +21,8 @@ use Illuminate\Notifications\Notifiable;
 'gcash_name',
 'bank_name',
 'bank_account_number',
+'is_online',
+
 ])]
 
 #[Hidden([

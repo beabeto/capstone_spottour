@@ -28,31 +28,40 @@ class NotificationController extends Controller
 
     public function open($id)
 {
-    $notification =
-        Notification::findOrFail($id);
+    $notification = Notification::findOrFail($id);
 
     $notification->update([
         'is_read' => 1
     ]);
 
-    if($notification->spot_id)
+    if($notification->food_id)
     {
         return redirect(
-    '/spots/' .
-    $notification->spot_id .
-    '#comment' .
-    $notification->comment_id
-);
+            '/foods/' .
+            $notification->food_id .
+            '#comment' .
+            $notification->comment_id
+        );
     }
 
     if($notification->hotel_id)
     {
         return redirect(
-    '/hotels/' .
-    $notification->hotel_id .
-    '#comment' .
-    $notification->comment_id
-);
+            '/hotels/' .
+            $notification->hotel_id .
+            '#comment' .
+            $notification->comment_id
+        );
+    }
+
+    if($notification->spot_id)
+    {
+        return redirect(
+            '/spots/' .
+            $notification->spot_id .
+            '#comment' .
+            $notification->comment_id
+        );
     }
 
     return redirect('/user');

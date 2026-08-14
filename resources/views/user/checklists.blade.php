@@ -1,9 +1,10 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
@@ -26,7 +27,7 @@ href="{{ asset('css/style.css') }}">
 
 <h1>✅ My Checklist</h1>
 
-{{-- SPOT CHECKLISTS --}}
+{{-- ================= SPOT CHECKLIST ================= --}}
 
 @if($checklists->count())
 
@@ -42,7 +43,7 @@ href="{{ asset('css/style.css') }}">
 
     <img
     src="{{ asset('uploads/spots/'.$checklist->spot->image) }}"
-    class="checklist-image">
+    class="favorite-image">
 
     <div class="favorite-content">
 
@@ -96,7 +97,7 @@ href="{{ asset('css/style.css') }}">
 @endif
 
 
-{{-- HOTEL CHECKLISTS --}}
+{{-- ================= HOTEL CHECKLIST ================= --}}
 
 @if($hotelChecklists->count())
 
@@ -166,9 +167,82 @@ href="{{ asset('css/style.css') }}">
 @endif
 
 
+{{-- ================= FOOD CHECKLIST ================= --}}
+
+@if($foodChecklists->count())
+
+<h2 class="section-title">
+
+    🍽 Restaurants
+
+</h2>
+
+@foreach($foodChecklists as $checklist)
+
+<div class="favorite-card">
+
+    <img
+    src="{{ asset('uploads/foods/'.$checklist->food->image) }}"
+    class="favorite-image">
+
+    <div class="favorite-content">
+
+        <h3>
+
+            {{ $checklist->food->name }}
+
+        </h3>
+
+        <p>
+
+            📍 {{ $checklist->food->location }}
+
+        </p>
+
+        <div class="favorite-rating">
+
+            ⭐ {{ number_format(
+                $checklist->food->ratings->avg('rating') ?? 0,
+                1
+            ) }}
+
+        </div>
+
+        <div class="favorite-actions">
+
+            <a
+            href="/foods/{{ $checklist->food->id }}"
+            class="view-btn">
+
+                View Restaurant
+
+            </a>
+
+            <a
+            href="/food/checklist/{{ $checklist->food->id }}"
+            class="remove-btn">
+
+                Remove
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endforeach
+
+@endif
+
+
+{{-- ================= EMPTY STATE ================= --}}
+
 @if(
     $checklists->count() == 0 &&
-    $hotelChecklists->count() == 0
+    $hotelChecklists->count() == 0 &&
+    $foodChecklists->count() == 0
 )
 
 <div class="empty-card">
@@ -181,8 +255,9 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        Start exploring spots and hotels
-        and add them to your checklist.
+        Start exploring tourist spots,
+        hotels, and restaurants and
+        add them to your checklist.
 
     </p>
 
@@ -195,4 +270,3 @@ href="{{ asset('css/style.css') }}">
 </body>
 
 </html>
-```

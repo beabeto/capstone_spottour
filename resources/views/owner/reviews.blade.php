@@ -14,29 +14,49 @@ href="{{ asset('css/style.css') }}">
 
 <div class="back-btn">
     <button onclick="history.back()">
-        ← 
+        ←
     </button>
 </div>
 
 <div class="notifications-container">
 
-<h1>
+<div class="spot-actions-top">
 
-⭐ Reviews & Feedback
+    <a
+    href="/owner/reviews"
+    class="view-btn">
 
-</h1>
+        ⭐ Reviews
+
+    </a>
+
+    <a
+    href="/owner/feedback"
+    class="bookmark-btn">
+
+        💬 Feedback Inbox
+
+    </a>
+
+</div>
+
+<br>
 
 @forelse($comments as $comment)
 
 <a
 
-@if(isset($comment->spot))
+@if(isset($comment->food))
 
-href="/owner/spots/{{ $comment->spot_id }}"
+href="/owner/foods/{{ $comment->food_id }}"
+
+@elseif(isset($comment->hotel))
+
+href="/owner/hotels/{{ $comment->hotel_id }}"
 
 @else
 
-href="/owner/hotels/{{ $comment->hotel_id }}"
+href="/owner/spots/{{ $comment->spot_id }}"
 
 @endif
 
@@ -63,23 +83,33 @@ class="review-link">
 
         <p>
 
-            @if(isset($comment->spot))
+            @if(isset($comment->food))
 
-                📍
+                🍽
 
                 <strong>
 
-                    {{ $comment->spot->name }}
+                    {{ $comment->food->name }}
 
                 </strong>
 
-            @else
+            @elseif(isset($comment->hotel))
 
                 🏨
 
                 <strong>
 
                     {{ $comment->hotel->name }}
+
+                </strong>
+
+            @else
+
+                📍
+
+                <strong>
+
+                    {{ $comment->spot->name }}
 
                 </strong>
 
@@ -93,17 +123,24 @@ class="review-link">
 
                 ⭐ Listing Rating:
 
-                @if(isset($comment->spot))
+                @if(isset($comment->food))
 
                     {{ number_format(
-                        $comment->spot->ratings->avg('rating') ?? 0,
+                        $comment->food->ratings->avg('rating') ?? 0,
+                        1
+                    ) }}
+
+                @elseif(isset($comment->hotel))
+
+                    {{ number_format(
+                        $comment->hotel->ratings->avg('rating') ?? 0,
                         1
                     ) }}
 
                 @else
 
                     {{ number_format(
-                        $comment->hotel->ratings->avg('rating') ?? 0,
+                        $comment->spot->ratings->avg('rating') ?? 0,
                         1
                     ) }}
 
@@ -131,7 +168,7 @@ class="review-link">
                 👍
 
                 {{ $comment->reactions
-                    ->where('reaction','like')
+                    ->where('type','like')
                     ->count() }}
 
             </span>
@@ -141,7 +178,7 @@ class="review-link">
                 👎
 
                 {{ $comment->reactions
-                    ->where('reaction','dislike')
+                    ->where('type','dislike')
                     ->count() }}
 
             </span>
