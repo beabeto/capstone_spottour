@@ -39,7 +39,15 @@ class InjectTheme
             $html = str_replace('</body>', $button.'</body>', $html);
         }
 
-        if (Auth::user()?->role === 'user' && ! str_contains($html, 'id="traveller-chat"')) {
+        $isLoggedInTraveller = Auth::check()
+            && Auth::user()?->role === 'user';
+        $isAuthSurface = $request->is('/')
+            || $request->is('login')
+            || $request->is('register')
+            || $request->is('password')
+            || $request->is('password/*');
+
+        if ($isLoggedInTraveller && ! $isAuthSurface && ! str_contains($html, 'id="traveller-chat"')) {
             $widget = view('user.partials.chat-widget')->render();
             $html = str_replace('</body>', $widget.'</body>', $html);
         }

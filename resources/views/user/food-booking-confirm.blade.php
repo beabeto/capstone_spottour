@@ -94,6 +94,18 @@ href="{{ asset('css/style.css') }}">
         <p><strong>Special Request:</strong> {{ $specialRequest }}</p>
         @endif
 
+        @if(($menus ?? collect())->isNotEmpty())
+            <div class="menu-confirm-list">
+                <strong>Menu items</strong>
+                <ul>
+                    @foreach($menus as $menu)
+                        <li>{{ $menu['name'] }} × {{ $menu['qty'] }} — PHP {{ number_format($menu['line_total'], 2) }}</li>
+                    @endforeach
+                </ul>
+                <p><strong>Menu total:</strong> PHP {{ number_format($menuTotal ?? 0, 2) }}</p>
+            </div>
+        @endif
+
         <p>
 
             <strong>Available Tables:</strong>
@@ -126,6 +138,7 @@ href="{{ asset('css/style.css') }}">
         <input type="hidden" name="guests" value="{{ $guests }}">
         <input type="hidden" name="special_request" value="{{ $specialRequest }}">
         <input type="hidden" name="package_id" value="{{ request('package_id') }}">
+        <input type="hidden" name="menu_items" value='@json($menus ?? [])'>
 
         <button
         type="submit"

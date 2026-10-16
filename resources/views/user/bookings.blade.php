@@ -317,6 +317,13 @@
 
         @endif
 
+        @if(!empty($booking->menu_items))
+            <div class="booking-info">
+                <strong>Menu items</strong>
+                {{ collect($booking->menu_items)->map(fn ($item) => ($item['name'] ?? 'Item').' × '.($item['qty'] ?? 0))->implode(', ') }}
+            </div>
+        @endif
+
         @if($booking->package_name)<div class="booking-info"><strong>Package</strong>{{ $booking->package_name }}</div>@endif
         <div class="booking-info"><strong>Payment method</strong>{{ \App\Support\PaymentChoice::label($booking->payment_method) }}</div>
             @include('partials.arrival-code', ['booking' => $booking])

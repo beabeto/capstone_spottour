@@ -13,6 +13,7 @@ class FoodBooking extends Model
     'reservation_time',
     'guests',
     'special_request',
+    'menu_items',
     'payer_name',
     'payer_number',
     'contact_email',
@@ -29,7 +30,10 @@ class FoodBooking extends Model
 
     protected function casts(): array
     {
-        return ['arrived_at' => 'datetime'];
+        return [
+            'arrived_at' => 'datetime',
+            'menu_items' => 'array',
+        ];
     }
 
     public function food()

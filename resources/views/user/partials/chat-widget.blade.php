@@ -1,3 +1,4 @@
+@if(Auth::check() && Auth::user()?->role === 'user')
 <link rel="stylesheet" href="{{ asset('css/traveller-chat.css') }}?v={{ filemtime(public_path('css/traveller-chat.css')) }}">
 <div id="traveller-chat" data-csrf="{{ csrf_token() }}" data-open="{{ request()->boolean('chat') ? '1' : '0' }}">
     <button type="button" class="chat-launcher" aria-label="Help" aria-expanded="false" aria-controls="travellerChatPanel">
@@ -24,3 +25,4 @@
     </section>
 </div>
 <script src="{{ asset('js/traveller-chat.js') }}?v={{ filemtime(public_path('js/traveller-chat.js')) }}"></script>
+@endif

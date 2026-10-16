@@ -71,6 +71,8 @@ class FoodController extends Controller
 
             'venue_capacity' => 'required|integer|min:1',
 
+            'price_per_guest' => 'nullable|numeric|min:0',
+
             'daily_booking_limit' => 'nullable|integer|min:1',
 
             'map_link' => 'nullable|url',
@@ -139,6 +141,8 @@ class FoodController extends Controller
             'venue_capacity' =>
                 $request->integer('venue_capacity'),
 
+            'price_per_guest' => $request->filled('price_per_guest') ? $request->input('price_per_guest') : 0,
+
             'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
 
             'map_link' =>
@@ -190,7 +194,107 @@ class FoodController extends Controller
         );
     }
 
-    
+    public function edit($id)
+    {
+        $food = Food::findOrFail($id);
+        abort_unless(
+            (int) $food->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin',
+            403
+        );
+
+        $owners = Auth::user()?->role === 'admin'
+            ? User::where('role', 'owner')->orderBy('name')->get()
+            : collect();
+
+        return view('owner.edit-food', compact('food', 'owners'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $food = Food::findOrFail($id);
+        abort_unless(
+            (int) $food->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin',
+            403
+        );
+
+        $isAdmin = Auth::user()?->role === 'admin';
+
+        $request->validate([
+            'name' => 'required|string|max:150',
+            'location' => 'required|string|max:255',
+            'description' => 'required|string',
+            'available_tables' => 'required|integer|min:1',
+            'venue_capacity' => 'required|integer|min:1',
+            'price_per_guest' => 'nullable|numeric|min:0',
+            'daily_booking_limit' => 'nullable|integer|min:1',
+            'map_link' => 'nullable|url',
+            'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
+        ]);
+
+        $image = $food->image;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $image = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/foods'), $image);
+        }
+
+        $gallery = $food->gallery_images ?? [];
+        foreach ($request->file('gallery_images', []) ?: [] as $file) {
+            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/foods'), $name);
+            $gallery[] = $name;
+        }
+
+        $coords = \App\Support\PlaceMap::locate(
+            $food->latitude,
+            $food->longitude,
+            $request->map_link,
+            (string) $request->name,
+            (string) $request->location
+        );
+
+        $food->update([
+            'owner_id' => $isAdmin ? $request->integer('owner_id') : $food->owner_id,
+            'name' => $request->name,
+            'location' => $request->location,
+            'description' => $request->description,
+            'available_tables' => $request->integer('available_tables'),
+            'venue_capacity' => $request->integer('venue_capacity'),
+            'price_per_guest' => $request->filled('price_per_guest') ? $request->input('price_per_guest') : ($food->price_per_guest ?? 0),
+            'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
+            'map_link' => $request->map_link,
+            'latitude' => $coords['latitude'] ?? $food->latitude,
+            'longitude' => $coords['longitude'] ?? $food->longitude,
+            'image' => $image,
+            'gallery_images' => $gallery,
+            'status' => $isAdmin ? $food->status : 'pending',
+        ]);
+
+        if (! $isAdmin) {
+            BookingNotice::admins(
+                Auth::user()->name.' updated the restaurant "'.$food->name.'" and it needs review.',
+                ['food_id' => $food->id],
+                [],
+                'listing'
+            );
+        }
+
+        return redirect($isAdmin ? '/admin/foods/'.$food->id : '/owner/foods/'.$food->id)
+            ->with('success', 'Restaurant updated successfully.');
+    }
+
+    public function delete($id)
+    {
+        $food = Food::findOrFail($id);
+        abort_unless((int) $food->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+
+        $food->delete();
+
+        return redirect(Auth::user()?->role === 'admin' ? '/admin/foods' : '/owner/foods')
+            ->with('success', 'Restaurant deleted successfully.');
+    }
 
     public function menus($id)
 {

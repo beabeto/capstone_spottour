@@ -2,9 +2,11 @@
 
 namespace App\Support;
 
+use App\Models\FoodMenu;
 use App\Models\HotelRoom;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class BookingExtras
 {
@@ -29,8 +31,56 @@ class BookingExtras
             ->find($request->integer('hotel_room_id'));
     }
 
-    public static function addPrice(float $total, ?Package $package): float
+    public static function menus(Request $request, int $foodId): Collection
     {
-        return $total + (float) ($package->price ?? 0);
+        $quantities = collect($request->input('menu_qty', []));
+        if ($quantities->isEmpty() && $request->filled('menu_items')) {
+            $decoded = json_decode((string) $request->input('menu_items'), true);
+            if (is_array($decoded)) {
+                $quantities = collect($decoded)
+                    ->mapWithKeys(fn ($row) => [(int) ($row['id'] ?? 0) => (int) ($row['qty'] ?? 0)]);
+            }
+        }
+
+        $ids = $quantities
+            ->filter(fn ($qty) => (int) $qty > 0)
+            ->keys()
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        return FoodMenu::where('food_id', $foodId)
+            ->whereIn('id', $ids)
+            ->get()
+            ->map(function (FoodMenu $menu) use ($quantities) {
+                $qty = max(0, (int) $quantities->get($menu->id, $quantities->get((string) $menu->id, 0)));
+                $price = (float) $menu->price;
+
+                return [
+                    'id' => $menu->id,
+                    'name' => $menu->name,
+                    'category' => $menu->category,
+                    'price' => $price,
+                    'qty' => $qty,
+                    'line_total' => $price * $qty,
+                    'image' => $menu->image,
+                ];
+            })
+            ->filter(fn (array $row) => $row['qty'] > 0)
+            ->values();
+    }
+
+    public static function menuTotal(Collection $menus): float
+    {
+        return (float) $menus->sum('line_total');
+    }
+
+    public static function addPrice(float $total, ?Package $package, float $extra = 0): float
+    {
+        return $total + (float) ($package->price ?? 0) + $extra;
     }
 }

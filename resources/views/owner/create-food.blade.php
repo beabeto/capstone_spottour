@@ -32,6 +32,7 @@
 <label>Description<textarea name="description" rows="4" required>{{ old('description') }}</textarea></label>
 <label>Available tables<input type="number" name="available_tables" min="1" value="{{ old('available_tables') }}" required></label>
 <label>Venue capacity<input type="number" name="venue_capacity" min="1" value="{{ old('venue_capacity') }}" placeholder="Total guests the restaurant can serve" required></label>
+<label>Price per guest<input type="number" name="price_per_guest" min="0" step="0.01" value="{{ old('price_per_guest') }}" placeholder="Table fee per guest"></label>
 <label>Bookings accepted per day<input type="number" name="daily_booking_limit" min="1" value="{{ old('daily_booking_limit') }}" placeholder="Leave blank for no daily limit"></label>
 <label>Google Maps link<input type="url" name="map_link" value="{{ old('map_link') }}" placeholder="https://maps.google.com/..."></label>
 <label>Restaurant cover image<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>

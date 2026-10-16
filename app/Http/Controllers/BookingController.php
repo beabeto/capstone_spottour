@@ -658,7 +658,7 @@ public function hotelBookingPage($id)
 
 public function foodBookingPage($id)
 {
-    $food = Food::with('packages')->findOrFail($id);
+    $food = Food::with(['packages', 'menus'])->findOrFail($id);
 
     return view('user.food-booking', compact('food'));
 }
@@ -984,13 +984,17 @@ public function foodConfirm(Request $request)
         'reservation_date' => 'required|date|after_or_equal:today',
         'reservation_time' => 'required|date_format:H:i',
         'guests' => 'required|integer|min:1',
+        'menu_qty' => 'nullable|array',
+        'menu_qty.*' => 'nullable|integer|min:0|max:50',
     ]);
 
-    $food = Food::with('packages')->findOrFail(
+    $food = Food::with(['packages', 'menus'])->findOrFail(
         $request->food_id
     );
 
     DailyCapacity::ensure('food', $food, [$request->reservation_date]);
+
+    $menus = BookingExtras::menus($request, $food->id);
 
     return view(
         'user.food-booking-confirm',
@@ -1000,6 +1004,8 @@ public function foodConfirm(Request $request)
             'reservationTime' => $request->reservation_time,
             'guests' => $request->integer('guests'),
             'specialRequest' => $request->input('special_request'),
+            'menus' => $menus,
+            'menuTotal' => BookingExtras::menuTotal($menus),
         ]
     );
 }
@@ -1014,7 +1020,9 @@ public function foodPaymentPage(Request $request)
     $food = Food::with('owner')->findOrFail($foodId);
     $guests = (int) $request->input('guests', old('guests', 1));
     $package = BookingExtras::package($request, 'food_id', $food->id);
-    $total = BookingExtras::addPrice((float) $food->price_per_guest * $guests, $package);
+    $menus = BookingExtras::menus($request, $food->id);
+    $menuTotal = BookingExtras::menuTotal($menus);
+    $total = BookingExtras::addPrice((float) $food->price_per_guest * $guests, $package, $menuTotal);
 
     return view('user.food-payment', [
         'food' => $food,
@@ -1022,6 +1030,8 @@ public function foodPaymentPage(Request $request)
         'reservation_time' => $request->input('reservation_time', old('reservation_time')),
         'guests' => $guests,
         'special_request' => $request->input('special_request', old('special_request')),
+        'menus' => $menus,
+        'menuTotal' => $menuTotal,
         'total' => $total,
     ]);
 }
@@ -1033,6 +1043,9 @@ public function foodStore(Request $request)
         'reservation_date' => 'required|date',
         'reservation_time' => 'required|date_format:H:i',
         'guests' => 'required|integer|min:1',
+        'menu_items' => 'nullable|string',
+        'menu_qty' => 'nullable|array',
+        'menu_qty.*' => 'nullable|integer|min:0|max:50',
     ], PaymentChoice::rules()));
     PaymentChoice::validateNumbers($request, $validator);
     $validator->validate();
@@ -1044,7 +1057,9 @@ public function foodStore(Request $request)
     DailyCapacity::ensure('food', $food, [$request->reservation_date]);
 
     $package = BookingExtras::package($request, 'food_id', $food->id);
-    $total = BookingExtras::addPrice((float) $food->price_per_guest * $request->guests, $package);
+    $menus = BookingExtras::menus($request, $food->id);
+    $menuTotal = BookingExtras::menuTotal($menus);
+    $total = BookingExtras::addPrice((float) $food->price_per_guest * $request->guests, $package, $menuTotal);
 
     if (PaymentChoice::hosted($request->payment_method) && ($response = $this->rejectCheapWallet($total))) {
         return $response;
@@ -1057,6 +1072,7 @@ public function foodStore(Request $request)
         'reservation_time' => $request->reservation_time,
         'guests' => $request->guests,
         'special_request' => $request->special_request,
+        'menu_items' => $menus->all(),
         'package_id' => $package?->id,
         'package_name' => $package?->name,
         'total_price' => $total,

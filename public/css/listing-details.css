@@ -38,6 +38,37 @@ body.listing-detail .room-types-grid{gap:12px!important}
 body.listing-detail .room-types-grid article{padding:12px!important;border:1px solid #d7e8e3!important;border-left:0!important;border-radius:14px!important;background:#f7fcfa!important}
 body.listing-detail .room-types-grid article>img{height:150px!important;border-radius:10px!important}
 
+body.listing-detail .menu-reserve-block,
+body.booking-form-page .menu-reserve-block{margin:4px 0 14px;padding:14px;border:1px solid #d7e8e3;border-radius:14px;background:#f7fcfa}
+body.listing-detail .menu-reserve-head,
+body.booking-form-page .menu-reserve-head{display:grid;gap:2px;margin:0 0 12px}
+body.listing-detail .menu-reserve-head strong,
+body.booking-form-page .menu-reserve-head strong{color:#17473f;font-size:14px}
+body.listing-detail .menu-reserve-head span,
+body.booking-form-page .menu-reserve-head span{color:#607772;font-size:12px}
+body.listing-detail .menu-reserve-grid,
+body.booking-form-page .menu-reserve-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+body.listing-detail .menu-reserve-card,
+body.booking-form-page .menu-reserve-card{display:grid;gap:8px;margin:0;padding:10px;border:1px solid #d7e8e3;border-radius:12px;background:#fff;cursor:default}
+body.listing-detail .menu-reserve-card img,
+body.booking-form-page .menu-reserve-card img,
+body.listing-detail .menu-reserve-empty,
+body.booking-form-page .menu-reserve-empty{display:block;width:100%;height:110px;border-radius:10px;object-fit:cover;background:#e8f5f1}
+body.listing-detail .menu-reserve-empty,
+body.booking-form-page .menu-reserve-empty{display:grid;place-items:center;color:#607772;font-size:12px;font-weight:700}
+body.listing-detail .menu-reserve-meta,
+body.booking-form-page .menu-reserve-meta{display:grid;gap:4px}
+body.listing-detail .menu-reserve-meta strong,
+body.booking-form-page .menu-reserve-meta strong{color:#17473f;font-size:13px}
+body.listing-detail .menu-reserve-meta small,
+body.booking-form-page .menu-reserve-meta small{color:#607772;font-size:11px}
+body.listing-detail .menu-reserve-meta span,
+body.booking-form-page .menu-reserve-meta span{color:#167b69;font-size:13px;font-weight:800}
+body.listing-detail .menu-reserve-meta input,
+body.booking-form-page .menu-reserve-meta input{width:100%;min-height:40px;margin:4px 0 0;padding:0 10px;border:1px solid #d5ebe4;border-radius:9px;background:#fff;color:#203531;font:inherit}
+body.dashboard-body .menu-confirm-list{margin:12px 0;padding:12px;border:1px solid #e6f0ec;border-radius:12px;background:#f7fcfa}
+body.dashboard-body .menu-confirm-list ul{margin:8px 0;padding-left:18px;color:#48635c}
+
 body.listing-detail .comment-card{margin-top:12px!important;padding:16px!important;border:1px solid #e6f0ec!important;border-radius:14px!important;background:#f7fcfa!important;box-shadow:none!important}
 body.listing-detail .comment-card:hover{transform:none!important;box-shadow:none!important}
 body.listing-detail .comment-avatar{width:44px!important;height:44px!important;border:2px solid #fff!important;box-shadow:0 0 0 2px #b7ddd2!important}

@@ -327,6 +327,8 @@ min="1"
 max="{{ $food->available_tables }}"
 value="1">
 
+@include('user.partials.food-menu-picker', ['food' => $food])
+
 <button>
 
 Proceed To Reservation

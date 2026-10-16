@@ -265,6 +265,13 @@
                         @if($booking->food)<p>Price per guest: <strong>PHP {{ number_format($booking->food->price_per_guest, 2) }}</strong></p>@endif
                         <p>Guests: <strong>{{ $booking->guests }}</strong></p>
                         @if($booking->package_name)<p>Package: <strong>{{ $booking->package_name }}</strong></p>@endif
+                        @if(!empty($booking->menu_items))
+                            <p>Menu items:
+                                <strong>
+                                    {{ collect($booking->menu_items)->map(fn ($item) => ($item['name'] ?? 'Item').' × '.($item['qty'] ?? 0))->implode(', ') }}
+                                </strong>
+                            </p>
+                        @endif
                         <p>Total: <strong>PHP {{ number_format($booking->total_price, 2) }}</strong></p>
                         @if($booking->special_request)<p>Special request: <strong>{{ $booking->special_request }}</strong></p>@endif
                         @include('owner.partials.payment-proof', ['booking' => $booking])

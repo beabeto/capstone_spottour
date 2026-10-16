@@ -18,6 +18,7 @@ class Food extends Model
         'description',
         'available_tables',
         'venue_capacity',
+        'price_per_guest',
         'daily_booking_limit',
         'map_link',
         'latitude',

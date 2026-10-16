@@ -30,6 +30,10 @@
                     <div><dt>Date</dt><dd>{{ \Carbon\Carbon::parse($reservation_date)->format('M d, Y') }}</dd></div>
                     <div><dt>Time</dt><dd>{{ \Carbon\Carbon::parse($reservation_time)->format('h:i A') }}</dd></div>
                     <div><dt>Guests</dt><dd>{{ $guests }}</dd></div>
+                    @forelse(($menus ?? collect()) as $menu)
+                        <div><dt>{{ $menu['name'] }} × {{ $menu['qty'] }}</dt><dd>&#8369;{{ number_format($menu['line_total'], 2) }}</dd></div>
+                    @empty
+                    @endforelse
                 </dl>
                 <div class="amount-row"><span>Total due</span><strong>&#8369;{{ number_format($total, 2) }}</strong></div>
             </div>
@@ -43,6 +47,7 @@
                 <input type="hidden" name="guests" value="{{ $guests }}">
                 <input type="hidden" name="special_request" value="{{ $special_request }}">
                 <input type="hidden" name="package_id" value="{{ request('package_id') }}">
+                <input type="hidden" name="menu_items" value='@json($menus ?? [])'>
                 @include('user.partials.payment-choice', ['owner' => $food->owner, 'amount' => $total])
                 <button type="submit" class="submit-payment-btn">Continue</button>
             </form>
