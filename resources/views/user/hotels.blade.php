@@ -1,105 +1,59 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotels</title>
-
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
-
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-
-<body>
-
-<div class="page-container">
-
-<!-- BACK -->
+<body class="catalog-page">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← Back
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
-<br></br>
+<div class="catalog-shell">
+    <header class="catalog-heading">
+        <div>
+            <span>Explore</span>
+            <h1>Hotels</h1>
+            <p>Stays with nightly rates, room availability, and direct booking.</p>
+        </div>
+        <strong class="catalog-count">{{ $hotels->count() }} {{ $hotels->count() === 1 ? 'hotel' : 'hotels' }}</strong>
+    </header>
 
-<h1>
-
-🏨 Hotels
-
-</h1>
-
-<div class="spots-grid">
-
-@foreach($hotels as $hotel)
-
-<div class="spots-card">
-
-    @if($hotel->image)
-
-    <img
-    src="{{ asset('uploads/hotels/'.$hotel->image) }}"
-    class="spots-image">
-
-    @else
-
-    <img
-    src="https://via.placeholder.com/300x200"
-    class="spots-image">
-
-    @endif
-
-    <div class="spots-content">
-
-        <h3>
-
-            {{ $hotel->name }}
-
-        </h3>
-
-        <p>
-
-            📍 {{ $hotel->location }}
-
-        </p>
-
-        <p>
-
-            💰 ₱{{ number_format(
-                $hotel->price_per_night,
-                2
-            ) }}
-
-            / Night
-
-        </p>
-
-        <p>
-
-            🛏 {{ $hotel->available_rooms }}
-            Rooms Available
-
-        </p>
-
-        <a
-        href="/hotels/{{ $hotel->id }}"
-        class="view-btn">
-
-            View Details
-
+    @forelse($hotels as $hotel)
+        @if($loop->first)<div class="catalog-grid">@endif
+        <a class="catalog-card" href="/hotels/{{ $hotel->id }}">
+            <div class="catalog-media">
+                @if($hotel->image)
+                    <img src="{{ asset('uploads/hotels/'.$hotel->image) }}" alt="{{ $hotel->name }}">
+                @else
+                    <div class="catalog-fallback">No photo yet</div>
+                @endif
+                <span class="catalog-chip">Hotel</span>
+            </div>
+            <div class="catalog-body">
+                <h2>{{ $hotel->name }}</h2>
+                <p class="catalog-location">{{ $hotel->location }}</p>
+                <div class="catalog-meta">
+                    <span class="catalog-rating">{{ $hotel->ratings_avg_rating ? '★ '.number_format($hotel->ratings_avg_rating, 1) : 'New' }}</span>
+                    <span class="catalog-price">
+                        PHP {{ number_format((float) $hotel->price_per_night, 2) }}
+                        <small>{{ $hotel->available_rooms }} rooms open</small>
+                    </span>
+                </div>
+                <span class="catalog-action">View details</span>
+            </div>
         </a>
-
-    </div>
-
-</div>
-
-@endforeach
-
-</div>
-
+        @if($loop->last)</div>@endif
+    @empty
+        <div class="catalog-empty">
+            <h2>No hotels yet</h2>
+            <p>Approved stays will show up here.</p>
+        </div>
+    @endforelse
 </div>
 
 </body>
-
 </html>

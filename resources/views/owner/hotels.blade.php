@@ -10,15 +10,15 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body>
+<body class="owner-listing-page">
 
 <div class="page-container">
 
 <div class="header-row">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← Back
+    <button onclick="window.history.back(); return false;">
+         Back
     </button>
 </div>
 
@@ -100,7 +100,7 @@ class="table-image">
 
 <td>
 
-₱{{ number_format(
+PHP {{ number_format(
     $hotel->price_per_night,
     2
 ) }}
@@ -144,7 +144,7 @@ class="table-image">
 </td>
 
 <td>
-
+<div class="listing-action-row listing-action-top">
 <a
 href="/owner/hotels/{{ $hotel->id }}"
 class="view-btn">
@@ -153,6 +153,16 @@ View
 
 </a>
 
+<a
+href="/owner/hotels/{{ $hotel->id }}/rooms"
+class="listing-menu-btn">
+
+Rooms
+
+</a>
+</div>
+
+<div class="listing-action-row listing-action-bottom">
 <a
 href="/owner/hotels/edit/{{ $hotel->id }}"
 class="edit-btn">
@@ -171,6 +181,7 @@ onclick="return confirm(
 Delete
 
 </a>
+</div>
 
 </td>
 

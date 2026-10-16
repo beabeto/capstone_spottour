@@ -1,0 +1,124 @@
+body.listing-detail{background:#eef3f1!important;color:#203531!important}
+body.listing-detail .spot-details-container{width:min(980px,calc(100% - 40px))!important;margin:0 auto!important;padding:72px 0 64px!important}
+body.listing-detail .spot-hero{height:auto!important;margin:0 0 16px!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 24px rgba(23,71,63,.06)!important}
+body.listing-detail .hero-image{display:block;width:100%!important;height:380px!important;object-fit:cover!important;transform:none!important}
+body.listing-detail .hero-image:hover{transform:none!important}
+body.listing-detail .hero-overlay{position:static!important;width:auto!important;padding:20px 22px 18px!important;background:#fff!important;color:#203531!important}
+body.listing-detail .hero-overlay h1{margin:0 0 6px!important;color:#17473f!important;font-size:clamp(28px,4vw,36px)!important;letter-spacing:-.03em!important;line-height:1.15!important}
+body.listing-detail .hero-overlay p{margin:0!important;color:#607772!important;font-size:15px!important}
+body.listing-detail .hero-rating{margin-top:12px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#17473f!important;font-size:14px!important;backdrop-filter:none!important}
+body.listing-detail .score-stars{display:inline-flex;align-items:center;gap:3px;color:#d5e0dc;font-style:normal}
+body.listing-detail .score-stars .is-on{color:#e0a106}
+body.listing-detail .score-stars b{margin-left:6px;color:#17473f;font-size:14px}
+
+body.listing-detail .spot-actions-top{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;margin:0 0 16px!important}
+body.listing-detail .spot-actions-top a{box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 12px!important;border:1px solid #d5ebe4!important;border-radius:10px!important;background:#fff!important;color:#17473f!important;font-size:14px!important;font-weight:800!important}
+body.listing-detail .spot-actions-top a.is-saved{border-color:#167b69!important;background:#e7f5f0!important;color:#126a59!important}
+body.listing-detail .spot-actions-top .book-now-btn{border-color:#167b69!important;background:#167b69!important;color:#fff!important}
+body.listing-detail .spot-actions-top .book-now-btn:hover{border-color:#17473f!important;background:#17473f!important;color:#fff!important}
+
+body.listing-detail .listing-gallery{margin:0 0 14px!important;gap:10px!important}
+body.listing-detail .listing-gallery img{height:160px!important;border:1px solid #d7e8e3!important;border-radius:14px!important}
+body.listing-detail .spot-card{margin:0 0 14px!important;padding:22px!important;border:1px solid #d7e8e3!important;border-radius:16px!important;background:#fff!important;box-shadow:none!important}
+body.listing-detail .spot-card h2{margin:0 0 12px!important;color:#17473f!important;font-size:18px!important;letter-spacing:-.02em!important}
+body.listing-detail .spot-card>p{margin:0 0 8px!important;color:#48635c!important;line-height:1.55!important}
+body.listing-detail .spot-card form{max-width:none!important}
+body.listing-detail .spot-card form button:not(.menu-btn){width:100%!important;min-height:44px!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important;cursor:pointer}
+body.listing-detail .comment-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;margin-top:12px!important;padding-top:12px!important;border-top:1px solid #e6f0ec!important}
+body.listing-detail .comment-actions a{justify-content:center!important;min-height:38px!important;border:1px solid #d5ebe4!important;border-radius:10px!important;background:#fff!important;color:#17473f!important;font-weight:800!important}
+body.listing-detail .comment-actions a:first-child::before{content:'Like '}
+body.listing-detail .comment-actions a:nth-child(2)::before{content:'Dislike '}
+body.listing-detail .comment-dropdown.show{display:grid!important;gap:2px!important;padding:6px!important}
+body.listing-detail .comment-dropdown a{display:flex!important;align-items:center;min-height:36px;padding:0 10px!important;border-radius:8px!important}
+body.listing-detail .comment-dropdown a:hover{background:#f3faf7!important}
+body.listing-detail .map-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:40px;margin-top:8px!important;padding:0 14px!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important;text-decoration:none!important}
+body.listing-detail .map-btn:hover{background:#17473f!important}
+
+body.listing-detail .room-types-grid{gap:12px!important}
+body.listing-detail .room-types-grid article{padding:12px!important;border:1px solid #d7e8e3!important;border-left:0!important;border-radius:14px!important;background:#f7fcfa!important}
+body.listing-detail .room-types-grid article>img{height:150px!important;border-radius:10px!important}
+
+body.listing-detail .comment-card{margin-top:12px!important;padding:16px!important;border:1px solid #e6f0ec!important;border-radius:14px!important;background:#f7fcfa!important;box-shadow:none!important}
+body.listing-detail .comment-card:hover{transform:none!important;box-shadow:none!important}
+body.listing-detail .comment-avatar{width:44px!important;height:44px!important;border:2px solid #fff!important;box-shadow:0 0 0 2px #b7ddd2!important}
+body.listing-detail .menu-card{display:grid!important;grid-template-columns:84px minmax(0,1fr);gap:4px 14px;align-items:center}
+body.listing-detail .menu-card .comment-header{display:contents}
+body.listing-detail .menu-card .comment-avatar{grid-column:1;grid-row:1 / span 2;width:84px!important;height:84px!important;border-radius:12px!important;box-shadow:none!important}
+body.listing-detail .menu-card .comment-header>div{grid-column:2;grid-row:1}
+body.listing-detail .menu-card .comment-body{grid-column:2;grid-row:2;margin:0}
+body.listing-detail .menu-card .comment-body h3{margin:8px 0 0!important;color:#167b69!important;font-size:16px!important}
+body.listing-detail .review-image{border-radius:12px!important}
+
+body.booking-form-page{background:#eef3f1!important}
+body.booking-form-page .booking-form-shell{width:min(980px,calc(100% - 40px))!important;padding:72px 0 64px!important}
+body.booking-form-page .booking-form-heading{margin:0 0 16px!important;padding:22px 24px!important;border:1px solid #d5ebe4!important;border-radius:18px!important;background:linear-gradient(120deg,#e5f6f0 0%,#fff 62%)!important}
+body.booking-form-page .booking-form-heading h1{color:#17473f!important;font-size:clamp(28px,4vw,34px)!important;letter-spacing:-.03em!important}
+body.booking-form-page form.spot-card{display:grid!important;gap:14px!important;margin:0!important;padding:22px!important;border:1px solid #d7e8e3!important;border-radius:16px!important;background:#fff!important;box-shadow:none!important}
+body.booking-form-page form.spot-card label{display:grid;gap:6px;color:#48635c;font-size:13px;font-weight:800}
+body.booking-form-page form.spot-card input{width:100%!important;margin:0!important;padding:12px 14px!important;border:1px solid #d5ebe4!important;border-radius:10px!important;background:#fff!important;color:#203531;font:inherit}
+body.booking-form-page form.spot-card label.guide-option{display:flex!important;align-items:center;gap:10px;font-weight:800;color:#17473f}
+body.booking-form-page form.spot-card label.guide-option input{width:18px!important;min-width:18px;height:18px;margin:0!important;padding:0!important;border-radius:4px!important}
+body.booking-form-page .booking-estimate{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:12px;background:#f6fbf9}
+body.booking-form-page .booking-estimate strong{color:#17473f;font-size:18px}
+body.booking-form-page .submit-payment-btn{width:100%!important;min-height:46px!important;margin:0!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important;cursor:pointer}
+body.booking-form-page .submit-payment-btn:hover{background:#17473f!important}
+
+body.dashboard-body .booking-confirm-container{width:min(980px,calc(100% - 40px))!important;padding:72px 0 64px!important}
+body.dashboard-body .booking-confirm-card{padding:22px!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:none!important}
+body.dashboard-body .booking-confirm-card h1{margin:0 0 16px!important;color:#17473f!important;font-size:clamp(28px,4vw,34px)!important;letter-spacing:-.03em!important}
+body.dashboard-body .confirm-image{display:block;width:100%!important;height:280px!important;margin:0 0 16px!important;border-radius:14px!important;object-fit:cover}
+body.dashboard-body .booking-confirm-card .payment-btn,body.dashboard-body .booking-confirm-card button{display:flex!important;align-items:center;justify-content:center;width:100%!important;min-height:46px!important;margin-top:16px!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important;cursor:pointer}
+
+body.payment-page{background:#eef3f1!important}
+body.payment-page .checkout-shell{position:relative!important;width:min(980px,calc(100% - 40px))!important;padding:72px 0 56px!important}
+body.payment-page .checkout-toolbar{position:fixed!important;top:18px!important;left:18px!important;z-index:1100!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;margin:0!important;width:auto!important}
+body.payment-page .back-link{position:static!important;top:auto!important;left:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:76px!important;max-width:none!important;min-height:42px!important;height:42px!important;margin:0!important;padding:0 15px!important;border:1px solid #d7ebe4!important;border-radius:9px!important;background:#fff!important;color:#17473f!important;font-weight:800!important;box-shadow:0 2px 8px rgba(23,71,63,.08)!important;cursor:pointer!important}
+body.payment-page .back-link:hover{border-color:#167b69!important;background:#f3fbf8!important;color:#126a59!important}
+body.payment-page .checkout-heading{margin:0 0 16px!important;padding:22px 24px!important;border:1px solid #e7f3ef!important;border-radius:18px!important;background:#fbfefd!important}
+body.payment-page .checkout-heading .eyebrow{color:#167b69!important}
+body.payment-page .checkout-heading h1{margin:0 0 6px!important;color:#17473f!important;font-size:clamp(28px,4vw,34px)!important;letter-spacing:-.03em!important}
+body.payment-page .checkout-heading p{margin:0!important;color:#607772!important}
+body.payment-page .order-card,body.payment-page .payment-form-card{border:1px solid #d7e8e3!important;border-radius:16px!important;box-shadow:0 10px 24px rgba(23,71,63,.06)!important}
+body.payment-page .amount-row strong{color:#17473f!important}
+body.payment-page .pay-option input{accent-color:#167b69!important}
+body.payment-page .submit-payment-btn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:48px!important;margin:4px 0 0!important;padding:0 16px!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-size:15px!important;font-weight:800!important;box-shadow:none!important;cursor:pointer!important}
+body.payment-page .submit-payment-btn:hover{background:#12685a!important;color:#fff!important}
+body.payment-page .pay-alert{margin:0 0 14px;padding:12px 14px;border:1px solid #f0c7c2;border-radius:12px;background:#fff5f4;color:#9f2d24;font-size:14px;font-weight:700;line-height:1.45}
+body.payment-page .pay-alert.is-note{border-color:#cfe5de;background:#f3faf7;color:#31564d}
+body.payment-page .pay-methods{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px;padding:0;border:0}
+body.payment-page .pay-methods legend{grid-column:1 / -1;margin:0 0 2px;color:#17473f;font-size:15px;font-weight:800}
+body.payment-page .pay-option{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px;border:1px solid #d5ebe4;border-radius:12px;background:#fff;cursor:pointer}
+body.payment-page .pay-option.is-disabled{opacity:.55;cursor:not-allowed;background:#f7faf9}
+body.payment-page .pay-option:has(input:checked){border-color:#167b69;background:#e7f5f0}
+body.payment-page .pay-option input{width:18px!important;min-width:18px;height:18px;margin:3px 0 0!important}
+body.payment-page .pay-option span{display:grid;gap:2px}
+body.payment-page .pay-option strong{color:#17473f;font-size:14px}
+body.payment-page .pay-option small{color:#607772;font-size:12px;font-weight:600;line-height:1.35}
+body.payment-page .pay-panel{margin:0 0 14px;padding:14px 16px;border-radius:12px;background:#f6fbf9;color:#17473f}
+body.payment-page .pay-panel[hidden]{display:none!important}
+body.payment-page .pay-panel p{margin:6px 0 0;color:#48635c;font-size:14px;line-height:1.45}
+body.payment-page .pay-panel img{width:120px;height:120px;margin-top:10px;object-fit:contain;border-radius:8px;background:#fff}
+body.payment-page .pay-proof .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+body.payment-page .pay-proof label{display:grid;gap:6px;color:#48635c;font-size:13px;font-weight:800}
+body.payment-page .pay-proof input{width:100%;margin:0;padding:12px 14px;border:1px solid #d5ebe4;border-radius:10px;background:#fff;font:inherit}
+body.payment-page .pay-proof.is-cash .pay-account{display:none}
+body.payment-page .pay-note{margin:0 0 14px;color:#607772;font-size:13px}
+body.payment-page .form-error{margin:0 0 10px;color:#b42318;font-size:13px;font-weight:700}
+
+body.listing-detail .dashboard-container,body.listing-detail>.spot-card,body.listing-detail>.page-container{box-sizing:border-box!important;width:min(980px,calc(100% - 40px))!important;max-width:none!important;margin:72px auto 64px!important;padding:22px!important}
+body.listing-detail .dashboard-container{padding:72px 0 64px!important;margin:0 auto!important}
+body.listing-detail .dashboard-container>.spot-card{margin:0!important}
+body.listing-detail>.page-container form,body.listing-detail>.spot-card form{display:grid;gap:12px}
+body.listing-detail>.page-container textarea,body.listing-detail>.spot-card textarea,body.listing-detail .dashboard-container textarea{width:100%!important;min-height:140px;padding:12px 14px!important;border:1px solid #d5ebe4!important;border-radius:10px!important}
+body.listing-detail>.page-container button,body.listing-detail>.spot-card button{width:100%!important;min-height:44px!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important}
+
+@media(max-width:760px){
+    body.listing-detail .spot-details-container,body.booking-form-page .booking-form-shell,body.dashboard-body .booking-confirm-container,body.payment-page .checkout-shell,body.listing-detail .dashboard-container{width:min(100% - 24px,980px)!important}
+    body.listing-detail .spot-hero{height:auto!important}
+    body.listing-detail .hero-image{height:240px!important}
+    body.listing-detail .spot-actions-top{grid-template-columns:1fr 1fr!important}
+    body.listing-detail .menu-card{grid-template-columns:72px minmax(0,1fr)}
+    body.payment-page .pay-methods,body.payment-page .pay-proof .form-grid{grid-template-columns:1fr}
+    body.payment-page .checkout-shell{padding-top:70px!important}
+    body.payment-page .checkout-toolbar{top:12px!important;left:12px!important}
+}

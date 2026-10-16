@@ -13,9 +13,7 @@ href="{{ asset('css/style.css') }}">
 <body class="dashboard-body">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <div class="spot-form-container">
@@ -24,7 +22,7 @@ href="{{ asset('css/style.css') }}">
 
 <h1>
 
-✏️ Edit Hotel
+ Edit Hotel
 
 </h1>
 

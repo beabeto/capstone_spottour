@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Food extends Model
 {
+    use SoftDeletes;
     protected $table = 'foods';
 
     protected $fillable = [
@@ -16,11 +18,20 @@ class Food extends Model
         'description',
         'available_tables',
         'venue_capacity',
+        'daily_booking_limit',
         'map_link',
+        'latitude',
+        'longitude',
         'image',
+        'gallery_images',
         'status'
 
     ];
+
+    protected function casts(): array
+    {
+        return ['gallery_images' => 'array'];
+    }
 
     public function menus()
 {
@@ -55,6 +66,11 @@ public function checklists()
 public function bookings()
 {
     return $this->hasMany(FoodBooking::class);
+}
+
+public function packages()
+{
+    return $this->hasMany(Package::class);
 }
 
 public function owner()

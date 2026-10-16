@@ -16,9 +16,76 @@ use App\Models\HotelComment;
 use App\Models\FoodComment;
 
 use Illuminate\Support\Facades\Auth;
+use App\Models\Notification;
+use App\Support\UpcomingReservations;
 
 class OwnerController extends Controller
 {
+    /** Data source for the revenue period picker on the owner dashboard. */
+    public function revenuePeriod(Request $request)
+    {
+        $period = $request->string('period', 'year')->toString();
+        abort_unless(in_array($period, ['today', 'week', 'month', 'year'], true), 422);
+        $ownerId = Auth::id();
+        $start = match ($period) {
+            'today' => now()->startOfDay(),
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            default => now()->startOfYear(),
+        };
+
+        $spot = Booking::where('status', 'approved')->where('created_at', '>=', $start)->whereHas('spot', fn ($q) => $q->where('user_id', $ownerId))->get(['created_at', 'total_price']);
+        $hotel = HotelBooking::where('status', 'approved')->where('created_at', '>=', $start)->whereHas('hotel', fn ($q) => $q->where('owner_id', $ownerId))->get(['created_at', 'total_price']);
+        $food = FoodBooking::where('status', 'approved')->where('created_at', '>=', $start)->whereHas('food', fn ($q) => $q->where('owner_id', $ownerId))->get(['created_at', 'total_price']);
+        $all = $spot->concat($hotel)->concat($food);
+
+        $label = match ($period) {
+            'today' => 'Today\'s Revenue',
+            'week' => 'This Week\'s Revenue',
+            'month' => 'This Month\'s Revenue',
+            default => 'This Year\'s Revenue',
+        };
+
+        if ($period === 'today') {
+            $keys = range(0, 23);
+            $labels = collect($keys)->map(fn ($hour) => sprintf('%02d:00', $hour))->all();
+            $data = collect($keys)->map(fn ($hour) => (float) $all->filter(fn ($booking) => $booking->created_at->hour === $hour)->sum('total_price'))->all();
+        } elseif ($period === 'week') {
+            $keys = range(0, 6);
+            $labels = collect($keys)->map(fn ($day) => now()->startOfWeek()->addDays($day)->format('D'))->all();
+            $data = collect($keys)->map(fn ($day) => (float) $all->filter(fn ($booking) => $booking->created_at->isSameDay(now()->startOfWeek()->addDays($day)))->sum('total_price'))->all();
+        } elseif ($period === 'month') {
+            $keys = range(1, now()->daysInMonth);
+            $labels = collect($keys)->map(fn ($day) => (string) $day)->all();
+            $data = collect($keys)->map(fn ($day) => (float) $all->filter(fn ($booking) => $booking->created_at->day === $day)->sum('total_price'))->all();
+        } else {
+            $keys = range(1, 12);
+            $labels = collect($keys)->map(fn ($month) => now()->setMonth($month)->format('M'))->all();
+            $data = collect($keys)->map(fn ($month) => (float) $all->filter(fn ($booking) => $booking->created_at->month === $month)->sum('total_price'))->all();
+        }
+        return response()->json(['label' => $label, 'labels' => $labels, 'data' => $data]);
+    }
+
+    public function bookingPeriod(Request $request)
+    {
+        $period = $request->string('period', 'month')->toString();
+        abort_unless(in_array($period, ['month', 'year'], true), 422);
+        $ownerId = Auth::id();
+        $start = $period === 'month' ? now()->startOfMonth() : now()->startOfYear();
+        $spot = Booking::where('created_at', '>=', $start)->whereHas('spot', fn ($q) => $q->where('user_id', $ownerId))->get(['created_at']);
+        $hotel = HotelBooking::where('created_at', '>=', $start)->whereHas('hotel', fn ($q) => $q->where('owner_id', $ownerId))->get(['created_at']);
+        $food = FoodBooking::where('created_at', '>=', $start)->whereHas('food', fn ($q) => $q->where('owner_id', $ownerId))->get(['created_at']);
+        $all = $spot->concat($hotel)->concat($food);
+        if ($period === 'month') {
+            $labels = collect(range(1, now()->daysInMonth))->map(fn ($day) => (string) $day)->all();
+            $data = collect(range(1, now()->daysInMonth))->map(fn ($day) => $all->filter(fn ($booking) => $booking->created_at->day === $day)->count())->all();
+            return response()->json(['label' => "This Month's Bookings", 'labels' => $labels, 'data' => $data]);
+        }
+        $labels = collect(range(1, 12))->map(fn ($month) => now()->setMonth($month)->format('M'))->all();
+        $data = collect(range(1, 12))->map(fn ($month) => $all->filter(fn ($booking) => $booking->created_at->month === $month)->count())->all();
+        return response()->json(['label' => "This Year's Bookings", 'labels' => $labels, 'data' => $data]);
+    }
+
     public function dashboard()
 {
     $ownerId = Auth::id();
@@ -274,7 +341,8 @@ $latestBookings = $latestSpotBookings
 
 $latestSpotReviews = SpotComment::with(
     'user',
-    'spot'
+    'spot.ratings',
+    'ratings'
 )
 ->whereHas('spot', function ($query) use ($ownerId) {
 
@@ -290,7 +358,8 @@ $latestSpotReviews = SpotComment::with(
 
 $latestHotelReviews = HotelComment::with(
     'user',
-    'hotel'
+    'hotel.ratings',
+    'ratings'
 )
 ->whereHas('hotel', function ($query) use ($ownerId) {
 
@@ -306,7 +375,8 @@ $latestHotelReviews = HotelComment::with(
 
 $latestFoodReviews = FoodComment::with(
     'user',
-    'food'
+    'food.ratings',
+    'ratings'
 )
 ->whereHas('food', function ($query) use ($ownerId) {
 
@@ -638,94 +708,21 @@ FoodBooking::whereHas(
 
 
 
-/*
-|--------------------------------------------------------------------------
-| UPCOMING BOOKINGS
-|--------------------------------------------------------------------------
-*/
+$upcomingBookings = UpcomingReservations::list($ownerId);
 
-$upcomingSpotBookings = Booking::with('user','spot')
-    ->where('booking_date', '>=', now()->toDateString())
-    ->whereHas('spot', function ($query) use ($ownerId) {
-
-        $query->where('user_id', $ownerId);
-
+$dayPlans = \App\Models\DayPlan::with(['user', 'spot', 'hotel', 'food'])
+    ->whereDate('plan_date', '>=', now()->toDateString())
+    ->where(function ($query) use ($ownerId) {
+        $query->whereHas('spot', fn ($spot) => $spot->where('user_id', $ownerId))
+            ->orWhereHas('hotel', fn ($hotel) => $hotel->where('owner_id', $ownerId))
+            ->orWhereHas('food', fn ($food) => $food->where('owner_id', $ownerId));
     })
+    ->orderBy('plan_date')
+    ->take(6)
     ->get();
 
-$upcomingHotelBookings = HotelBooking::with('user','hotel')
-    ->where('check_in', '>=', now()->toDateString())
-    ->whereHas('hotel', function ($query) use ($ownerId) {
-
-        $query->where('owner_id', $ownerId);
-
-    })
-    ->get();
-
-$upcomingFoodBookings = FoodBooking::with('user','food')
-    ->where('reservation_date', '>=', now()->toDateString())
-    ->whereHas('food', function ($query) use ($ownerId) {
-
-        $query->where('owner_id', $ownerId);
-
-    })
-    ->get();
-
-$upcomingBookings = collect();
-
-foreach($upcomingSpotBookings as $booking){
-
-    $upcomingBookings->push((object)[
-
-    'customer' => $booking->user->name,
-    'listing' => optional($booking->spot)->name,
-    'category' => 'Spot',
-    'date' => $booking->booking_date,
-    'status' => $booking->status
-
-]);
-
-}
-
-foreach($upcomingHotelBookings as $booking){
-
-   $upcomingBookings->push((object)[
-
-        'customer' => $booking->user->name,
-
-        'listing' => optional($booking->hotel)->name,
-
-        'category' => 'Hotel',
-
-        'date' => $booking->check_in,
-
-        'status' => $booking->status
-
-    ]);
-
-}
-
-foreach($upcomingFoodBookings as $booking){
-
-    $upcomingBookings->push((object)[
-
-        'customer' => $booking->user->name,
-
-        'listing' => optional($booking->food)->name,
-
-        'category' => 'Restaurant',
-
-        'date' => $booking->reservation_date,
-
-        'status' => $booking->status
-
-    ]);
-
-}
-
-$upcomingBookings = $upcomingBookings
-    ->sortBy('date')
-    ->take(5);
+$notifications = Notification::where('user_id', $ownerId)->latest()->take(6)->get();
+$unreadCount = Notification::where('user_id', $ownerId)->where('is_read', false)->count();
 
     
     return view(
@@ -747,7 +744,10 @@ $upcomingBookings = $upcomingBookings
         'totalCustomers',
         'revenueLabels',
         'revenueData',
-        'upcomingBookings'
+        'upcomingBookings',
+        'dayPlans',
+        'notifications',
+        'unreadCount'
     )
 );
 }
@@ -756,70 +756,32 @@ $upcomingBookings = $upcomingBookings
 {
     $ownerId = Auth::id();
 
-    // SPOT COMMENTS
-    $spotComments = SpotComment::with(
-        'user',
-        'spot',
-        'spot.ratings',
-        'ratings',
-        'reactions'
-    )
-    ->whereHas('spot', function ($query) use ($ownerId) {
+    $listings = collect()
+        ->concat(Spot::with('ratings.user')->where('user_id', $ownerId)->get()->map(fn ($spot) => (object) [
+            'kind' => 'spot',
+            'type' => 'Tourist spot',
+            'name' => $spot->name,
+            'url' => '/owner/spots/'.$spot->id,
+            'ratings' => $spot->ratings,
+        ]))
+        ->concat(Hotel::with('ratings.user')->where('owner_id', $ownerId)->get()->map(fn ($hotel) => (object) [
+            'kind' => 'hotel',
+            'type' => 'Hotel',
+            'name' => $hotel->name,
+            'url' => '/owner/hotels/'.$hotel->id,
+            'ratings' => $hotel->ratings,
+        ]))
+        ->concat(Food::with('ratings.user')->where('owner_id', $ownerId)->get()->map(fn ($food) => (object) [
+            'kind' => 'food',
+            'type' => 'Restaurant',
+            'name' => $food->name,
+            'url' => '/owner/foods/'.$food->id,
+            'ratings' => $food->ratings,
+        ]))
+        ->sortByDesc(fn ($listing) => optional($listing->ratings->max('created_at'))->timestamp ?? 0)
+        ->values();
 
-        $query->where(
-            'user_id',
-            $ownerId
-        );
-
-    })
-    ->get();
-
-    // HOTEL COMMENTS
-    $hotelComments = HotelComment::with(
-        'user',
-        'hotel',
-        'hotel.ratings',
-        'ratings',
-        'reactions'
-    )
-    ->whereHas('hotel', function ($query) use ($ownerId) {
-
-        $query->where(
-            'owner_id',
-            $ownerId
-        );
-
-    })
-    ->get();
-
-    // FOOD COMMENTS
-    $foodComments = FoodComment::with(
-        'user',
-        'food',
-        'food.ratings',
-        'ratings',
-        'reactions'
-    )
-    ->whereHas('food', function ($query) use ($ownerId) {
-
-        $query->where(
-            'owner_id',
-            $ownerId
-        );
-
-    })
-    ->get();
-
-    // COMBINE ALL COMMENTS
-    $comments = $spotComments
-        ->concat($hotelComments)
-        ->concat($foodComments)
-        ->sortByDesc('created_at');
-
-    return view(
-        'owner.reviews',
-        compact('comments')
-    );
+    return view('owner.reviews', compact('listings'));
 }
        
 }

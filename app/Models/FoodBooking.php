@@ -15,14 +15,26 @@ class FoodBooking extends Model
     'special_request',
     'payer_name',
     'payer_number',
+    'contact_email',
+    'payment_method',
+    'payment_reference',
     'receipt',
     'total_price',
+    'package_id',
+    'package_name',
+    'arrival_code',
+    'arrived_at',
     'status'
 ];
 
+    protected function casts(): array
+    {
+        return ['arrived_at' => 'datetime'];
+    }
+
     public function food()
     {
-        return $this->belongsTo(Food::class);
+        return $this->belongsTo(Food::class)->withTrashed();
     }
 
     public function user()

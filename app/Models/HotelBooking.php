@@ -28,16 +28,39 @@ class HotelBooking extends Model
 
         'payer_number',
 
+        'contact_email',
+
+        'payment_method',
+
+        'payment_reference',
+
+        'hotel_room_id',
+
+        'room_name',
+
+        'package_id',
+
+        'package_name',
+
+        'arrival_code',
+
+        'arrived_at',
+
         'status'
 
     ];
+
+    protected function casts(): array
+    {
+        return ['arrived_at' => 'datetime'];
+    }
 
     public function hotel()
     {
         return $this->belongsTo(
             Hotel::class,
             'hotel_id'
-        );
+        )->withTrashed();
     }
 
     public function user()

@@ -3,96 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>All Activities</title>
-
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
-
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-<body class="admin-body">
-
-<div class="admin-main-full">
-
-<div class="back-btn">
-
-    <button onclick="history.back()">
-
-        ← 
-
-    </button>
-
-</div>
-
-<h1>
-
-    🕒 Recent Activities
-
-</h1>
-
+<body class="admin-body admin-detail-page">
+<div class="admin-main-full activity-page">
+<div class="back-btn"><button type="button" onclick="window.history.back(); return false;">Back</button></div>
+<header class="management-heading">
+<span>Admin</span>
+<h1>Recent Activities</h1>
+<p>Bookings, new listings, and new accounts.</p>
+</header>
 <div class="activity-list">
-
 @forelse($activities as $activity)
-
-<div class="activity-card">
-
-    <div class="activity-avatar">
-
-@if(!empty($activity['profile_image']))
-
-<img
-src="{{ asset('uploads/profile/'.$activity['profile_image']) }}"
-alt="Profile">
-
-@else
-
-<div class="activity-icon">
-
-    {{ $activity['icon'] }}
-
-</div>
-
-@endif
-
-</div>
-
-    <div class="activity-content">
-
-        <h4>
-
-            {{ $activity['title'] }}
-
-        </h4>
-
-        <p>
-
-            {{ $activity['message'] }}
-
-        </p>
-
-        <small>
-
-            {{ \Carbon\Carbon::parse($activity['date'])->diffForHumans() }}
-
-        </small>
-
-    </div>
-
-</div>
-
+@include('admin.partials.activity-row', ['activity' => $activity])
 @empty
-
-<div class="empty-state">
-
-    No activities found.
-
-</div>
-
+<div class="empty-state">No activities found.</div>
 @endforelse
-
 </div>
-
 </div>
-
 </body>
 </html>

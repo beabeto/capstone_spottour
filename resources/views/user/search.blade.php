@@ -24,9 +24,9 @@ href="{{ asset('css/user-dashboard.css') }}">
 
 <div class="back-btn">
 
-<button onclick="history.back()">
+<button onclick="window.history.back(); return false;">
 
-← Back
+ Back
 
 </button>
 
@@ -44,7 +44,7 @@ SEARCH HEADER
 
 <h1>
 
-🔍 Search Results
+ Search Results
 
 </h1>
 
@@ -62,6 +62,11 @@ Showing results for
 
 </div>
 
+<form action="/search" method="GET" class="search-results-form">
+    <input type="text" name="keyword" value="{{ $keyword }}" placeholder="Search spots, hotels, or restaurants" required>
+    <button type="submit">Search</button>
+</form>
+
 </div>
 
 </div>
@@ -76,7 +81,7 @@ TOURIST SPOTS
 
 <h2>
 
-📍 Tourist Spots
+ Tourist Spots
 
 </h2>
 
@@ -105,15 +110,15 @@ border-radius:15px;">
 
 <p>
 
-📍 {{ $spot->location }}
+ {{ $spot->location }}
 
 </p>
 
 <p>
 
-⭐
 
-{{ number_format(
+
+★ {{ number_format(
 $spot->ratings->avg('rating') ?? 0,
 1
 ) }}
@@ -126,7 +131,7 @@ href="/spots/{{ $spot->id }}"
 
 class="explore-btn">
 
-View Spot →
+View Spot
 
 </a>
 
@@ -148,7 +153,7 @@ View Spot →
 
 <h2>
 
-🏨 Hotels
+ Hotels
 
 </h2>
 
@@ -177,13 +182,13 @@ border-radius:15px;">
 
 <p>
 
-📍 {{ $hotel->location }}
+ {{ $hotel->location }}
 
 </p>
 
 <p>
 
-⭐ {{ number_format(
+ ★ {{ number_format(
 $hotel->ratings->avg('rating') ?? 0,
 1
 ) }}
@@ -196,7 +201,7 @@ href="/hotels/{{ $hotel->id }}"
 
 class="explore-btn">
 
-View Hotel →
+View Hotel
 
 </a>
 
@@ -219,7 +224,7 @@ View Hotel →
 
 <h2>
 
-🍽 Restaurants
+ Restaurants
 
 </h2>
 
@@ -248,13 +253,13 @@ border-radius:15px;">
 
 <p>
 
-📍 {{ $food->location }}
+ {{ $food->location }}
 
 </p>
 
 <p>
 
-⭐ {{ number_format(
+ ★ {{ number_format(
 $food->ratings->avg('rating') ?? 0,
 1
 ) }}
@@ -267,7 +272,7 @@ href="/foods/{{ $food->id }}"
 
 class="explore-btn">
 
-View Restaurant →
+View Restaurant
 
 </a>
 
@@ -294,7 +299,7 @@ $foods->count()==0
 
 <div class="empty-icon">
 
-🔍
+
 
 </div>
 
@@ -343,13 +348,13 @@ Back to Dashboard
 
 <h3>
 
-🌴 SpotTour
+ SpotTour
 
 </h3>
 
 <p>
 
-Explore • Book • Travel
+Explore - Book - Travel
 
 </p>
 

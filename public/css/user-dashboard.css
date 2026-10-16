@@ -9,6 +9,18 @@
     box-sizing:border-box;
 }
 
+/* Account menu icons and notification page spacing. */
+.notification-page{padding-top:78px!important}.notification-page .notification-page-header{margin-top:0!important}
+
+/* Final dashboard navigation alignment. */
+.dashboard-search{display:flex!important;align-items:center!important}
+.dashboard-search form{display:flex!important;align-items:stretch!important;width:100%!important;height:42px!important}
+.dashboard-search input{height:42px!important;box-sizing:border-box!important;margin:0!important;padding:0 14px!important;border:1px solid #bed9d2!important;border-right:0!important;border-radius:9px 0 0 9px!important;line-height:normal!important}
+.dashboard-search button{width:88px!important;height:42px!important;box-sizing:border-box!important;margin:0!important;padding:0 14px!important;border:1px solid #167b69!important;border-radius:0 9px 9px 0!important;background:#167b69!important;color:#fff!important;font-size:14px!important;font-weight:800!important;line-height:1!important}
+.dashboard-search button:hover{background:#17473f!important}
+.notification{position:relative!important}.notification-icon{display:flex!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;margin:0!important;padding:0!important;border:1px solid #c9e2da!important;border-radius:9px!important;background:#e8f5f1!important;color:#17473f!important;cursor:pointer!important;font-size:19px!important;line-height:1!important}.notification-icon:hover,.notification-icon[aria-expanded=true]{background:#d8eee7!important}.notification-menu{display:none;position:absolute;top:calc(100% + 9px);right:0;width:min(360px,calc(100vw - 24px));max-height:min(480px,calc(100vh - 92px));overflow:auto;border:1px solid #dcebe7;border-radius:13px;background:#fff;box-shadow:0 18px 42px rgba(23,71,63,.18);z-index:1300}.notification-menu.show-notification-menu{display:block}.notification-menu-header{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #dcebe7;color:#203531}.notification-menu-header a{color:#167b69;font-size:12px;font-weight:800;text-decoration:none}.notification-menu-list{padding:6px}.notification-menu-item{display:grid;grid-template-columns:9px minmax(0,1fr);gap:10px;padding:11px 10px;border-radius:9px;color:#314b45;text-decoration:none}.notification-menu-item:hover{background:#f0f8f5}.notification-menu-item strong{display:block;margin-bottom:3px;font-size:13px}.notification-menu-item small{display:-webkit-box;overflow:hidden;color:#71827f;font-size:12px;line-height:1.4;-webkit-line-clamp:2;-webkit-box-orient:vertical}.notification-menu-dot{width:7px;height:7px;margin-top:5px;border-radius:50%;background:#d7e1de}.notification-menu-dot.is-unread{background:#e8a21a}.notification-menu-empty{margin:0;padding:20px 14px;color:#71827f;text-align:center;font-size:13px}.user-menu{right:0!important}.user-menu a{display:flex!important;align-items:center!important;min-height:42px!important;padding:10px 16px!important;text-align:left!important}.welcome-content{display:flex!important;align-items:center!important;justify-content:space-between!important}.welcome-content>div{min-width:0}.welcome-content h1{margin:0 0 8px!important}.welcome-content p{max-width:620px!important}
+@media(max-width:650px){.dashboard-search form,.dashboard-search input,.dashboard-search button{height:40px!important}.dashboard-search button{width:78px!important}.notification-menu{right:-50px;width:min(340px,calc(100vw - 20px))}.welcome-content{align-items:flex-start!important}.welcome-avatar{margin-left:auto!important}}
+
 body.dashboard-body{
     font-family:Arial, Helvetica, sans-serif;
     background:#f5f7fb;
@@ -1335,3 +1347,164 @@ to{
 }
 
 }
+
+/* Shared SpotTour look for the user home. */
+body.dashboard-body{font-family:"Segoe UI",Arial,sans-serif!important;background:#f3f7f6!important;color:#203531!important}
+.dashboard-body .navbar{border-bottom:1px solid #d7e8e3!important;box-shadow:none!important}
+.dashboard-body .dashboard-container{width:min(1180px,calc(100% - 40px))!important}
+.dashboard-body .welcome-section{margin-top:8px!important;padding:28px 30px!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:linear-gradient(135deg,#e7f5f0,#fff)!important;box-shadow:none!important}
+.dashboard-body .welcome-content h1{margin:0 0 8px!important;color:#17473f!important;font-size:clamp(28px,4vw,36px)!important;letter-spacing:-.035em!important}
+.dashboard-body .welcome-content p{color:#607772!important;font-size:15px!important;line-height:1.55!important}
+.dashboard-body .welcome-avatar{width:86px!important;height:86px!important;border:4px solid #fff!important;box-shadow:0 0 0 3px #b7ddd2!important}
+.dashboard-body .section-header{margin:28px 0 14px!important}
+.dashboard-body .section-header h2{color:#17473f!important;font-size:22px!important;letter-spacing:-.03em}
+.dashboard-body .section-header p{color:#607772!important}
+.dashboard-body .city-map{margin-top:8px}
+.dashboard-body .city-map-card{position:relative;overflow:hidden;border:1px solid #d7e8e3;border-radius:16px;background:#fff;box-shadow:0 8px 22px rgba(23,71,63,.05)}
+.dashboard-body .city-map .section-header{align-items:center!important}
+.dashboard-body .city-map .map-filter{flex:0 0 auto;align-self:center;box-sizing:border-box;width:168px!important;min-width:168px!important;height:40px!important;margin:0!important;padding:0 34px 0 14px!important;border:1px solid #d5ebe4!important;border-radius:10px!important;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2317473f' d='M1.2 1.4 6 6.2l4.8-4.8'/%3E%3C/svg%3E") no-repeat right 12px center!important;color:#17473f!important;font:800 13px "Segoe UI",Arial,sans-serif!important;line-height:40px!important;appearance:none!important;cursor:pointer}
+.dashboard-body .city-map .map-filter:focus{border-color:#167b69!important;box-shadow:0 0 0 3px rgba(22,123,105,.16)!important;outline:none}
+.dashboard-body #place-map{height:480px;margin:14px;border-radius:12px;background:#e7f1ee}
+.dashboard-body .map-empty{margin:0;padding:0 16px 16px;color:#607772;text-align:center}
+.dashboard-body .place-pin{background:transparent;border:0}
+.dashboard-body .place-pin span{display:block;width:22px;height:22px;border:3px solid #fff;border-radius:50% 50% 50% 0;box-shadow:0 6px 12px rgba(23,71,63,.28);transform:rotate(-45deg)}
+.dashboard-body .place-popup{display:grid;gap:4px;min-width:180px}
+.dashboard-body .place-popup small{color:#167b69;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.dashboard-body .place-popup strong{color:#17473f;font-size:15px}
+.dashboard-body .place-popup p{margin:0;color:#607772;font-size:12px;line-height:1.4}
+.dashboard-body .place-popup div{display:flex;gap:10px;margin-top:6px}
+.dashboard-body .place-popup a{color:#167b69;font-size:13px;font-weight:800}
+.dashboard-body .explore-grid{gap:16px!important}
+.dashboard-body .explore-card{align-items:stretch!important;padding:0 0 18px!important;overflow:hidden!important;border:1px solid #d7e8e3!important;border-radius:16px!important;background:#fff!important;box-shadow:0 8px 22px rgba(23,71,63,.05)!important;text-align:left!important}
+.dashboard-body .explore-card:hover{transform:translateY(-3px)!important;box-shadow:0 14px 28px rgba(23,71,63,.1)!important}
+.dashboard-body .explore-card .explore-data-image{display:block;width:100%!important;height:168px!important;margin:0 0 16px!important;border-radius:0!important;object-fit:cover}
+.dashboard-body .explore-card h3,.dashboard-body .explore-card p{width:auto!important;padding:0 18px;text-align:left!important}
+.dashboard-body .explore-card h3{margin:0 0 6px!important;color:#17473f!important;font-size:20px!important}
+.dashboard-body .explore-card p{color:#607772!important}
+.dashboard-body .explore-card .explore-btn{align-self:flex-start!important;margin:14px 18px 0!important;background:#167b69!important;color:#fff!important}
+.dashboard-body .explore-card .explore-btn:hover{background:#17473f!important}
+.dashboard-body .stat-card,.dashboard-body .spot-card,.dashboard-body .favorite-card{border:1px solid #d7e8e3!important;border-radius:16px!important;box-shadow:0 8px 22px rgba(23,71,63,.05)!important}
+.dashboard-body .user-menu{overflow-x:hidden!important;overflow-y:auto!important}
+.dashboard-body .user-menu .logout-menu{width:auto!important;box-sizing:border-box!important;background:#fff1ef!important;color:#b42318!important;box-shadow:none!important}
+.dashboard-body .user-menu .logout-menu:hover{background:#ffe4e0!important;color:#8f1b12!important}
+@media(max-width:640px){.dashboard-body .dashboard-container{width:min(100% - 24px,1180px)!important}.dashboard-body .welcome-section{padding:22px!important}.dashboard-body .welcome-avatar{width:64px!important;height:64px!important}.dashboard-body #place-map{height:360px;margin:12px}.dashboard-body .city-map .section-header{align-items:flex-start!important;flex-direction:column}.dashboard-body .city-map .map-filter{width:100%!important;min-width:0!important}}
+
+/* Traveller account menu, home cards, and account pages. */
+.dashboard-body .welcome-kicker{margin:0 0 6px!important;color:#167b69!important;font-size:12px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase}
+.dashboard-body .user-menu{width:min(340px,calc(100vw - 24px))!important;padding:8px!important;border:1px solid #d5ebe4!important;border-radius:18px!important;background:#fff!important;box-shadow:0 24px 50px rgba(23,71,63,.18)!important}
+.dashboard-body .user-menu-profile{display:flex;align-items:center;gap:12px;margin:0 0 6px;padding:12px;border-radius:14px;background:linear-gradient(135deg,#e8f6f1,#fff)}
+.dashboard-body .user-menu-profile img{width:48px;height:48px;border:2px solid #fff;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px #b7ddd2}
+.dashboard-body .user-menu-profile strong{display:block;color:#17473f;font-size:15px;line-height:1.2}
+.dashboard-body .user-menu-profile small{display:block;margin-top:3px;color:#607772;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+.dashboard-body .user-menu a.menu-item{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;gap:12px!important;align-items:center!important;width:100%!important;min-height:62px!important;margin:2px 0!important;padding:8px 10px!important;border-radius:14px!important;color:#203531!important;text-decoration:none!important}
+.dashboard-body .user-menu a.menu-item:hover{background:#f3faf7!important;color:#17473f!important}
+.dashboard-body .menu-item-icon{display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:12px;background:#e7f5f0;color:#167b69}
+.dashboard-body .menu-item-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dashboard-body .menu-item-copy{display:grid;min-width:0;gap:2px}
+.dashboard-body .menu-item-copy strong{color:#17473f;font-size:14px;font-weight:800;line-height:1.2}
+.dashboard-body .menu-item-copy small{color:#6d827c;font-size:12px;font-weight:600;line-height:1.3}
+.dashboard-body .user-menu .logout-menu{margin-top:6px!important;background:#fff6f5!important;color:#9f2d24!important;box-shadow:none!important}
+.dashboard-body .user-menu .logout-menu .menu-item-icon{background:#ffe8e4;color:#b42318}
+.dashboard-body .user-menu .logout-menu .menu-item-copy strong{color:#9f2d24}
+.dashboard-body .user-menu .logout-menu:hover{background:#ffece9!important;color:#8f1b12!important}
+.dashboard-body .notification-menu{border-radius:18px;box-shadow:0 24px 50px rgba(23,71,63,.18)}
+.dashboard-body .notification-menu-header{padding:16px 16px 12px}
+.dashboard-body .notification-menu-item{padding:12px;border-radius:12px}
+.dashboard-body .explore-card{position:relative!important}
+.dashboard-body .explore-card:has(.explore-data-image) .explore-icon{position:absolute!important;top:136px;left:16px;z-index:1;width:44px!important;height:44px!important;margin:0!important;border:3px solid #fff;border-radius:14px!important;background:#e7f5f0!important;color:#167b69!important;font-size:20px!important;box-shadow:0 8px 16px rgba(23,71,63,.12)}
+.dashboard-body .explore-card:has(.explore-data-image) h3{padding-top:22px!important}
+.dashboard-body .explore-card:not(:has(.explore-data-image)) .explore-icon{width:52px!important;height:52px!important;margin:18px 18px 8px!important;border-radius:14px!important;background:#e7f5f0!important;color:#167b69!important;font-size:24px!important}
+.dashboard-body .booking-preview-card,.dashboard-body .empty-dashboard-card{border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 8px 22px rgba(23,71,63,.05)!important}
+.dashboard-body .booking-preview-content h3{color:#17473f!important}
+.dashboard-body .booking-category,.dashboard-body .booking-preview-content .booking-status{display:inline-flex;align-items:center;min-height:24px;margin:0 0 8px;padding:0 9px;border-radius:99px;background:#e7f5f0;color:#126a59;font-size:12px;font-weight:800}
+
+/* Compact dashboard density + organized trip panels */
+body.dashboard-body{font-size:15px!important;line-height:1.45!important}
+.dashboard-body .dashboard-container{width:min(1080px,calc(100% - 36px))!important;padding:18px 0 48px!important}
+.dashboard-body .navbar{padding:12px 18px!important}
+.dashboard-body .welcome-section{margin-top:4px!important;padding:22px 24px!important}
+.dashboard-body .welcome-content h1{font-size:clamp(24px,3.2vw,30px)!important}
+.dashboard-body .welcome-avatar{width:72px!important;height:72px!important}
+.dashboard-body .section-header{margin:22px 0 12px!important}
+.dashboard-body .section-header h2{font-size:18px!important;margin:0!important}
+.dashboard-body .section-header p{font-size:13px!important;margin:4px 0 0!important}
+.dashboard-body .stats-grid{gap:12px!important;margin:0 0 8px!important}
+.dashboard-body .stat-card{padding:16px!important}
+.dashboard-body .stat-card h2{font-size:26px!important;margin:8px 0 4px!important}
+.dashboard-body .stat-card p{font-size:13px!important}
+.dashboard-body .explore-grid{gap:14px!important}
+.dashboard-body .explore-card .explore-data-image{height:148px!important}
+.dashboard-body .explore-card h3{font-size:17px!important}
+.dashboard-body #place-map{height:390px!important;margin:12px!important}
+.dashboard-body .booking-preview-card{display:grid!important;grid-template-columns:140px minmax(0,1fr)!important;gap:0!important;margin:0 0 12px!important;overflow:hidden!important}
+.dashboard-body .booking-preview-image{width:140px!important;min-width:140px!important;height:112px!important}
+.dashboard-body .booking-preview-content{padding:14px 16px!important}
+.dashboard-body .booking-preview-content h3{font-size:17px!important;margin:0 0 6px!important}
+.dashboard-body .booking-preview-content p{font-size:13px!important;margin:0 0 8px!important}
+.dashboard-body .booking-preview-content .explore-btn{min-height:36px!important;padding:0 12px!important;font-size:13px!important}
+
+.dashboard-body .dashboard-panel{margin:8px 0 22px;padding:16px 16px 10px;border:1px solid #d7e8e3;border-radius:16px;background:#fff;box-shadow:0 8px 20px rgba(23,71,63,.04)}
+.dashboard-body .panel-header{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;margin:0 0 12px!important}
+.dashboard-body .panel-header.is-compact{margin:4px 0 10px!important}
+.dashboard-body .panel-header .view-all-link{flex:0 0 auto;color:#167b69;font-size:13px;font-weight:800;text-decoration:none}
+.dashboard-body .panel-divider{height:1px;margin:12px 0;background:#e7f0ed}
+.dashboard-body .trip-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;margin:0 0 10px;padding:10px;border:1px solid #e7f0ed;border-radius:12px;background:#fbfefd}
+.dashboard-body .trip-thumb{width:64px;height:64px;overflow:hidden;border-radius:10px;background:#e8f5f1}
+.dashboard-body .trip-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.dashboard-body .trip-thumb-fallback,.dashboard-body .trip-thumb.is-plan-mark{display:grid;place-items:center;width:100%;height:100%;color:#167b69;font-size:12px;font-weight:800}
+.dashboard-body .trip-copy{min-width:0}
+.dashboard-body .trip-kind{display:inline-flex;align-items:center;min-height:22px;margin:0 0 4px;padding:0 8px;border-radius:999px;background:#e7f5f0;color:#126a59;font-size:11px;font-weight:800}
+.dashboard-body .trip-copy h3{margin:0 0 3px;color:#17473f;font-size:15px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dashboard-body .trip-copy p{margin:0;color:#607772;font-size:12px;line-height:1.4}
+.dashboard-body .trip-note{margin-top:4px!important;color:#48635c!important}
+.dashboard-body .trip-action{display:inline-flex;align-items:center;justify-content:center;min-width:68px;min-height:34px;padding:0 12px;border-radius:9px;background:#167b69;color:#fff!important;font-size:12px;font-weight:800;text-decoration:none}
+.dashboard-body .trip-action:hover{background:#12685a;color:#fff!important}
+.dashboard-body .trip-empty{padding:18px 12px 16px;text-align:center}
+.dashboard-body .trip-empty h3{margin:0 0 6px;color:#17473f;font-size:16px}
+.dashboard-body .trip-empty p{margin:0 0 12px;color:#607772;font-size:13px}
+.dashboard-body .trip-empty .explore-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:9px;background:#167b69;color:#fff;font-size:13px;font-weight:800;text-decoration:none}
+
+@media(max-width:700px){
+.dashboard-body .booking-preview-card{grid-template-columns:1fr!important}
+.dashboard-body .booking-preview-image{width:100%!important;min-width:0!important;height:150px!important}
+.dashboard-body .trip-row{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"thumb copy" "thumb action"}
+.dashboard-body .trip-thumb{width:56px;height:56px}
+.dashboard-body .trip-action{grid-area:action;justify-self:start;margin-top:2px}
+.dashboard-body .trip-copy{grid-area:copy}
+.dashboard-body .panel-header{flex-direction:column}
+}
+.account-page{background:#f3f7f6!important;color:#203531!important;font-family:"Segoe UI",Arial,sans-serif!important}
+.account-page .favorites-container,.account-page .dashboard-container,.account-page .profile-container,.account-page .page-container{width:min(1080px,calc(100% - 40px))!important}
+.account-hero,.account-page .management-heading{margin:0 0 22px!important;padding:24px 26px!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:linear-gradient(135deg,#e8f6f1,#fff)!important}
+.account-kicker,.account-page .management-heading span{display:block;margin:0 0 6px;color:#167b69;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.account-hero h1,.account-page .management-heading h1,.account-page .favorites-container>h1,.account-page .dashboard-container>h1{margin:0 0 6px!important;color:#17473f!important;font-size:clamp(28px,4vw,36px)!important;letter-spacing:-.04em!important}
+.account-hero p,.account-page .management-heading p{margin:0!important;max-width:620px;color:#607772!important;font-size:15px!important;line-height:1.55!important}
+.account-page .section-title{display:flex;align-items:center;gap:8px;margin:8px 0 14px!important;color:#17473f!important;font-size:18px!important}
+.account-page .section-title::before{content:'';width:4px;height:18px;border-radius:4px;background:#167b69}
+.account-page .favorite-card{align-items:stretch!important;gap:18px!important;padding:16px!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 24px rgba(23,71,63,.05)!important}
+.account-page .favorite-card::before{display:none}
+.account-page .favorite-card:hover{transform:translateY(-2px)!important;box-shadow:0 16px 30px rgba(23,71,63,.08)!important}
+.account-page .favorite-image,.account-page .favorite-image img{width:220px!important;height:156px!important;border-radius:14px!important;object-fit:cover}
+.account-page .favorite-content h3{margin:0 0 6px!important;color:#17473f!important;font-size:22px!important}
+.account-page .favorite-content p,.account-page .booking-info{color:#607772}
+.account-page .booking-info{display:grid;gap:2px;padding:7px 0;border-bottom:1px solid #eef5f2}
+.account-page .booking-info strong{color:#17473f;font-size:12px;letter-spacing:.03em;text-transform:uppercase}
+.account-page .booking-status{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.account-page .badge-pending,.account-page .badge-approved,.account-page .badge-cancelled,.account-page .badge-rejected{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:99px;font-size:12px;font-weight:800}
+.account-page .badge-pending{background:#fff6e4;color:#9a6412}
+.account-page .badge-approved{background:#e7f5f0;color:#126a59}
+.account-page .badge-cancelled,.account-page .badge-rejected{background:#fff1ef;color:#b42318}
+.account-page .confirmation-link,.account-page .cancel-booking-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:38px;padding:0 14px!important;border-radius:10px!important;font-size:13px!important;font-weight:800!important;text-decoration:none}
+.account-page .confirmation-link{border:1px solid #b7ddd2!important;background:#167b69!important;color:#fff!important}
+.account-page .confirmation-link:hover{background:#17473f!important}
+.account-page .cancel-booking-btn{border:1px solid #f0c7c2!important;background:#fff6f5!important;color:#b42318!important}
+.account-page .empty-favorites,.account-page .empty-card{padding:28px!important;border:1px dashed #c9e2da!important;border-radius:16px!important;background:#fff!important;color:#607772;text-align:center}
+.account-page .profile-container>.account-hero{grid-column:1 / -1}
+.account-page .profile-card,.account-page .profile-stats-card{border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 24px rgba(23,71,63,.05)!important}
+.account-page .profile-card form input:not([type=file]),.account-page .profile-card form select,.account-page .feedback-form input,.account-page .feedback-form textarea{width:100%;margin:0 0 12px;padding:12px 14px;border:1px solid #d5ebe4;border-radius:12px;background:#fff;color:#203531;font:inherit}
+.account-page .profile-card form input[type=file]{width:100%;margin:0 0 12px;padding:10px;border:1px dashed #b7ddd2;border-radius:12px;background:#f7fcfa}
+.account-page .profile-card form button,.account-page .feedback-form button{min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#167b69;color:#fff;font-weight:800;cursor:pointer}
+.account-page .profile-card form button:hover,.account-page .feedback-form button:hover{background:#17473f}
+.account-page .profile-box{border:1px solid #d7e8e3;border-radius:14px;background:#f7fcfa}
+.account-page .feedback-card{border:1px solid #d7e8e3;border-radius:16px;background:#fff;box-shadow:0 8px 20px rgba(23,71,63,.04)}
+@media(max-width:760px){.account-page .favorites-container,.account-page .dashboard-container,.account-page .profile-container,.account-page .page-container{width:min(100% - 24px,1080px)!important}.account-page .favorite-card{flex-direction:column!important}.account-page .favorite-image,.account-page .favorite-image img{width:100%!important;height:180px!important}}

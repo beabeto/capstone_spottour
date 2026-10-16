@@ -14,7 +14,8 @@ class HotelReply extends Model
 
         'reply',
 
-        'parent_reply_id'
+        'parent_reply_id',
+        'image'
 
     ];
 
@@ -31,5 +32,10 @@ class HotelReply extends Model
             HotelComment::class,
             'comment_id'
         );
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(HotelReplyRating::class, 'reply_id');
     }
 }

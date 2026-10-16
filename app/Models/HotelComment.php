@@ -12,7 +12,8 @@ class HotelComment extends Model
 
         'hotel_id',
 
-        'comment'
+        'comment',
+        'image'
 
     ];
 

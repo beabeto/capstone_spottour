@@ -7,15 +7,14 @@
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
 <body class="dashboard-body">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <div class="booking-confirm-container">
@@ -24,7 +23,7 @@ href="{{ asset('css/style.css') }}">
 
     <h1>
 
-        📖 Booking Confirmation
+         Booking Confirmation
 
     </h1>
 
@@ -46,7 +45,7 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $spot->location }}
+             {{ $spot->location }}
 
         </p>
 
@@ -74,11 +73,13 @@ href="{{ asset('css/style.css') }}">
 
         </p>
 
+        <p><strong>Booking Date:</strong> {{ \Carbon\Carbon::parse($bookingDate)->format('F d, Y') }}</p>
+
         <p>
 
             <strong>Entrance Fee:</strong>
 
-            ₱{{ number_format(
+            PHP {{ number_format(
                 $spot->price,
                 2
             ) }}
@@ -91,75 +92,34 @@ href="{{ asset('css/style.css') }}">
 
             <strong>Cottage Price:</strong>
 
-            ₱{{ number_format(
+            PHP {{ number_format(
                 $spot->cottage_price,
                 2
             ) }}
 
         </p>
 
-        <p>
-
-            <strong>Available Cottages:</strong>
-
-            {{ $spot->available_cottages }}
-
-        </p>
+        <p><strong>Cottages Reserved:</strong> {{ $quantity }}</p>
 
         @endif
 
     </div>
 
-    <form
-    method="POST"
-    action="/booking/payment">
-
-        @csrf
-
-        <input
-        type="hidden"
-        name="spot_id"
-        value="{{ $spot->id }}">
-
-        <label>
-
-            📅 Booking Date
-
-        </label>
-
-        <input
-        type="date"
-        name="booking_date"
-        min="{{ date('Y-m-d') }}"
-        required>
+    <form method="GET" action="/booking/payment">
+        <input type="hidden" name="spot_id" value="{{ $spot->id }}">
+        <input type="hidden" name="booking_date" value="{{ $bookingDate }}">
+        <input type="hidden" name="quantity" value="{{ $quantity }}">
+        <input type="hidden" name="needs_guide" value="{{ request('needs_guide') ? 1 : 0 }}">
+        <input type="hidden" name="package_id" value="{{ request('package_id') }}">
 
         @if($spot->booking_type == 'cottage')
-
-        <label>
-
-            🏡 Number of Cottages
-
-        </label>
-
-        <input
-        type="number"
-        id="quantity"
-        name="quantity"
-        min="1"
-        max="{{ $spot->available_cottages }}"
-        value="1"
-        oninput="calculateTotal()">
-
         <div class="total-box">
 
             Estimated Total:
 
             <span id="totalPrice">
 
-                ₱{{ number_format(
-                    $spot->cottage_price,
-                    2
-                ) }}
+                PHP {{ number_format($spot->cottage_price * $quantity, 2) }}
 
             </span>
 
@@ -171,7 +131,7 @@ href="{{ asset('css/style.css') }}">
         type="submit"
         class="payment-btn">
 
-            💳 Proceed To Payment
+             Proceed To Payment
 
         </button>
 
@@ -180,41 +140,6 @@ href="{{ asset('css/style.css') }}">
 </div>
 
 </div>
-
-@if($spot->booking_type == 'cottage')
-
-<script>
-
-function calculateTotal()
-{
-    let quantity =
-        document.getElementById(
-            'quantity'
-        ).value;
-
-    let price =
-        {{ $spot->cottage_price }};
-
-    let total =
-        quantity * price;
-
-    document
-    .getElementById(
-        'totalPrice'
-    )
-    .innerHTML =
-    '₱' +
-    total.toLocaleString(
-        undefined,
-        {
-            minimumFractionDigits:2
-        }
-    );
-}
-
-</script>
-
-@endif
 
 </body>
 

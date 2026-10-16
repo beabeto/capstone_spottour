@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>Reservation Calendar</title>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+
+<link rel="stylesheet"
+href="/css/style.css">
+
+</head>
+
+<body class="admin-body reservation-calendar-page">
+
+<div class="back-btn">
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
+</div>
+
+<div class="calendar-container">
+
+<header class="calendar-page-heading">
+    <div>
+        <span>Administrator workspace</span>
+        <h1>All Reservations Calendar</h1>
+        <p>Spot, hotel, and restaurant reservations each have their own color. A solid block is confirmed, a dashed block is pending, and a faded block is cancelled or rejected.</p>
+    </div>
+    <div class="calendar-filter">
+        <select id="calendarPeriod" aria-label="Calendar period">
+            <option value="today">Today</option>
+            <option value="week">This week</option>
+            <option value="month" selected>This month</option>
+            <option value="list">Upcoming list</option>
+        </select>
+    </div>
+</header>
+
+<div class="calendar-summary" aria-label="Reservation type colors">
+    <div><span class="calendar-dot spot"></span><strong>Tourist spot</strong><small>3 reservations</small></div>
+    <div><span class="calendar-dot hotel"></span><strong>Hotel</strong><small>3 reservations</small></div>
+    <div><span class="calendar-dot restaurant"></span><strong>Restaurant</strong><small>2 reservations</small></div>
+</div>
+<div class="calendar-status-key" aria-label="Reservation status styles">
+    <span class="cal-chip approved">Confirmed · 5</span>
+    <span class="cal-chip pending">Pending · 2</span>
+    <span class="cal-chip cancelled">Cancelled or rejected · 1</span>
+</div>
+
+<div class="calendar-navigation" id="calendarNavigation"><button type="button" data-calendar-nav="prev">Previous</button><strong id="calendarTitle"></strong><button type="button" data-calendar-nav="today">Today</button><button type="button" data-calendar-nav="next">Next</button></div>
+
+<div id="calendar"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+
+document.addEventListener(
+'DOMContentLoaded',
+function()
+{
+    let calendarEl =
+        document.getElementById(
+            'calendar'
+        );
+
+    let calendar =
+        new FullCalendar.Calendar(
+            calendarEl,
+            {
+
+                initialView:
+                    'dayGridMonth',
+
+                height:'auto',
+                dayMaxEvents: 2,
+                eventMaxStack: 2,
+                moreLinkText: 'more reservations',
+                headerToolbar: false,
+                buttonText: { today: 'Today', month: 'Month', week: 'Week', list: 'List' },
+
+                events:
+[
+
+    
+
+    
+    {
+
+        title:
+        "Tourist Spot",
+
+        start:
+        '2026-10-10',
+
+        classNames:['cal-spot','cal-pending'],
+
+        extendedProps:
+        {
+            type:'Spot',
+
+            user:"User",
+
+            place:"Tourist Spot",
+
+            quantity:'1',
+
+            total:'500.00',
+
+            status:'Pending'
+        }
+
+    },
+
+    
+    {
+
+        title:
+        "Tourist Spot",
+
+        start:
+        '2026-11-11',
+
+        classNames:['cal-spot','cal-approved'],
+
+        extendedProps:
+        {
+            type:'Spot',
+
+            user:"user1",
+
+            place:"Tourist Spot",
+
+            quantity:'1',
+
+            total:'500.00',
+
+            status:'Approved'
+        }
+
+    },
+
+    
+    {
+
+        title:
+        "Tourist Spot",
+
+        start:
+        '2026-08-20',
+
+        classNames:['cal-spot','cal-pending'],
+
+        extendedProps:
+        {
+            type:'Spot',
+
+            user:"Ianzel Morales",
+
+            place:"Tourist Spot",
+
+            quantity:'1',
+
+            total:'500.00',
+
+            status:'Pending'
+        }
+
+    },
+
+    
+
+
+    
+
+    
+    {
+
+        title:
+        "Hotel",
+
+        start:
+        '2026-07-07',
+
+        end:
+        '2026-07-08',
+
+        classNames:['cal-hotel','cal-approved'],
+
+        extendedProps:
+        {
+            type:'Hotel',
+
+            user:"User",
+
+            place:"Hotel",
+
+            rooms:'1',
+
+            total:'1,000.00',
+
+            status:'Approved'
+        }
+
+    },
+
+    
+    {
+
+        title:
+        "Philippine Gateway Hotel",
+
+        start:
+        '2026-09-29',
+
+        end:
+        '2026-10-06',
+
+        classNames:['cal-hotel','cal-cancelled'],
+
+        extendedProps:
+        {
+            type:'Hotel',
+
+            user:"Ianzel Morales",
+
+            place:"Philippine Gateway Hotel",
+
+            rooms:'1',
+
+            total:'14,000.00',
+
+            status:'Rejected'
+        }
+
+    },
+
+    
+    {
+
+        title:
+        "Philippine Gateway Hotel",
+
+        start:
+        '2026-09-29',
+
+        end:
+        '2026-10-06',
+
+        classNames:['cal-hotel','cal-approved'],
+
+        extendedProps:
+        {
+            type:'Hotel',
+
+            user:"Ianzel Morales",
+
+            place:"Philippine Gateway Hotel",
+
+            rooms:'1',
+
+            total:'14,000.00',
+
+            status:'Approved'
+        }
+
+    },
+
+    
+
+
+    
+
+    
+    {
+
+        title:
+        "Restaurant",
+
+        start:
+        '2026-12-12',
+
+        classNames:['cal-restaurant','cal-approved'],
+
+        extendedProps:
+        {
+            type:'Restaurant',
+
+            user:"user1",
+
+            place:"Restaurant",
+
+            guests:'1',
+
+            time:'12:00:00',
+
+            status:'Approved'
+        }
+
+    },
+
+    
+    {
+
+        title:
+        "Restaurant",
+
+        start:
+        '2026-10-20',
+
+        classNames:['cal-restaurant','cal-approved'],
+
+        extendedProps:
+        {
+            type:'Restaurant',
+
+            user:"User",
+
+            place:"Restaurant",
+
+            guests:'1',
+
+            time:'12:00:00',
+
+            status:'Approved'
+        }
+
+    },
+
+    
+],
+
+                eventClick:function(info)
+{
+    let details =
+
+        'Type: ' + info.event.extendedProps.type +
+
+        '\nName: ' + info.event.extendedProps.place +
+
+        '\nUser: ' + info.event.extendedProps.user +
+
+        '\nStatus: ' + info.event.extendedProps.status;
+
+    if(info.event.extendedProps.type == 'Spot')
+    {
+        details +=
+
+        '\nQuantity: ' +
+        info.event.extendedProps.quantity +
+
+        '\nTotal: PHP ' +
+        info.event.extendedProps.total;
+    }
+
+    if(info.event.extendedProps.type == 'Hotel')
+    {
+        details +=
+
+        '\nRooms: ' +
+        info.event.extendedProps.rooms +
+
+        '\nTotal: PHP ' +
+        info.event.extendedProps.total;
+    }
+
+    if(info.event.extendedProps.type == 'Restaurant')
+    {
+        details +=
+
+        '\nGuests: ' +
+        info.event.extendedProps.guests +
+
+        '\nTime: ' +
+        info.event.extendedProps.time;
+    }
+
+    alert(details);
+}
+
+            }
+        );
+
+    calendar.render();
+
+    const calendarHeading = document.getElementById('calendarNavigation');
+    const updateCalendarTitle = () => document.getElementById('calendarTitle').textContent = calendar.view.title;
+    updateCalendarTitle();
+    calendar.on('datesSet', updateCalendarTitle);
+    calendarHeading.addEventListener('click', (event) => {
+        const action = event.target.dataset.calendarNav;
+        if (!action) return;
+        calendar[action]();
+    });
+
+    document.getElementById('calendarPeriod').addEventListener('change', function () {
+        if (this.value === 'today') { calendar.today(); calendar.changeView('timeGridDay'); }
+        if (this.value === 'week') { calendar.changeView('timeGridWeek'); }
+        if (this.value === 'month') { calendar.changeView('dayGridMonth'); }
+        if (this.value === 'list') { calendar.changeView('listWeek'); }
+    });
+});
+
+</script>
+
+</body>
+</html>

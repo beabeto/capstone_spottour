@@ -5,25 +5,24 @@
 
 <title>My Bookings</title>
 
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-pages.css') }}">
 
 </head>
 
 
-<body class="dashboard-body">
+<body class="dashboard-body account-page">
 
-<div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
-</div>
+@include('user.partials.account-bar')
 
 <div class="favorites-container">
 
-    <h1>
-        📅 My Bookings
-    </h1>
+    <header class="account-hero">
+        <p class="account-kicker">Your trips</p>
+        <h1>My Bookings</h1>
+        <p>Review spot, hotel, and restaurant reservations, then download a PDF confirmation.</p>
+    </header>
 
     @if(session('success'))
 
@@ -36,14 +35,51 @@ href="{{ asset('css/style.css') }}">
     {{-- ================= SPOT BOOKINGS ================= --}}
 
     <h2 class="section-title">
-        📍 Spot Reservations
+         Spot Reservations
     </h2>
 
     @forelse($bookings as $booking)
 
     <div class="favorite-card">
 
-        {{-- Your existing Spot Booking Card Here --}}
+        <div class="favorite-image">
+            @if($booking->spot && $booking->spot->image)
+                <img src="{{ asset('uploads/spots/'.$booking->spot->image) }}" alt="Tourist spot">
+            @else
+                <img src="https://via.placeholder.com/300x200?text=Tourist+Spot" alt="Tourist spot">
+            @endif
+        </div>
+
+        <div class="booking-details">
+            <div class="booking-info"><strong>Tourist spot</strong>{{ optional($booking->spot)->name ?? 'Removed tourist spot' }}</div>
+            <div class="booking-info"><strong>Booking date</strong>{{ \Carbon\Carbon::parse($booking->booking_date)->format('F d, Y') }}</div>
+            <div class="booking-info"><strong>{{ optional($booking->spot)->booking_type === 'cottage' ? 'Cottages reserved' : 'Guests' }}</strong>{{ $booking->quantity }}</div>
+            <div class="booking-info"><strong>Total payment</strong>PHP {{ number_format($booking->total_price, 2) }}</div>
+            @if($booking->needs_guide)<div class="booking-info"><strong>Tourist guide</strong>Requested</div>@endif
+            @if($booking->package_name)<div class="booking-info"><strong>Package</strong>{{ $booking->package_name }}</div>@endif
+            <div class="booking-info"><strong>Payment method</strong>{{ \App\Support\PaymentChoice::label($booking->payment_method) }}</div>
+            @include('partials.arrival-code', ['booking' => $booking])
+            <div class="booking-info"><strong>Booking email</strong>{{ $booking->contact_email ?? Auth::user()->email }}</div>
+        </div>
+
+        <div class="booking-status">
+            @if($booking->status == 'pending_payment')
+                <span class="badge-pending">Waiting for payment</span>
+            @elseif(in_array($booking->status, ['pending', 'pending_verification']))
+                <span class="badge-pending">Pending Verification</span>
+            @elseif($booking->status == 'approved')
+                <span class="badge-approved">Approved</span>
+            @elseif($booking->status == 'cancelled')
+                <span class="badge-cancelled">Cancelled</span>
+            @else
+                <span class="badge-rejected">Rejected</span>
+            @endif
+
+            <a href="/booking/confirmation/spot/{{ $booking->id }}" class="confirmation-link">Download PDF</a>
+            @if(in_array($booking->status, ['pending', 'pending_payment', 'pending_verification']))
+                <a href="/booking/cancel/{{ $booking->id }}" class="cancel-booking-btn" onclick="return confirm('Cancel this reservation?')">Cancel</a>
+            @endif
+        </div>
 
     </div>
 
@@ -65,7 +101,7 @@ href="{{ asset('css/style.css') }}">
     {{-- ================= HOTEL BOOKINGS ================= --}}
 
     <h2 class="section-title">
-        🏨 Hotel Reservations
+         Hotel Reservations
     </h2>
 
     @forelse($hotelBookings as $booking)
@@ -92,35 +128,47 @@ href="{{ asset('css/style.css') }}">
         <div class="booking-details">
 
             <div class="booking-info">
-                <strong>🏨 Hotel</strong>
-                {{ $booking->hotel->name }}
+                <strong> Hotel</strong>
+                {{ optional($booking->hotel)->name ?? 'Removed hotel' }}
             </div>
 
             <div class="booking-info">
-                <strong>📅 Check In</strong>
+                <strong> Check In</strong>
                 {{ \Carbon\Carbon::parse($booking->check_in)->format('F d, Y') }}
             </div>
 
             <div class="booking-info">
-                <strong>📅 Check Out</strong>
+                <strong> Check Out</strong>
                 {{ \Carbon\Carbon::parse($booking->check_out)->format('F d, Y') }}
             </div>
 
             <div class="booking-info">
-                <strong>🚪 Rooms</strong>
+                <strong> Rooms</strong>
                 {{ $booking->rooms }}
             </div>
 
             <div class="booking-info">
-                <strong>💰 Total Payment</strong>
-                ₱{{ number_format($booking->total_price,2) }}
+                <strong> Total Payment</strong>
+                PHP {{ number_format($booking->total_price,2) }}
             </div>
+
+            @if($booking->room_name)<div class="booking-info"><strong>Room</strong>{{ $booking->room_name }}</div>@endif
+            @if($booking->package_name)<div class="booking-info"><strong>Package</strong>{{ $booking->package_name }}</div>@endif
+            <div class="booking-info"><strong>Payment method</strong>{{ \App\Support\PaymentChoice::label($booking->payment_method) }}</div>
+            @include('partials.arrival-code', ['booking' => $booking])
+            <div class="booking-info"><strong>Booking Email</strong>{{ $booking->contact_email ?? Auth::user()->email }}</div>
 
         </div>
 
         <div class="booking-status">
 
-            @if($booking->status == 'pending')
+            @if($booking->status == 'pending_payment')
+
+            <span class="badge-pending">
+                Waiting for payment
+            </span>
+
+            @elseif(in_array($booking->status, ['pending', 'pending_verification']))
 
             <span class="badge-pending">
                 Pending Verification
@@ -146,14 +194,15 @@ href="{{ asset('css/style.css') }}">
 
             @endif
 
-            @if($booking->status == 'pending')
+            <a href="/booking/confirmation/hotel/{{ $booking->id }}" class="confirmation-link">Download PDF</a>
+            @if(in_array($booking->status, ['pending', 'pending_payment', 'pending_verification']))
 
             <a
             href="/hotel/booking/cancel/{{ $booking->id }}"
             class="cancel-booking-btn"
             onclick="return confirm('Cancel this reservation?')">
 
-                Cancel Reservation
+                Cancel
 
             </a>
 
@@ -177,7 +226,7 @@ href="{{ asset('css/style.css') }}">
 
 <h2 class="section-title">
 
-🍽 Restaurant Reservations
+ Restaurant Reservations
 
 </h2>
 
@@ -208,11 +257,11 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                🍽 Restaurant
+                 Restaurant
 
             </strong>
 
-            {{ $booking->food->name }}
+            {{ optional($booking->food)->name ?? 'Removed restaurant' }}
 
         </div>
 
@@ -220,7 +269,7 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                📅 Reservation Date
+                 Reservation Date
 
             </strong>
 
@@ -232,7 +281,7 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                🕒 Reservation Time
+                 Reservation Time
 
             </strong>
 
@@ -244,7 +293,7 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                👥 Guests
+                 Guests
 
             </strong>
 
@@ -258,7 +307,7 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                📝 Special Request
+                 Special Request
 
             </strong>
 
@@ -268,11 +317,24 @@ href="{{ asset('css/style.css') }}">
 
         @endif
 
+        @if($booking->package_name)<div class="booking-info"><strong>Package</strong>{{ $booking->package_name }}</div>@endif
+        <div class="booking-info"><strong>Payment method</strong>{{ \App\Support\PaymentChoice::label($booking->payment_method) }}</div>
+            @include('partials.arrival-code', ['booking' => $booking])
+        <div class="booking-info"><strong>Booking Email</strong>{{ $booking->contact_email ?? Auth::user()->email }}</div>
+
     </div>
 
     <div class="booking-status">
 
-        @if($booking->status == 'pending')
+        @if($booking->status == 'pending_payment')
+
+        <span class="badge-pending">
+
+            Waiting for payment
+
+        </span>
+
+        @elseif(in_array($booking->status, ['pending', 'pending_verification']))
 
         <span class="badge-pending">
 
@@ -306,14 +368,15 @@ href="{{ asset('css/style.css') }}">
 
         @endif
 
-        @if($booking->status == 'pending')
+        <a href="/booking/confirmation/food/{{ $booking->id }}" class="confirmation-link">Download PDF</a>
+        @if(in_array($booking->status, ['pending', 'pending_payment', 'pending_verification']))
 
         <a
         href="/food/booking/cancel/{{ $booking->id }}"
         class="cancel-booking-btn"
         onclick="return confirm('Cancel this reservation?')">
 
-            Cancel Reservation
+            Cancel
 
         </a>
 
@@ -348,7 +411,4 @@ href="{{ asset('css/style.css') }}">
 
 
 </body>
-```
-
-
 </html>

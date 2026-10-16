@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class FoodMenu extends Model
 {
+    public static function categories(): array
+    {
+        return [
+            'meal' => 'Meal',
+            'appetizer' => 'Appetizer',
+            'dessert' => 'Dessert',
+            'drink' => 'Drink',
+        ];
+    }
+
     protected $fillable = [
 
         'food_id',

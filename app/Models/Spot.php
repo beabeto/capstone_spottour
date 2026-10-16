@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Spot extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'user_id',
         'name',
@@ -13,6 +15,7 @@ class Spot extends Model
         'description',
         'price',
         'image',
+        'gallery_images',
         'status',
        
 
@@ -22,8 +25,14 @@ class Spot extends Model
 
 'cottage_price',
 
+'daily_booking_limit',
+
 'map_link',
+        'latitude',
+        'longitude',
     ];
+
+    protected function casts(): array { return ['gallery_images' => 'array']; }
 
     public function owner()
     {
@@ -50,6 +59,11 @@ public function comments()
 public function bookings()
 {
     return $this->hasMany(Booking::class);
+}
+
+public function packages()
+{
+    return $this->hasMany(Package::class);
 }
 
 }

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Hotel extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
 
         'owner_id',
@@ -22,13 +24,36 @@ class Hotel extends Model
 
         'available_rooms',
 
+        'daily_booking_limit',
+
+        'room_types',
+
         'amenities',
 
         'map_link',
 
+        'latitude',
+
+        'longitude',
+
         'status'
 
     ];
+
+    protected function casts(): array
+    {
+        return ['room_types' => 'array'];
+    }
+
+    public function rooms()
+    {
+        return $this->hasMany(HotelRoom::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
 
     /*
     |--------------------------------------------------------------------------

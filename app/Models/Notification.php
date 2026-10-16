@@ -16,13 +16,37 @@ class Notification extends Model
 
      'hotel_id',
 
+    'food_id',
+
     'comment_id',
 
     'message',
 
-    'is_read'
+    'is_read',
+
+    'category',
+
+    'chat_thread_id',
 
 ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Notification $notification) {
+            if (filled($notification->category)) {
+                return;
+            }
+
+            $message = strtolower((string) $notification->message);
+
+            if (str_contains($message, 'booking')
+                || str_contains($message, 'reservation')
+                || str_contains($message, 'payment')
+                || str_contains($message, 'paid')) {
+                $notification->category = 'booking';
+            }
+        });
+    }
 
     public function receiver()
     {
@@ -62,5 +86,10 @@ public function hotel()
         Hotel::class,
         'hotel_id'
     );
+}
+
+public function food()
+{
+    return $this->belongsTo(Food::class, 'food_id');
 }
 }

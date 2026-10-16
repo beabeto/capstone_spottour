@@ -18,21 +18,20 @@ href="{{ asset('css/style.css') }}">
 
 <div class="back-btn">
 
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 
 </div>
 
-<div class="dashboard-container">
+<div class="dashboard-container notification-page">
 
-<h1>
-
-    🔔 Notifications
-
-</h1>
+<div class="notification-page-header">
+    <div>
+        <span class="eyebrow">Inbox</span>
+        <h1>Notifications</h1>
+        <p>Updates about your bookings, saved places, and account activity.</p>
+    </div>
+    <a href="/user" class="notification-dashboard-btn">Back to dashboard</a>
+</div>
 
 @forelse($notifications as $notification)
 
@@ -40,32 +39,10 @@ href="{{ asset('css/style.css') }}">
 
     <a
 
-    href="
-@if($notification->food_id)
-
-    /foods/{{ $notification->food_id }}
-
-@elseif($notification->hotel_id)
-
-    /hotels/{{ $notification->hotel_id }}
-
-@elseif($notification->spot_id)
-
-    /spots/{{ $notification->spot_id }}
-
-@elseif(str_contains(strtolower($notification->message), 'feedback'))
-
-    /user/feedback
-
-@else
-
-    #
-
-@endif
-"
+    href="/notification/{{ $notification->id }}"
 
     class="notification-link">
-
+    
         <div class="notification-left">
 
             <img
@@ -80,27 +57,31 @@ href="{{ asset('css/style.css') }}">
 
         <div class="notification-content">
 
-            <div class="notification-badge">
+            <div class="notification-type">
 
-                @if($notification->food_id)
+                @if($notification->category === 'booking' || str_contains(strtolower($notification->message), 'booking') || str_contains(strtolower($notification->message), 'reservation') || str_contains(strtolower($notification->message), 'payment'))
 
-    🍽 Restaurant Notification
+     Booking
+
+@elseif($notification->food_id)
+
+     Restaurant Notification
 
 @elseif($notification->hotel_id)
 
-    🏨 Hotel Notification
+     Hotel Notification
 
 @elseif($notification->spot_id)
 
-    📍 Spot Notification
+     Spot Notification
 
 @elseif(str_contains(strtolower($notification->message), 'feedback'))
 
-    💬 Feedback Reply
+     Feedback Reply
 
 @else
 
-    🔔 Notification
+     Notification
 
 @endif
 
@@ -120,24 +101,16 @@ href="{{ asset('css/style.css') }}">
 
         </div>
 
-        <div class="notification-arrow">
-
-            →
-
-        </div>
-
     </a>
 
     <a
-
     href="/notification/delete/{{ $notification->id }}"
-
     class="delete-btn"
-
+    aria-label="Delete notification"
     onclick="return confirm('Delete this notification?')">
-
-        🗑️
-
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h10l-.8 11H7.8L7 9z" fill="currentColor"/>
+        </svg>
     </a>
 
 </div>

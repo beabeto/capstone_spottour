@@ -9,21 +9,20 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body>
+<body class="owner-listing-page">
+@php $workspace = Auth::user()->role === 'admin' ? 'admin' : 'owner'; @endphp
 
 <div class="page-container">
 
 <div class="header-row">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <h1>
 
-🍽 {{ $food->name }} Menu
+ {{ $food->name }} Menu
 
 </h1>
 
@@ -105,7 +104,7 @@ No Image
 
 <td>
 
-₱{{ number_format($menu->price,2) }}
+PHP {{ number_format($menu->price,2) }}
 
 </td>
 

@@ -6,6 +6,7 @@
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
@@ -13,11 +14,7 @@ href="{{ asset('css/style.css') }}">
 
 <div class="back-btn">
 
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 
 </div>
 
@@ -27,7 +24,7 @@ href="{{ asset('css/style.css') }}">
 
     <h1>
 
-        🍽 Reservation Confirmation
+         Reservation Confirmation
 
     </h1>
 
@@ -49,7 +46,7 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $food->location }}
+             {{ $food->location }}
 
         </p>
 
@@ -68,6 +65,34 @@ href="{{ asset('css/style.css') }}">
             Reservation Details
 
         </h3>
+
+        <p>
+
+            <strong>Reservation Date:</strong>
+
+            {{ \Carbon\Carbon::parse($reservationDate)->format('F d, Y') }}
+
+        </p>
+
+        <p>
+
+            <strong>Reservation Time:</strong>
+
+            {{ \Carbon\Carbon::parse($reservationTime)->format('h:i A') }}
+
+        </p>
+
+        <p>
+
+            <strong>Guests:</strong>
+
+            {{ $guests }}
+
+        </p>
+
+        @if($specialRequest)
+        <p><strong>Special Request:</strong> {{ $specialRequest }}</p>
+        @endif
 
         <p>
 
@@ -96,60 +121,17 @@ href="{{ asset('css/style.css') }}">
         name="food_id"
         value="{{ $food->id }}">
 
-        <label>
-
-            📅 Reservation Date
-
-        </label>
-
-        <input
-        type="date"
-        name="reservation_date"
-        min="{{ date('Y-m-d') }}"
-        required>
-
-        <label>
-
-            🕒 Reservation Time
-
-        </label>
-
-        <input
-        type="time"
-        name="reservation_time"
-        required>
-
-        <label>
-
-            👥 Number of Guests
-
-        </label>
-
-        <input
-        type="number"
-        id="guests"
-        name="guests"
-        min="1"
-        max="{{ $food->venue_capacity }}"
-        value="1"
-        required>
-
-        <label>
-
-            📝 Special Request
-
-        </label>
-
-        <textarea
-        name="special_request"
-        rows="4"
-        placeholder="Optional"></textarea>
+        <input type="hidden" name="reservation_date" value="{{ $reservationDate }}">
+        <input type="hidden" name="reservation_time" value="{{ $reservationTime }}">
+        <input type="hidden" name="guests" value="{{ $guests }}">
+        <input type="hidden" name="special_request" value="{{ $specialRequest }}">
+        <input type="hidden" name="package_id" value="{{ request('package_id') }}">
 
         <button
         type="submit"
         class="payment-btn">
 
-            💳 Proceed To Payment
+             Proceed To Payment
 
         </button>
 

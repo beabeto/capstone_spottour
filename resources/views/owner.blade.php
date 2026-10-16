@@ -19,29 +19,31 @@ use Illuminate\Support\Str;
 
     <!-- SIDEBAR -->
 
-    <aside class="owner-sidebar" id="ownerSidebar">
+    <aside class="owner-sidebar workspace-sidebar" id="ownerSidebar">
 
         <div class="sidebar-logo">
 
     <div class="logo-header">
 
-        <h2>SpotTour</h2>
+        <h2>Spot<span>Tour</span></h2>
 
         <button
             class="menu-toggle"
-            onclick="toggleOwnerSidebar()">
-            ☰
+            onclick="toggleOwnerSidebar()"
+            aria-label="Toggle sidebar"
+            aria-expanded="true">
+
         </button>
 
     </div>
 
-
+</div>
 
         <ul class="owner-menu">
 
             <li>
-                <a href="{{ url('/owner') }}">
-                    🏠
+                <a href="{{ url('/owner') }}" class="workspace-nav dashboard-nav"><i></i>
+
                     <span>Dashboard</span>
                 </a>
             </li>
@@ -54,9 +56,9 @@ use Illuminate\Support\Str;
             )
 
             <li>
-                <a href="/owner/spots">
-                    📍
-                    <span>My Spots</span>
+                <a href="/owner/spots" class="workspace-nav spots-nav"><i></i>
+
+                    <span>Spots</span>
                 </a>
             </li>
 
@@ -71,9 +73,9 @@ use Illuminate\Support\Str;
 
             <li>
 
-<a href="/owner/hotels">
+<a href="/owner/hotels" class="workspace-nav hotels-nav"><i></i>
 
-🏨
+
 
 <span>
 
@@ -96,13 +98,13 @@ Hotels
 
 <li>
 
-    <a href="/owner/foods">
+    <a href="/owner/foods" class="workspace-nav foods-nav"><i></i>
 
-        🍽
+
 
         <span>
 
-            Food Establishments
+            Restaurants
 
         </span>
 
@@ -113,32 +115,34 @@ Hotels
 @endif
 
             <li>
-                <a href="/owner/bookings">
+                <a href="/owner/packages" class="workspace-nav"><i></i>
+                    <span>Packages</span>
+                </a>
+            </li>
 
-    📖 Bookings
-
-    @if($pendingBookings > 0)
-
-        <span class="menu-badge">
-
-            {{ $pendingBookings }}
-
-        </span>
-
-    @endif
-
-</a>
-           
+            <li>
+                <a href="/owner/day-plans" class="workspace-nav calendar-nav"><i></i>
+                    <span>Day plans</span>
+                </a>
+            </li>
+            <li>
+                <a href="/owner/bookings" class="workspace-nav bookings-nav"><i></i>
+                    <span>Bookings</span>
+                    @if($pendingBookings > 0)
+                        <span class="menu-badge">{{ $pendingBookings }}</span>
+                    @endif
+                </a>
+            </li>
 
 <li>
 
-<a href="/owner/calendar">
+<a href="/owner/calendar" class="workspace-nav calendar-nav"><i></i>
 
-📅
+
 
 <span>
 
-Reservation Calendar
+Calendar
 
 </span>
 
@@ -157,9 +161,9 @@ Reservation Calendar
 )
 
 <li>
-    <a href="/owner/reviews">
+    <a href="/owner/reviews" class="workspace-nav reviews-nav"><i></i>
 
-    ⭐ Reviews
+     <span>Ratings</span>
 
     @if($totalReviews > 0)
 
@@ -177,22 +181,23 @@ Reservation Calendar
 @endif
 
             <li>
-                <a href="/owner/feedback">
-                    💬
+                <a href="/owner/feedback" class="workspace-nav feedback-nav"><i></i>
+
                     <span>Feedback</span>
                 </a>
             </li>
 
             <li>
-                <a href="owner/profile">
-                    👤
-                    <span>Profile</span>
+                <a href="/owner/chats" class="workspace-nav"><i></i>
+                    <span>Traveller chat</span>
+                    @php $chatWaiting = \App\Models\ChatThread::where('assignee_role', 'owner')->where('assignee_id', Auth::id())->where('staff_unread', '>', 0)->count(); @endphp
+                    @if($chatWaiting > 0)<span class="menu-badge">{{ $chatWaiting }}</span>@endif
                 </a>
             </li>
 
             <li>
-                <a href="/logout">
-                    🚪
+                <a href="/logout" onclick="localStorage.removeItem('spottour-owner-welcome-closed')" class="logout-link workspace-nav logout-nav"><i></i>
+
                     <span>Logout</span>
                 </a>
             </li>
@@ -207,11 +212,15 @@ Reservation Calendar
 
         <div class="owner-topbar">
 
-            <h1>
-                Owner Dashboard
-            </h1>
+            <button type="button" class="header-menu" onclick="toggleOwnerSidebar()" aria-label="Open menu"></button>
+            <div class="workspace-title">
+                <h1>Owner Dashboard</h1>
+                <p class="store-indicator"><span>Your business</span>{{ ucfirst(str_replace('_', ' ', Auth::user()->business_type)) }}</p>
+            </div>
 
-            <div class="admin-user">
+            <div class="topbar-actions">
+            @include('partials.notification-menu', ['notifications' => $notifications, 'unreadCount' => $unreadCount, 'allUrl' => '/owner/notifications'])
+            <div class="admin-user account-chip is-owner" role="link" tabindex="0" onclick="window.location='/owner/profile'" onkeydown="if(event.key==='Enter')window.location='/owner/profile'">
 
     @if(Auth::user()->profile_image)
 
@@ -233,15 +242,20 @@ Reservation Calendar
             {{ Auth::user()->name }}
         </span>
 
-        <small class="admin-role">
-            {{ ucfirst(Auth::user()->role) }}
-        </small>
+        <small class="admin-role">Owner</small>
 
     </div>
 
 </div>
+            </div>
 
         </div>
+
+        <section class="owner-welcome owner-welcome-top" id="ownerWelcome">
+            <button type="button" class="welcome-close" aria-label="Close welcome message" onclick="closeOwnerWelcome()">&times;</button>
+            <h2>Welcome back, {{ Auth::user()->name }}!</h2>
+            <p>Manage your business, track revenue, and respond to booking requests from one place.</p>
+        </section>
 
 
         <div class="owner-cards">
@@ -262,17 +276,11 @@ Reservation Calendar
             </div>
 
             <div class="owner-card">
-                <h3>Reviews</h3>
+                <h3>Ratings</h3>
                 <p>{{ $totalReviews }}</p>
             </div>
 
             <div class="owner-card revenue-card">
-
-    <div class="revenue-icon">
-
-        💰
-
-    </div>
 
     <div>
 
@@ -284,7 +292,7 @@ Reservation Calendar
 
         <h2>
 
-            ₱{{ number_format($totalRevenue,2) }}
+            PHP {{ number_format($totalRevenue,2) }}
 
         </h2>
 
@@ -300,13 +308,13 @@ Reservation Calendar
 
         </div>
 
-       
+
 
         <div class="dashboard-graphs">
 
     <div class="graph-card">
 
-        <h3>📊 Monthly Bookings</h3>
+        <div class="graph-heading"><h3 id="bookingGraphTitle">This Month's Bookings</h3><select id="bookingPeriod" aria-label="Booking period"><option value="month" selected>This month</option><option value="year">This year</option></select></div>
 
         <canvas id="bookingChart"></canvas>
 
@@ -314,7 +322,7 @@ Reservation Calendar
 
     <div class="graph-card">
 
-        <h3>💰 Monthly Revenue</h3>
+        <div class="graph-heading"><h3 id="revenueGraphTitle">This Year's Revenue</h3><select id="revenuePeriod" aria-label="Revenue period"><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option><option value="year" selected>This year</option></select></div>
 
         <canvas id="revenueChart"></canvas>
 
@@ -328,13 +336,13 @@ Reservation Calendar
 
 <h2>
 
-📅 Upcoming Reservations
+ Upcoming Reservations
 
 </h2>
 
 <a href="/owner/calendar">
 
-View Calendar →
+View Calendar
 
 </a>
 
@@ -380,7 +388,7 @@ View Calendar →
 
 {{ ucfirst($booking->category) }}
 
-•
+-
 
 {{ \Carbon\Carbon::parse($booking->date)->format('l') }}
 
@@ -415,18 +423,46 @@ No upcoming reservations.
 </div>
 
 <div class="dashboard-section">
+    <div class="section-header">
+        <h2>Guest day plans</h2>
+        <a href="/owner/day-plans">View all</a>
+    </div>
+    <div class="schedule-list">
+        @forelse(($dayPlans ?? collect()) as $plan)
+            <div class="schedule-card">
+                <div class="schedule-date">
+                    <h3>{{ $plan->plan_date->format('d') }}</h3>
+                    <span>{{ $plan->plan_date->format('M') }}</span>
+                </div>
+                <div class="schedule-content">
+                    <h4>{{ $plan->user?->name ?? 'Traveller' }}</h4>
+                    <p>
+                        {{ $plan->spot?->name ? 'Spot: '.$plan->spot->name : '' }}
+                        {{ $plan->food?->name ? ' · Meal: '.$plan->food->name : '' }}
+                        {{ $plan->hotel?->name ? ' · Stay: '.$plan->hotel->name : '' }}
+                    </p>
+                    <small>{{ $plan->note ?: 'Included your listing' }}</small>
+                </div>
+            </div>
+        @empty
+            <div class="empty-review">No travellers have included your listings in a day plan yet.</div>
+        @endforelse
+    </div>
+</div>
+
+<div class="dashboard-section">
 
     <div class="section-header">
 
         <h2>
 
-            📖 Latest Bookings
+             Latest Bookings
 
         </h2>
 
         <a href="/owner/bookings">
 
-            View All →
+            View All
 
         </a>
 
@@ -488,15 +524,15 @@ No upcoming reservations.
 
                         @if(isset($booking->spot))
 
-                            📍 Spot
+                             Spot
 
                         @elseif(isset($booking->hotel))
 
-                            🏨 Hotel
+                             Hotel
 
                         @elseif(isset($booking->food))
 
-                            🍽 Restaurant
+                             Restaurant
 
                         @endif
 
@@ -549,13 +585,13 @@ No upcoming reservations.
 
         <h2>
 
-            ⭐ Recent Reviews
+             Recent ratings
 
         </h2>
 
         <a href="/owner/reviews">
 
-            View All →
+            View All
 
         </a>
 
@@ -599,29 +635,28 @@ No upcoming reservations.
 
                 @if(isset($review->spot))
 
-                    📍 {{ $review->spot->name }}
+                     {{ $review->spot->name }}
 
                 @elseif(isset($review->hotel))
 
-                    🏨 {{ $review->hotel->name }}
+                     {{ $review->hotel->name }}
 
                 @elseif(isset($review->food))
 
-                    🍽 {{ $review->food->name }}
+                     {{ $review->food->name }}
 
                 @endif
 
             </div>
 
             <div class="review-stars">
-
-                ⭐
-
-                {{ number_format(
-                    $review->ratings->avg('rating') ?? 0,
-                    1
-                ) }}
-
+                @php
+                    $listing = $review->spot ?? $review->hotel ?? $review->food ?? null;
+                    $guestScore = $listing?->ratings?->firstWhere('user_id', $review->user_id)?->rating
+                        ?? $review->ratings->avg('rating')
+                        ?? 0;
+                @endphp
+                @include('partials.score-stars', ['score' => $guestScore])
             </div>
 
             <p class="review-message">
@@ -652,7 +687,7 @@ No upcoming reservations.
 
 <h2>
 
-🏆 Business Performance
+ Business Performance
 
 </h2>
 
@@ -664,7 +699,7 @@ No upcoming reservations.
 
 <h3>
 
-📍 Best Spot
+ Best Spot
 
 </h3>
 
@@ -700,7 +735,7 @@ No Spot
 
 <h3>
 
-🏨 Best Hotel
+ Best Hotel
 
 </h3>
 
@@ -736,7 +771,7 @@ No Hotel
 
 <h3>
 
-🍽 Best Restaurant
+ Best Restaurant
 
 </h3>
 
@@ -772,7 +807,7 @@ No Restaurant
 
 <h3>
 
-✅ Completion Rate
+ Completion Rate
 
 </h3>
 
@@ -794,36 +829,18 @@ Approved Bookings
 
 </div>
 
-        <div class="owner-welcome">
-
-            <h2>
-
-Welcome back,
-
-{{ Auth::user()->name }}
-
-👋
-
-</h2>
-
-<p>
-
-Manage your business, monitor bookings, track revenue, and respond to customer reviews from one place.
-
-</p>
-
-<p>
-
-<strong>
-
-Business Type:
-
-</strong>
-
-{{ ucfirst(str_replace('_',' ',Auth::user()->business_type)) }}
-
-</p>
-        </div>
+        <footer class="dashboard-footer">
+            <div class="footer-left">
+                <h3>Spot<span>Tour</span></h3>
+                <p>Explore - Book - Travel</p>
+            </div>
+            <div class="footer-right">
+                <a href="/owner/spots">Tourist Spots</a>
+                <a href="/owner/hotels">Hotels</a>
+                <a href="/owner/foods">Restaurants</a>
+                <a href="/owner/feedback">Feedback</a>
+            </div>
+        </footer>
 
     </main>
 
@@ -833,11 +850,25 @@ Business Type:
 
 function toggleOwnerSidebar()
 {
-    document
-        .getElementById('ownerSidebar')
-        .classList
-        .toggle('collapsed');
+    const sidebar = document.getElementById('ownerSidebar');
+    const trigger = document.querySelector('.menu-toggle');
+    if (window.matchMedia('(max-width: 900px)').matches) {
+        sidebar.classList.toggle('show');
+        trigger.setAttribute('aria-expanded', sidebar.classList.contains('show'));
+    } else {
+        sidebar.classList.toggle('collapsed');
+        trigger.setAttribute('aria-expanded', !sidebar.classList.contains('collapsed'));
+    }
 }
+
+function closeOwnerWelcome(){ document.getElementById('ownerWelcome')?.remove(); localStorage.setItem('spottour-owner-welcome-closed','1'); }
+if(localStorage.getItem('spottour-owner-welcome-closed') === '1') document.getElementById('ownerWelcome')?.remove();
+
+document.querySelectorAll('.owner-menu .workspace-nav').forEach((link) => {
+    const path = new URL(link.href).pathname;
+    const current = window.location.pathname;
+    if (current === path || (path !== '/owner' && current.startsWith(path + '/'))) link.classList.add('is-active');
+});
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -847,7 +878,7 @@ function toggleOwnerSidebar()
 const bookingChart =
 document.getElementById('bookingChart');
 
-new Chart(bookingChart,{
+const ownerBookingChart = new Chart(bookingChart,{
 
     type:'bar',
 
@@ -887,12 +918,23 @@ new Chart(bookingChart,{
 
 });
 
+document.getElementById('bookingPeriod')?.addEventListener('change', async (event) => {
+    const response = await fetch('/owner/booking-period?period=' + encodeURIComponent(event.target.value), {headers:{Accept:'application/json'}});
+    if (!response.ok) return;
+    const data = await response.json();
+    ownerBookingChart.data.labels = data.labels;
+    ownerBookingChart.data.datasets[0].label = data.label;
+    ownerBookingChart.data.datasets[0].data = data.data;
+    ownerBookingChart.update();
+    document.getElementById('bookingGraphTitle').textContent = data.label;
+});
+
 const revenueChart =
 document.getElementById('revenueChart');
 
 if(revenueChart){
 
-new Chart(revenueChart,{
+const ownerRevenueChart = new Chart(revenueChart,{
 
     type:'line',
 
@@ -942,6 +984,18 @@ new Chart(revenueChart,{
 
     }
 
+});
+
+document.getElementById('revenuePeriod')?.addEventListener('change', async (event) => {
+    const period = event.target.value;
+    const response = await fetch('/owner/revenue-period?period=' + encodeURIComponent(period), {headers:{Accept:'application/json'}});
+    if (!response.ok) return;
+    const data = await response.json();
+    ownerRevenueChart.data.labels = data.labels;
+    ownerRevenueChart.data.datasets[0].label = data.label;
+    ownerRevenueChart.data.datasets[0].data = data.data;
+    ownerRevenueChart.update();
+    document.getElementById('revenueGraphTitle').textContent = data.label;
 });
 
 }

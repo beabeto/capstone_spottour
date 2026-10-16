@@ -12,10 +12,17 @@ content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body listing-detail">
+
+@php
+    $isFavorite = \App\Models\HotelFavorite::where('user_id', Auth::id())->where('hotel_id', $hotel->id)->exists();
+    $isBookmarked = \App\Models\HotelBookmark::where('user_id', Auth::id())->where('hotel_id', $hotel->id)->exists();
+    $isChecklist = \App\Models\HotelChecklist::where('user_id', Auth::id())->where('hotel_id', $hotel->id)->exists();
+@endphp
 
 @if(session('success'))
 
@@ -30,8 +37,8 @@ href="{{ asset('css/style.css') }}">
 <!-- BACK -->
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← Back
+    <button onclick="window.history.back(); return false;">
+         Back
     </button>
 </div>
 
@@ -45,7 +52,7 @@ href="{{ asset('css/style.css') }}">
 
     <img
     src="{{ asset('uploads/hotels/'.$hotel->image) }}"
-    class="hero-image">
+    class="hero-image" onclick="this.classList.toggle('image-zoomed')" title="Click to enlarge">
 
     @endif
 
@@ -59,21 +66,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $hotel->location }}
+             {{ $hotel->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $hotel->ratings()->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $hotel->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -86,27 +84,29 @@ href="{{ asset('css/style.css') }}">
 
     <a
     href="/hotel/favorite/{{ $hotel->id }}"
-    class="favorite-btn">
+    class="favorite-btn{{ $isFavorite ? ' is-saved' : '' }}">
 
-        ❤️ Favorite
+         {{ $isFavorite ? 'Remove Favorite' : 'Favorite' }}
 
     </a>
 
     <a
     href="/hotel/bookmark/{{ $hotel->id }}"
-    class="bookmark-btn">
+    class="bookmark-btn{{ $isBookmarked ? ' is-saved' : '' }}">
 
-        🔖 Bookmark
+         {{ $isBookmarked ? 'Remove Bookmark' : 'Bookmark' }}
 
     </a>
 
     <a
     href="/hotel/checklist/{{ $hotel->id }}"
-    class="checklist-btn">
+    class="checklist-btn{{ $isChecklist ? ' is-saved' : '' }}">
 
-        ✅ Checklist
+         {{ $isChecklist ? 'Remove Checklist' : 'Checklist' }}
 
     </a>
+
+    <a href="/booking/hotel/{{ $hotel->id }}" class="book-now-btn">Book now</a>
 
 </div>
 
@@ -138,20 +138,24 @@ href="{{ asset('css/style.css') }}">
 
     </h2>
 
+    @if($hotel->rooms->isNotEmpty())<div class="room-types-grid">@foreach($hotel->rooms as $room)<article>@if($room->cover_image)<img src="{{ asset('uploads/hotel-rooms/'.$room->cover_image) }}" alt="{{ $room->name }}">@endif<strong>{{ $room->name }}</strong><span>PHP {{ number_format($room->price_per_night, 2) }} / night</span><small>{{ $room->available_rooms }} room(s) available</small>@if($room->gallery_images)<div class="room-gallery">@foreach($room->gallery_images as $image)<img src="{{ asset('uploads/hotel-rooms/'.$image) }}" alt="{{ $room->name }} photo" onclick="this.classList.toggle('image-zoomed')">@endforeach</div>@endif</article>@endforeach</div>@endif
+
+    @if($hotel->rooms->isEmpty())
     <p>
 
-        💰 Price Per Night:
+         Price Per Night:
 
-        ₱{{ number_format(
+        PHP {{ number_format(
             $hotel->price_per_night,
             2
         ) }}
 
     </p>
+    @endif
 
     <p>
 
-        🛏 Available Rooms:
+         Available Rooms:
 
         {{ $hotel->available_rooms }}
 
@@ -189,7 +193,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $hotel->location }}
+         {{ $hotel->location }}
 
     </p>
 
@@ -200,7 +204,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -210,7 +214,7 @@ href="{{ asset('css/style.css') }}">
 
 <!-- HOTEL RESERVATION -->
 
-<div class="spot-card">
+<div class="spot-card" id="booking">
 
     <h2>
 
@@ -236,6 +240,9 @@ action="/hotel/booking/confirm">
         <input
         type="date"
         name="check_in"
+        class="availability-date"
+        data-listing-type="hotel"
+        data-listing-id="{{ $hotel->id }}"
         min="{{ date('Y-m-d') }}"
         required>
 
@@ -276,7 +283,7 @@ action="/hotel/booking/confirm">
             <p>
 
                 Room Rate:
-                ₱{{ number_format(
+                PHP {{ number_format(
                     $hotel->price_per_night,
                     2
                 ) }}
@@ -308,51 +315,14 @@ action="/hotel/booking/confirm">
 
     </h2>
 
-    <div class="rating-big">
+    @include('partials.rating-board', ['ratings' => $hotel->ratings])
 
-        ⭐
-
-        {{ number_format(
-            $hotel->ratings->avg('rating') ?? 0,
-            1
-        ) }}
-
-    </div>
-
-    <p>
-
-        {{ $hotel->ratings->count() }}
-        Ratings
-
-    </p>
-
-    <form
-    method="POST"
-    action="/hotel/rate">
-
+    <form method="POST" action="/hotel/rate" class="rating-compose">
         @csrf
-
-        <input
-        type="hidden"
-        name="hotel_id"
-        value="{{ $hotel->id }}">
-
-        <select name="rating">
-
-            <option value="1">⭐ 1 Star</option>
-            <option value="2">⭐⭐ 2 Stars</option>
-            <option value="3">⭐⭐⭐ 3 Stars</option>
-            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
-
-        </select>
-
-        <button>
-
-            Submit Rating
-
-        </button>
-
+        <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
+        <span>Your rating</span>
+        @include('partials.star-input', ['inputId' => 'user-hotel-'.$hotel->id, 'value' => $hotel->ratings->where('user_id', Auth::id())->sortByDesc('id')->first()?->rating, 'label' => 'Rate this hotel'])
+        <p class="rating-help">Select a star to submit your rating.</p>
     </form>
 
 </div>
@@ -369,7 +339,7 @@ action="/hotel/booking/confirm">
 
     <form
     method="POST"
-    action="/hotel/comment">
+    action="/hotel/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -431,7 +401,7 @@ class="comment-card">
             class="menu-btn"
             onclick="toggleMenu({{ $comment->id }})">
 
-                ⋮
+
 
             </button>
 
@@ -475,7 +445,9 @@ class="comment-card">
 
     <p>
 
-        {{ $comment->comment }}
+    {{ $comment->comment }}
+
+    @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
 
     </p>
 
@@ -489,7 +461,7 @@ class="comment-card">
 
 <div class="comment-rating">
 
-    ⭐ Comment Rating:
+     Comment Rating:
 
     {{ number_format(
         $comment->ratings->avg('rating') ?? 0,
@@ -502,7 +474,7 @@ class="comment-card">
 
     <a href="/hotel/comment/{{ $comment->id }}/like">
 
-        👍
+
 
         {{ $comment->reactions
             ->where('reaction','like')
@@ -512,7 +484,7 @@ class="comment-card">
 
     <a href="/hotel/comment/{{ $comment->id }}/dislike">
 
-        👎
+
 
         {{ $comment->reactions
             ->where('reaction','dislike')
@@ -535,22 +507,11 @@ class="comment-card">
         name="comment_id"
         value="{{ $comment->id }}">
 
-        <select
-        name="rating">
-
-            <option value="1">⭐</option>
-            <option value="2">⭐⭐</option>
-            <option value="3">⭐⭐⭐</option>
-            <option value="4">⭐⭐⭐⭐</option>
-            <option value="5">⭐⭐⭐⭐⭐</option>
-
-        </select>
-
-        <button type="submit">
-
-            Rate
-
-        </button>
+        <div class="star-rating star-rating-small" role="radiogroup" aria-label="Rate this review">
+            @for($rating = 5; $rating >= 1; $rating--)
+                <input id="hotel-comment-{{ $comment->id }}-{{ $rating }}" type="radio" name="rating" value="{{ $rating }}" onchange="this.form.submit()"><label for="hotel-comment-{{ $comment->id }}-{{ $rating }}" title="{{ $rating }} star{{ $rating > 1 ? 's' : '' }}">&#9733;</label>
+            @endfor
+        </div>
 
     </form>
 
@@ -561,7 +522,7 @@ style="display:none;">
 
 <form
 method="POST"
-action="/hotel/comment/reply">
+action="/hotel/comment/reply" enctype="multipart/form-data">
 
     @csrf
 
@@ -575,6 +536,8 @@ action="/hotel/comment/reply">
     rows="2"
     placeholder="Write a reply..."
     required></textarea>
+
+    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
     <button type="submit">
 
@@ -610,7 +573,14 @@ action="/hotel/comment/reply">
 
     {{ $reply->reply }}
 
+    @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
+
 </p>
+
+<form method="POST" action="/hotel/reply/rate" class="reply-rating-form" aria-label="Rate this reply">
+    @csrf<input type="hidden" name="reply_id" value="{{ $reply->id }}"><span>Rate reply</span>
+    @include('partials.star-input', ['inputId' => 'hotel-reply-'.$reply->id, 'value' => $reply->ratings->firstWhere('user_id', Auth::id())?->rating, 'small' => true, 'label' => 'Rate this reply'])
+</form>
 
 <small>
 
@@ -627,7 +597,7 @@ action="/hotel/comment/reply">
         class="menu-btn"
         onclick="toggleReplyMenu({{ $reply->id }})">
 
-            ⋮
+
 
         </button>
 
@@ -674,7 +644,7 @@ style="display:none;">
 
     <form
     method="POST"
-    action="/hotel/comment/reply">
+action="/hotel/comment/reply" enctype="multipart/form-data">
 
         @csrf
 
@@ -687,7 +657,9 @@ style="display:none;">
         name="reply"
         rows="2"
         placeholder="Reply to {{ $reply->user->name }}"
-        required></textarea>
+    required></textarea>
+
+    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button type="submit">
 
@@ -701,7 +673,7 @@ style="display:none;">
 
 </div>
 
-        
+
 
     </div>
 
@@ -786,8 +758,10 @@ function toggleReplyToReply(id)
     }
 }
 
+
 </script>
 
+<script src="{{ asset('js/availability-calendar.js') }}"></script>
 </body>
 
 </html>

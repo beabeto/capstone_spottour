@@ -1,4 +1,3 @@
-```blade
 <!DOCTYPE html>
 
 <html>
@@ -8,6 +7,7 @@
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
@@ -15,11 +15,7 @@ href="{{ asset('css/style.css') }}">
 
 <div class="back-btn">
 
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 
 </div>
 
@@ -29,7 +25,7 @@ href="{{ asset('css/style.css') }}">
 
     <h1>
 
-        🏨 Hotel Reservation Confirmation
+         Hotel Reservation Confirmation
 
     </h1>
 
@@ -51,7 +47,7 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $hotel->location }}
+             {{ $hotel->location }}
 
         </p>
 
@@ -96,6 +92,11 @@ href="{{ asset('css/style.css') }}">
         </p>
 
         <p>
+            <strong>Room type:</strong>
+            {{ $hotel->rooms->firstWhere('id', (int) request('hotel_room_id'))?->name ?? 'Standard room' }}
+        </p>
+
+        <p>
 
             <strong>Available Rooms:</strong>
 
@@ -107,8 +108,8 @@ href="{{ asset('css/style.css') }}">
 
             <strong>Price Per Night:</strong>
 
-            ₱{{ number_format(
-                $hotel->price_per_night,
+            PHP {{ number_format(
+                $hotel->rooms->firstWhere('id', (int) request('hotel_room_id'))?->price_per_night ?? $hotel->price_per_night,
                 2
             ) }}
 
@@ -129,11 +130,15 @@ href="{{ asset('css/style.css') }}">
             );
 
             $rooms = request('rooms');
+            $roomType = $hotel->rooms->firstWhere('id', (int) request('hotel_room_id'));
+            $nightly = $roomType?->price_per_night ?? $hotel->price_per_night;
+            $extra = optional($hotel->packages->firstWhere('id', (int) request('package_id')))->price ?? 0;
 
             $total =
                 $nights *
                 $rooms *
-                $hotel->price_per_night;
+                $nightly +
+                $extra;
 
         @endphp
 
@@ -151,7 +156,7 @@ href="{{ asset('css/style.css') }}">
 
             <strong>
 
-                ₱{{ number_format(
+                PHP {{ number_format(
                     $total,
                     2
                 ) }}
@@ -162,33 +167,14 @@ href="{{ asset('css/style.css') }}">
 
     </div>
 
-<form
-method="POST"
-action="/hotel/payment">
-
-    @csrf
-
+<form method="GET" action="/hotel/payment">
     <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
-
-<input type="hidden" name="check_in" value="{{ request('check_in') }}">
-
-<input type="hidden" name="check_out" value="{{ request('check_out') }}">
-
-<input type="hidden" name="rooms" value="{{ request('rooms') }}">
-
-<input
-type="hidden"
-name="total_price"
-value="{{ $total }}">
-
-    <button
-    type="submit"
-    class="payment-btn">
-
-        💳 Proceed To Payment
-
-    </button>
-
+    <input type="hidden" name="check_in" value="{{ request('check_in') }}">
+    <input type="hidden" name="check_out" value="{{ request('check_out') }}">
+    <input type="hidden" name="rooms" value="{{ request('rooms') }}">
+    <input type="hidden" name="hotel_room_id" value="{{ request('hotel_room_id') }}">
+    <input type="hidden" name="package_id" value="{{ request('package_id') }}">
+    <button type="submit" class="payment-btn">Proceed To Payment</button>
 </form>
 
 </div>
@@ -198,4 +184,3 @@ value="{{ $total }}">
 </body>
 
 </html>
-```

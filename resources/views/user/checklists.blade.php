@@ -10,22 +10,23 @@ content="width=device-width, initial-scale=1.0">
 
 <title>My Checklist</title>
 
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-pages.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body account-page">
 
-<div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
-</div>
+@include('user.partials.account-bar')
 
 <div class="dashboard-container">
 
-<h1>✅ My Checklist</h1>
+<header class="account-hero">
+    <p class="account-kicker">Trip plan</p>
+    <h1>My Checklist</h1>
+    <p>Places you plan to visit, kept together in one list.</p>
+</header>
 
 {{-- ================= SPOT CHECKLIST ================= --}}
 
@@ -33,7 +34,7 @@ href="{{ asset('css/style.css') }}">
 
 <h2 class="section-title">
 
-    📍 Tourist Spots
+     Tourist Spots
 
 </h2>
 
@@ -55,13 +56,13 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $checklist->spot->location }}
+             {{ $checklist->spot->location }}
 
         </p>
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $checklist->spot->ratings->avg('rating') ?? 0,
                 1
             ) }}
@@ -103,7 +104,7 @@ href="{{ asset('css/style.css') }}">
 
 <h2 class="section-title">
 
-    🏨 Hotels
+     Hotels
 
 </h2>
 
@@ -125,13 +126,13 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $checklist->hotel->location }}
+             {{ $checklist->hotel->location }}
 
         </p>
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $checklist->hotel->ratings->avg('rating') ?? 0,
                 1
             ) }}
@@ -173,7 +174,7 @@ href="{{ asset('css/style.css') }}">
 
 <h2 class="section-title">
 
-    🍽 Restaurants
+     Restaurants
 
 </h2>
 
@@ -195,13 +196,13 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $checklist->food->location }}
+             {{ $checklist->food->location }}
 
         </p>
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $checklist->food->ratings->avg('rating') ?? 0,
                 1
             ) }}

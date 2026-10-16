@@ -12,6 +12,8 @@ use Illuminate\Notifications\Notifiable;
 #[Fillable([
     'name',
     'email',
+    'gender',
+    'birth_date',
     'password',
     'role',
     'business_type',
@@ -19,6 +21,7 @@ use Illuminate\Notifications\Notifiable;
     'status',
     'gcash_number',
 'gcash_name',
+'gcash_qr',
 'bank_name',
 'bank_account_number',
 'is_online',

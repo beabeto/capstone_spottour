@@ -9,21 +9,20 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body>
+<body class="owner-listing-page">
+@php $workspace = Auth::user()->role === 'admin' ? 'admin' : 'owner'; @endphp
 
 <div class="page-container">
 
 <div class="header-row">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <h1>
 
-🍽 Add Menu Item
+ Add Menu Item
 
 </h1>
 
@@ -31,7 +30,7 @@ href="{{ asset('css/style.css') }}">
 
 <form
 method="POST"
-action="/owner/foods/{{ $food->id }}/menus/store"
+action="/{{ $workspace }}/foods/{{ $food->id }}/menus/store"
 enctype="multipart/form-data"
 class="form-card">
 
@@ -118,7 +117,7 @@ name="image">
 type="submit"
 class="add-btn">
 
-💾 Save Menu Item
+ Save Menu Item
 
 </button>
 

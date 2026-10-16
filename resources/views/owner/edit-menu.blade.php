@@ -9,19 +9,18 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body>
+<body class="owner-listing-page">
+@php $workspace = Auth::user()->role === 'admin' ? 'admin' : 'owner'; @endphp
 
 <div class="page-container">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <h1>
 
-✏️ Edit Menu Item
+ Edit Menu Item
 
 </h1>
 
@@ -99,7 +98,7 @@ name="image">
 type="submit"
 class="add-btn">
 
-💾 Update Menu
+ Update Menu
 
 </button>
 

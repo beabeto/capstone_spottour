@@ -7,15 +7,14 @@
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body listing-detail">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <div class="spot-card">

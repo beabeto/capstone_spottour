@@ -15,12 +15,10 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body admin-detail-page">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 @if(session('success'))
@@ -57,14 +55,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $food->location }}
+             {{ $food->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            🍽 Food Establishment
-
+            @include('partials.score-stars', ['score' => $food->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -73,32 +69,26 @@ href="{{ asset('css/style.css') }}">
 
 <!-- ADMIN ACTIONS -->
 
-<div class="spot-actions-top">
+<div class="owner-listing-actions">
+<a href="/admin/foods/{{ $food->id }}/menus" class="view-btn">Manage menus</a>
+<a href="/admin/foods/{{ $food->id }}/menus/create" class="view-btn">Add menu</a>
+@if($food->status === 'pending')
+<a
+href="/admin/foods/approve/{{ $food->id }}"
+class="approve-btn">
 
-    <a
-    href="/admin/foods/approve/{{ $food->id }}"
-    class="favorite-btn">
-
-        ✅ Approve
-
-    </a>
-
-    <a
-    href="/admin/foods/reject/{{ $food->id }}"
-    class="bookmark-btn">
-
-        ❌ Reject
+         Approve
 
     </a>
 
     <a
-    href="/admin/foods/delete/{{ $food->id }}"
-    class="checklist-btn"
-    onclick="return confirm('Delete this food establishment?')">
+href="/admin/foods/reject/{{ $food->id }}"
+class="reject-btn">
 
-        🗑 Delete
+     Reject
 
-    </a>
+</a>
+@endif
 
 </div>
 
@@ -132,35 +122,35 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🍽 Available Tables:
+         Available Tables:
         {{ $food->available_tables }}
 
     </p>
 
     <p>
 
-        🎉 Venue Capacity:
+         Venue Capacity:
         {{ $food->venue_capacity }}
 
     </p>
 
     <p>
 
-        📌 Status:
+         Status:
         {{ ucfirst($food->status) }}
 
     </p>
 
     <p>
 
-        👤 Owner:
+         Owner:
         {{ $food->owner->name ?? 'N/A' }}
 
     </p>
 
     <p>
 
-        📧 Owner Email:
+         Owner Email:
         {{ $food->owner->email ?? 'N/A' }}
 
     </p>
@@ -179,7 +169,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $food->location }}
+         {{ $food->location }}
 
     </p>
 
@@ -190,7 +180,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -204,7 +194,7 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        🍴 Food Menus
+         Food Menus
 
     </h2>
 
@@ -248,7 +238,7 @@ href="{{ asset('css/style.css') }}">
 
         <h3>
 
-            ₱{{ number_format(
+            PHP {{ number_format(
                 $menu->price,
                 2
             ) }}
@@ -275,7 +265,7 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        💳 Owner Payment Information
+         Owner Payment Information
 
     </h2>
 
@@ -309,36 +299,25 @@ href="{{ asset('css/style.css') }}">
 
 </div>
 
-```blade
 <!-- FOOD RATING -->
 
 <div class="spot-card">
 
     <h2>
 
-        ⭐ Food Rating
+         Food Rating
 
     </h2>
 
-    <div class="rating-big">
+    @include('partials.rating-board', ['ratings' => $food->ratings])
 
-        ⭐
-
-        {{ number_format(
-            $food->ratings->avg('rating') ?? 0,
-            1
-        ) }}
-
-        / 5
-
-    </div>
-
-    <p>
-
-        Total Ratings:
-        {{ $food->ratings->count() }}
-
-    </p>
+    <form method="POST" action="/food/rate" class="rating-compose">
+        @csrf
+        <input type="hidden" name="food_id" value="{{ $food->id }}">
+        <span>Your rating</span>
+        @include('partials.star-input', ['inputId' => 'admin-food-'.$food->id, 'value' => $food->ratings->where('user_id', Auth::id())->sortByDesc('id')->first()?->rating, 'label' => 'Rate this restaurant'])
+        <p class="rating-help">Select a star to submit your rating.</p>
+    </form>
 
 </div>
 
@@ -348,9 +327,17 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        💬 Customer Reviews
+         Customer Reviews
 
     </h2>
+
+    <form method="POST" action="/food/comment" enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="food_id" value="{{ $food->id }}">
+        <textarea name="comment" rows="4" placeholder="Write an administrator review..." required></textarea>
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+        <button type="submit">Submit Comment</button>
+    </form>
 
     @forelse($food->comments ?? collect() as $comment)
 
@@ -388,15 +375,34 @@ href="{{ asset('css/style.css') }}">
 
         </p>
 
+        @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
+
+        @foreach($comment->replies as $reply)
+        <div class="reply-card">
+            <div class="reply-header">
+                <img src="{{ $reply->user && $reply->user->profile_image ? asset('uploads/profile/'.$reply->user->profile_image) : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" class="reply-avatar" alt="">
+                <div>
+                    <strong>{{ $reply->user->name ?? 'Guest' }}</strong>
+                    <small>{{ $reply->created_at->diffForHumans() }}</small>
+                </div>
+            </div>
+            <div class="reply-content">
+                {{ $reply->reply }}
+                @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
+            </div>
+        </div>
+        @endforeach
+
+        <form method="POST" action="/food/comment/reply" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="comment_id" value="{{ $comment->id }}">
+            <textarea name="reply" rows="2" placeholder="Write a reply..." required></textarea>
+            <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+            <button type="submit">Reply</button>
+        </form>
+
         <div class="comment-rating">
-
-            ⭐
-
-            {{ number_format(
-                $comment->ratings->avg('rating') ?? 0,
-                1
-            ) }}
-
+            @include('partials.score-stars', ['score' => $comment->ratings->avg('rating') ?? 0])
         </div>
 
         @if($comment->ratings->count())

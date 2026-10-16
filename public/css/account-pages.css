@@ -1,0 +1,121 @@
+body.account-page{background:#eef3f1!important;color:#203531!important}
+body.account-page .back-btn{display:block!important;position:fixed!important;top:18px!important;left:18px!important;z-index:40}
+
+body.account-page .favorites-container,
+body.account-page .dashboard-container,
+body.account-page .profile-container,
+body.account-page .page-container{box-sizing:border-box!important;width:min(980px,calc(100% - 40px))!important;max-width:none!important;margin:0 auto!important;padding:72px 0 64px!important}
+
+body.account-page .account-hero,
+body.account-page .management-heading{display:block!important;margin:0 0 18px!important;padding:22px 24px!important;border:1px solid #d5ebe4!important;border-radius:18px!important;background:linear-gradient(120deg,#e5f6f0 0%,#fff 62%)!important;box-shadow:0 10px 24px rgba(23,71,63,.04)}
+body.account-page .account-kicker,
+body.account-page .management-heading span{margin:0 0 4px!important;color:#167b69!important;font-size:12px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase}
+body.account-page .account-hero h1,
+body.account-page .management-heading h1{margin:0 0 6px!important;color:#17473f!important;font-size:34px!important;letter-spacing:-.04em!important}
+body.account-page .account-hero p,
+body.account-page .management-heading p{margin:0!important;max-width:640px;color:#607772!important}
+
+body.account-page .section-title{display:block!important;margin:22px 0 12px!important;color:#17473f!important;font-size:16px!important}
+body.account-page .section-title::before{content:none!important}
+
+body.account-page .favorite-card{display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;gap:0!important;align-items:stretch!important;overflow:hidden;margin:0 0 14px!important;padding:0!important;border:1px solid #d7e8e3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 24px rgba(23,71,63,.05)!important;transform:none!important}
+body.account-page .favorite-card::before{display:none!important}
+body.account-page .favorite-card:hover{transform:none!important;box-shadow:0 12px 26px rgba(23,71,63,.07)!important}
+body.account-page .favorite-image{position:relative;width:100%!important;max-width:100%!important;min-width:0;height:100%!important;min-height:160px;overflow:hidden;border-radius:0!important}
+body.account-page .favorite-image img{display:block;width:100%!important;max-width:100%!important;height:100%!important;min-height:160px;object-fit:cover;border-radius:0!important}
+body.account-page .favorite-content,
+body.account-page .booking-details{display:flex!important;flex-direction:column;justify-content:center;gap:6px;min-width:0;padding:16px 18px}
+body.account-page .favorite-content h3{margin:0!important;color:#17473f!important;font-size:20px!important}
+body.account-page .favorite-content p{margin:0!important;color:#607772!important;font-size:14px!important}
+body.account-page .favorite-rating{margin:0!important;color:#c47b12!important;font-size:14px!important}
+body.account-page .favorite-actions{display:flex!important;grid-template-columns:none!important;gap:8px!important;width:auto!important;margin-top:8px}
+body.account-page .favorite-actions .view-btn,
+body.account-page .favorite-actions .remove-btn{width:auto!important;min-height:36px!important;padding:0 14px!important;border-radius:9px!important;font-size:13px!important;font-weight:800!important}
+body.account-page .favorite-actions .view-btn{background:#167b69!important;color:#fff!important}
+body.account-page .favorite-actions .remove-btn{border:1px solid #f0c7c2!important;background:#fff6f5!important;color:#b42318!important}
+
+body.account-page .favorites-container .favorite-card{grid-template-columns:200px minmax(0,1fr) 156px!important;align-items:stretch!important}
+body.account-page .booking-details{grid-column:2!important;display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;min-width:0!important;overflow:hidden}
+body.account-page .booking-info{display:grid;gap:2px;min-width:0;margin:0;padding:8px 10px;overflow-wrap:anywhere;border:0;border-radius:10px;background:#f6fbf9}
+body.account-page .booking-info strong{color:#607772;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+body.account-page .booking-status{grid-column:3!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;gap:8px!important;width:auto!important;margin:0!important;padding:16px!important;border-radius:0!important;background:transparent!important;color:inherit!important;font-size:inherit!important;font-weight:600!important;box-shadow:none!important}
+body.account-page .confirmation-link{border:0!important;background:#167b69!important;color:#fff!important}
+body.account-page .cancel-booking-btn{border:1px solid #f0c7c2!important;background:#fff6f5!important;color:#b42318!important}
+body.account-page .badge-pending,
+body.account-page .badge-approved,
+body.account-page .badge-cancelled,
+body.account-page .badge-rejected,
+body.account-page .confirmation-link,
+body.account-page .cancel-booking-btn{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;width:100%!important;min-height:38px!important;margin:0!important;padding:0 12px!important;border-radius:9px!important;font-size:13px!important;font-weight:800!important;text-align:center!important;text-decoration:none!important}
+body.account-page .empty-favorites,
+body.account-page .empty-card,
+body.account-page .feedback-empty{margin:0 0 14px!important;padding:22px!important;border:1px dashed #c9e2da!important;border-radius:14px!important;background:#fff!important;color:#607772!important;text-align:center!important}
+body.account-page .empty-favorites h2,
+body.account-page .empty-card h3{margin:0 0 4px;color:#17473f;font-size:16px}
+
+body.account-page .profile-container{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;align-items:start!important}
+body.account-page .profile-container>.account-hero{grid-column:1 / -1}
+body.account-page .profile-card,
+body.account-page .profile-stats-card{height:auto!important;margin:0!important;padding:22px!important;border:1px solid #d7e8e3!important;border-radius:16px!important;background:#fff!important;box-shadow:none!important}
+body.account-page .profile-card{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
+body.account-page .profile-stats-card{padding:14px!important}
+body.account-page .profile-header{display:flex!important;align-items:center;gap:16px;margin:0 0 18px!important;padding:0 0 18px!important;border-bottom:1px solid #e6f0ec!important;text-align:left!important}
+body.account-page .profile-header .profile-image{width:84px!important;height:84px!important;margin:0!important;border:4px solid #fff!important;border-radius:50%!important;object-fit:cover;box-shadow:0 0 0 3px #b7ddd2}
+body.account-page .profile-identity{display:grid;justify-items:start;gap:3px;min-width:0}
+body.account-page .profile-header h2{margin:0 0 2px!important;color:#17473f!important;font-size:22px!important}
+body.account-page .profile-header p,
+body.account-page .profile-header small{display:block;margin:0 0 6px!important;color:#607772!important;text-align:left!important}
+body.account-page .profile-card form{display:grid;gap:12px}
+body.account-page .profile-card form label{display:grid;gap:6px;color:#48635c;font-size:13px;font-weight:800;text-align:left}
+body.account-page .profile-card form input:not([type=file]),
+body.account-page .profile-card form select{width:100%!important;margin:0!important;padding:12px 14px!important;border:1px solid #d5ebe4!important;border-radius:10px!important;background:#fff!important;color:#203531;font:inherit}
+body.account-page .profile-card form input[type=file]{width:100%;padding:8px;border:1px dashed #b7ddd2;border-radius:10px;background:#f7fcfa}
+body.account-page .auth-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+body.account-page .password-security-note{padding:14px;border-radius:12px;background:#f6fbf9}
+body.account-page .password-security-note h3,
+body.account-page .profile-card h3{margin:0 0 6px;color:#17473f;font-size:16px}
+body.account-page .password-security-note p{margin:0 0 10px;color:#607772;font-size:13px;line-height:1.5}
+body.account-page .profile-card form button{width:auto!important;min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#167b69;color:#fff;font-weight:800;cursor:pointer}
+body.account-page .profile-card .owner-gcash-qr{width:148px;height:148px;object-fit:contain;border:1px solid #d7e8e3;border-radius:12px;background:#fff}
+body.account-page .profile-card form input[readonly]{background:#f6fbf9!important;color:#48635c}
+body.account-page .profile-stats{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px!important;align-items:stretch}
+body.account-page .profile-box:last-child{grid-column:auto!important}
+body.account-page .profile-box{display:grid!important;justify-items:center;align-content:center;gap:4px;height:100%;min-height:96px;margin:0!important;padding:16px 8px!important;border:1px solid #d7e8e3!important;border-radius:14px!important;background:#f7fcfa!important;text-align:center!important}
+body.account-page .profile-box h3{margin:0!important;color:#607772!important;font-size:12px!important;font-weight:800!important;letter-spacing:.04em;text-transform:uppercase}
+body.account-page .profile-box span{color:#17473f;font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1}
+
+body.account-page.feedback-page .page-container{display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-content:stretch!important;gap:16px!important;align-items:stretch!important}
+body.account-page.feedback-page .management-heading,
+body.account-page.feedback-page .feedback-note,
+body.account-page.feedback-page .feedback-form,
+body.account-page.feedback-page .feedback-list,
+body.account-page.feedback-page .page-container>form{grid-column:1!important;width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
+body.account-page .feedback-form,
+body.account-page .feedback-list{display:flex!important;flex-direction:column;height:auto!important;margin:0!important}
+body.account-page .feedback-list{gap:12px}
+body.account-page .feedback-list h2{margin:0;color:#17473f;font-size:18px}
+body.account-page .feedback-form,
+body.account-page .feedback-card,
+body.account-page .feedback-empty{padding:22px!important;border:1px solid #d7e8e3!important;border-radius:16px!important;background:#fff!important}
+body.account-page .feedback-form textarea{min-height:180px;resize:vertical}
+body.account-page .feedback-form button{width:100%!important;min-height:44px}
+body.account-page .feedback-empty{flex:1;display:flex;align-items:center;justify-content:center;margin:0!important}
+
+@media(max-width:800px){
+    .account-bar{padding:0 16px}
+    body.account-page .favorites-container,
+    body.account-page .dashboard-container,
+    body.account-page .profile-container,
+    body.account-page .page-container{width:min(100% - 24px,980px)!important}
+    body.account-page .favorite-card,
+    body.account-page .favorites-container .favorite-card,
+    body.account-page .profile-container,
+    body.account-page.feedback-page .page-container,
+    body.account-page .booking-details,
+    body.account-page .auth-two-col{grid-template-columns:1fr!important}
+    body.account-page .favorite-image,
+    body.account-page .favorite-image img{width:100%!important;height:180px!important}
+    body.account-page .profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    body.account-page .booking-details,
+    body.account-page .booking-status{grid-column:1!important}
+}

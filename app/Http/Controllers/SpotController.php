@@ -6,7 +6,9 @@ use App\Models\SpotComment;
 
 
 use App\Models\Spot;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Support\BookingNotice;
 use Illuminate\Support\Facades\Auth;
 
 class SpotController extends Controller
@@ -15,10 +17,10 @@ class SpotController extends Controller
 
     public function userIndex()
     {
-        $spots = Spot::where(
-            'status',
-            'approved'
-        )->get();
+        $spots = Spot::where('status', 'approved')
+            ->withAvg('ratings', 'rating')
+            ->latest()
+            ->get();
 
         return view(
             'user.spots',
@@ -45,11 +47,12 @@ class SpotController extends Controller
 
     public function adminIndex()
     {
-        $spots = Spot::all();
+          $spots = Spot::with('owner')->latest()->get();
+        $deletedSpots = Spot::onlyTrashed()->latest('deleted_at')->get();
 
         return view(
             'admin.spots',
-            compact('spots')
+            compact('spots', 'deletedSpots')
         );
     }
 
@@ -57,17 +60,26 @@ class SpotController extends Controller
 
     public function create()
     {
-        return view('owner.create-spot');
+        abort_if(request()->is('admin/*') && Auth::user()->role !== 'admin', 403);
+        $owners = Auth::user()->role === 'admin'
+            ? User::where('role', 'owner')->orderBy('name')->get()
+            : collect();
+
+        return view('owner.create-spot', compact('owners'));
     }
 
     // SAVE SPOT
 
     public function store(Request $request)
     {
+        $isAdmin = Auth::user()->role === 'admin';
+
         $request->validate([
             'name' => 'required',
             'location' => 'required',
             'description' => 'required',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
         ]);
 
         $imageName = null;
@@ -84,9 +96,24 @@ class SpotController extends Controller
             );
         }
 
-        Spot::create([
+        $gallery = [];
+        foreach ($request->file('gallery_images', []) as $file) {
+            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/spots'), $name);
+            $gallery[] = $name;
+        }
 
-            'user_id' => Auth::id(),
+        $coords = \App\Support\PlaceMap::locate(
+            $request->latitude,
+            $request->longitude,
+            $request->map_link,
+            (string) $request->name,
+            (string) $request->location
+        );
+
+        $spot = Spot::create([
+
+            'user_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
 
             'name' => $request->name,
 
@@ -98,9 +125,12 @@ class SpotController extends Controller
 
             'price' => $request->price,
 
-            'image' => $imageName,
+            'daily_booking_limit' => $request->filled('daily_booking_limit') ? max(1, $request->integer('daily_booking_limit')) : null,
 
-            'status' => 'pending',
+            'image' => $imageName,
+            'gallery_images' => $gallery,
+
+            'status' => $isAdmin ? 'approved' : 'pending',
 
             'booking_type' =>
     $request->booking_type,
@@ -112,10 +142,21 @@ class SpotController extends Controller
     $request->cottage_price,
 
     'map_link' => $request->map_link,
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
 
         ]);
 
-        return redirect('/owner/spots')
+        if (!$isAdmin) {
+            BookingNotice::admins(
+                Auth::user()->name.' submitted the tourist spot "'.$spot->name.'" for review.',
+                ['spot_id' => $spot->id],
+                [],
+                'listing'
+            );
+        }
+
+        return redirect($isAdmin ? '/admin/spots' : '/owner/spots')
             ->with(
                 'success',
                 'Spot added successfully!'
@@ -126,7 +167,7 @@ public function show($id)
 {
     $spot = Spot::with([
 
-        'ratings',
+        'ratings.user',
 
         'comments.user',
 
@@ -164,6 +205,9 @@ public function rate(Request $request)
 
 public function comment(Request $request)
 {
+    $request->validate(['comment' => 'required|string|max:1000', 'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120']);
+    $image = $request->hasFile('image') ? time().'_'.$request->file('image')->getClientOriginalName() : null;
+    if ($image) $request->file('image')->move(public_path('uploads/comments'), $image);
     SpotComment::create([
 
         'spot_id' =>
@@ -173,13 +217,15 @@ public function comment(Request $request)
         Auth::id(),
 
         'comment' =>
-        $request->comment
+        $request->comment,
+
+        'image' => $image
 
     ]);
 
     return back()->with(
     'success',
-    '💬 Comment posted.'
+    ' Comment posted.'
 );
 }
 
@@ -187,7 +233,7 @@ public function ownerShow($id)
 {
     $spot = Spot::with([
 
-        'ratings',
+        'ratings.user',
 
         'comments.user',
 
@@ -236,6 +282,14 @@ public function update(
         );
     }
 
+    $coords = \App\Support\PlaceMap::locate(
+        $request->latitude,
+        $request->longitude,
+        $request->map_link,
+        (string) $request->name,
+        (string) $request->location
+    );
+
     $spot->update([
 
         'name' => $request->name,
@@ -246,7 +300,13 @@ public function update(
 
         'price' => $request->price,
 
+        'daily_booking_limit' => $request->filled('daily_booking_limit') ? max(1, $request->integer('daily_booking_limit')) : null,
+
         'map_link' => $request->map_link,
+
+        'latitude' => $coords['latitude'],
+
+        'longitude' => $coords['longitude'],
 
         'booking_type' => $request->booking_type,
 
@@ -282,7 +342,7 @@ public function delete($id)
 
 public function adminShow($id)
 {
-    $spot = Spot::findOrFail($id);
+    $spot = Spot::with('ratings.user')->findOrFail($id);
 
     return view(
         'admin.spot-details',
@@ -298,6 +358,13 @@ public function approve($id)
         'status' => 'approved'
     ]);
 
+    BookingNotice::send(
+        (int) $spot->user_id,
+        'Your tourist spot "'.$spot->name.'" was approved.',
+        ['spot_id' => $spot->id],
+        'listing'
+    );
+
     return back()->with(
         'success',
         'Spot approved successfully.'
@@ -311,6 +378,13 @@ public function reject($id)
     $spot->update([
         'status' => 'rejected'
     ]);
+
+    BookingNotice::send(
+        (int) $spot->user_id,
+        'Your tourist spot "'.$spot->name.'" was rejected.',
+        ['spot_id' => $spot->id],
+        'listing'
+    );
 
     return back()->with(
         'success',
@@ -328,6 +402,14 @@ public function adminDelete($id)
         'success',
         'Spot deleted successfully.'
     );
+}
+
+public function restore($id)
+{
+    $spot = Spot::onlyTrashed()->findOrFail($id);
+    abort_if($spot->deleted_at->lt(now()->subDays(30)), 410, 'This spot can no longer be restored.');
+    $spot->restore();
+    return redirect('/admin/spots')->with('success', 'Spot restored successfully.');
 }
 
 

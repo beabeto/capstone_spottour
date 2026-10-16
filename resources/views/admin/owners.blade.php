@@ -8,17 +8,19 @@
 href="{{ asset('css/style.css') }}">
 
 </head>
-<body class="admin-body">
+<body class="admin-body admin-detail-page">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <div class="admin-main-full">
 
 <h1>Owners Management</h1>
+
+@if(session('success'))
+<div class="toast-success">{{ session('success') }}</div>
+@endif
 
 <div class="table-card">
 
@@ -37,6 +39,8 @@ href="{{ asset('css/style.css') }}">
 <th>Business Type</th>
 
 <th>Status</th>
+
+<th>Account help</th>
 
 </tr>
 
@@ -58,20 +62,24 @@ href="{{ asset('css/style.css') }}">
 
 <td>
 
-@if($owner->status == 'active')
+@if($owner->is_online)
 
 <span class="active-badge">
-Active
+Online
 </span>
 
 @else
 
 <span class="inactive-badge">
-Inactive
+Offline
 </span>
 
 @endif
 
+</td>
+
+<td>
+<a href="/admin/accounts/{{ $owner->id }}" class="view-btn">See information</a>
 </td>
 
 </tr>
@@ -86,5 +94,6 @@ Inactive
 
 </div>
 
+<script>setTimeout(() => window.location.reload(), 30000);</script>
 </body>
 </html>

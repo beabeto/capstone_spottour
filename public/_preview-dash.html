@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="/css/style.css?v=1791277920">
+</head>
+
+
+<body class="admin-body">
+
+<div class="admin-container">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar workspace-sidebar" id="sidebar">
+
+       <div class="sidebar-logo">
+
+    <div class="logo-header">
+
+        <h2>Spot<span>Tour</span></h2>
+
+        <button
+            class="menu-toggle"
+            onclick="toggleSidebar()"
+            aria-label="Toggle sidebar"
+            aria-expanded="true">
+
+        </button>
+
+    </div>
+
+
+
+</div>
+
+        <ul class="sidebar-menu">
+
+            <li><a href="/admin" class="workspace-nav dashboard-nav"><i></i><span>Dashboard</span></a></li>
+            <li><a href="/admin/spots" class="workspace-nav spots-nav"><i></i><span>Spots</span></a></li>
+            <li><a href="/admin/hotels" class="workspace-nav hotels-nav"><i></i><span>Hotels</span></a></li>
+            <li><a href="/admin/foods" class="workspace-nav foods-nav"><i></i><span>Restaurants</span></a></li>
+            <li><a href="/admin/users" class="workspace-nav users-nav"><i></i><span>Users</span></a></li>
+            <li><a href="/admin/owners" class="workspace-nav owners-nav"><i></i><span>Owners</span></a></li>
+            <li><a href="/admin/bookings" class="workspace-nav bookings-nav"><i></i><span>Bookings</span></a></li>
+            <li><a href="/admin/calendar" class="workspace-nav calendar-nav"><i></i><span>Calendar</span></a></li>
+            <li>
+
+    <a href="/admin/feedback" class="workspace-nav feedback-nav">
+
+        <i></i>
+
+
+
+        <span>
+
+            Feedback
+
+        </span>
+
+        
+    </a>
+
+</li>
+            <li><a href="/logout" onclick="localStorage.removeItem('spottour-admin-welcome-closed')" class="logout-link workspace-nav logout-nav"><i></i><span>Logout</span></a></li>
+
+        </ul>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="admin-main">
+
+        <!-- TOPBAR -->
+
+<div class="topbar-right"><div class="workspace-title"><h1>Admin Dashboard</h1><p class="workspace-subtitle">Control center</p></div>
+
+    <div class="topbar-actions">
+
+    <div class="notification-wrapper">
+
+        <button
+            class="notification-bell"
+            onclick="toggleNotifications(event)"
+            aria-label="Open notifications">
+            &#128276;
+
+
+
+            
+                <span class="notification-badge">
+
+                    2
+
+                </span>
+
+            
+        </button>
+
+        <div
+            id="notificationDropdown"
+            class="notification-dropdown">
+
+            <h4>Notifications</h4>
+
+            <a href="/admin/users">
+                 0 New Users
+            </a>
+
+            <a href="/admin/spots">
+                 0 Pending Spots
+            </a>
+
+            <a href="/admin/hotels">
+                 0 Pending Hotels
+            </a>
+
+            <a href="/admin/foods">
+                 0 Pending Restaurants
+            </a>
+
+            <a href="/admin/bookings">
+                 2 Pending Bookings
+            </a>
+
+            <a href="/admin/feedback">
+                 0 New Feedback
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="admin-user account-chip is-admin" role="link" tabindex="0" onclick="window.location='/admin/profile'" onkeydown="if(event.key==='Enter')window.location='/admin/profile'">
+
+        
+            <img
+            src="/uploads/profile/1789371781.jpg"
+            alt="Profile">
+
+        
+        <div>
+
+            <span class="admin-name">
+
+                Yanzel
+
+            </span>
+
+            <small class="admin-role">Administrator</small>
+
+        </div>
+
+    </div>
+
+    </div>
+
+</div>
+
+        <section class="owner-welcome owner-welcome-top" id="adminWelcome">
+            <button type="button" class="welcome-close" aria-label="Close welcome message" onclick="closeAdminWelcome()">&times;</button>
+            <h2>Welcome back, Yanzel!</h2>
+            <p>Review listings, bookings, and feedback from your administrator workspace.</p>
+        </section>
+
+        <!-- CARDS -->
+
+        <div class="dashboard-cards">
+
+            <div class="stat-card">
+                <h3>Total Users</h3>
+    <p>
+        5
+    </p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Owners</h3>
+    <p>
+        4
+    </p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Bookings</h3>
+               <p> 8</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Feedback</h3>
+                <p>0</p>
+            </div>
+
+        </div>
+
+        <section class="admin-revenue" aria-label="Revenue">
+            <div>
+                <span>Today</span>
+                <strong>PHP 0.00</strong>
+            </div>
+            <div>
+                <span>This month</span>
+                <strong>PHP 0.00</strong>
+            </div>
+            <div>
+                <span>Total revenue</span>
+                <strong>PHP 15,500.00</strong>
+            </div>
+        </section>
+
+        <div class="approval-section">
+
+    <div class="section-title">
+
+        <h2>
+
+             Pending Approvals
+
+        </h2>
+
+    </div>
+
+    <div class="approval-grid">
+
+        <a href="/admin/spots" class="approval-card">
+
+            <h3>
+
+                 Spots
+
+            </h3>
+
+            <span>
+
+                0
+
+            </span>
+
+        </a>
+
+        <a href="/admin/hotels" class="approval-card">
+
+            <h3>
+
+                 Hotels
+
+            </h3>
+
+            <span>
+
+                0
+
+            </span>
+
+        </a>
+
+
+
+        <a href="/admin/foods" class="approval-card">
+
+            <h3>
+
+                 Restaurants
+
+            </h3>
+
+            <span>
+
+                0
+
+            </span>
+
+        </a>
+
+
+
+    </div>
+
+</div>
+
+<div class="dashboard-graphs">
+
+    <div class="graph-card">
+
+        <div class="graph-heading"><h2>Monthly Registrations</h2><select class="analytics-period" aria-label="Registration reporting period"><option>This month</option><option>This year</option></select></div>
+
+        <canvas id="registrationChart"></canvas>
+
+    </div>
+
+    <div class="graph-card">
+
+        <div class="graph-heading"><h2>Booking Analytics</h2><select class="analytics-period" aria-label="Booking reporting period"><option>All listings</option><option>Approved only</option></select></div>
+
+        <canvas id="bookingChart"></canvas>
+
+    </div>
+
+    <div class="graph-card">
+
+        <div class="graph-heading"><h2>Monthly Revenue</h2><select class="analytics-period" aria-label="Revenue reporting period"><option>This year</option><option>This month</option><option>Today</option></select></div>
+
+        <canvas id="revenueChart"></canvas>
+
+    </div>
+
+</div>
+
+<div class="top-performers">
+
+    <div class="section-title">
+
+        <h2>
+
+             Top Performing Listings
+
+        </h2>
+
+    </div>
+
+    <div class="performer-grid">
+
+        <!-- Top Spot -->
+
+        <div class="performer-card">
+
+            <h3> Top Tourist Spot</h3>
+
+            
+                
+                    <img
+                    src="/uploads/spots/1789367882.jpg"
+                    alt="Surigao City Boulevard">
+
+                
+                <h4>Surigao City Boulevard</h4>
+
+                <p>
+
+                    0 Bookings
+
+                </p>
+
+            
+        </div>
+
+        <!-- Top Hotel -->
+
+        <div class="performer-card">
+
+            <h3> Top Hotel</h3>
+
+            
+                
+                    <img
+                    src="/uploads/hotels/1789370436_gateway.jpg"
+                    alt="Philippine Gateway Hotel">
+
+                
+                <h4>Philippine Gateway Hotel</h4>
+
+                <p>
+
+                    2 Bookings
+
+                </p>
+
+            
+        </div>
+
+        <!-- Top Restaurant -->
+
+        <div class="performer-card">
+
+            <h3> Top Restaurant</h3>
+
+            
+                
+                    <img
+                    src="/uploads/foods/1790743421_manjagao.jpg"
+                    alt="Manjagao Restaurant - Gateway Hotel Surigao">
+
+                
+                <h4>Manjagao Restaurant - Gateway Hotel Surigao</h4>
+
+                <p>
+
+                    0 Reservations
+
+                </p>
+
+            
+        </div>
+
+    </div>
+
+</div>
+
+<div class="section-title">
+
+    <h2>
+
+         Recent Activities
+
+    </h2>
+
+    <a href="/admin/activities" class="view-all-btn">
+
+        View All
+
+    </a>
+
+</div>
+
+    <div class="activity-list">
+
+        
+        <div class="activity-card">
+
+           
+           <div class="activity-avatar">
+
+
+<div class="activity-icon">
+
+    
+
+</div>
+
+
+</div>
+            <div class="activity-content">
+
+                <h4>
+
+                    Ian Morales
+
+                </h4>
+
+                <p>
+
+                    Registered an account
+
+                </p>
+
+                <span class="activity-kind account">Account</span>
+
+                <small>
+
+                    1 day ago
+
+                </small>
+
+            </div>
+
+        </div>
+
+        
+        <div class="activity-card">
+
+           
+           <div class="activity-avatar">
+
+
+<div class="activity-icon">
+
+    
+
+</div>
+
+
+</div>
+            <div class="activity-content">
+
+                <h4>
+
+                    Manjagao Restaurant - Gateway Hotel Surigao
+
+                </h4>
+
+                <p>
+
+                    New restaurant added
+
+                </p>
+
+                <span class="activity-kind restaurant">Restaurant</span>
+
+                <small>
+
+                    6 days ago
+
+                </small>
+
+            </div>
+
+        </div>
+
+        
+        <div class="activity-card">
+
+           
+           <div class="activity-avatar">
+
+
+<img
+src="/uploads/profile/1790744516.jpg"
+alt="Profile">
+
+
+</div>
+            <div class="activity-content">
+
+                <h4>
+
+                    Ianzel Morales
+
+                </h4>
+
+                <p>
+
+                    Booked Philippine Gateway Hotel
+
+                </p>
+
+                <span class="activity-kind booking">Booking</span>
+
+                <small>
+
+                    1 week ago
+
+                </small>
+
+            </div>
+
+        </div>
+
+        
+    </div>
+
+</div>
+
+        <footer class="dashboard-footer">
+            <div class="footer-left">
+                <h3>Spot<span>Tour</span></h3>
+                <p>Explore - Book - Travel</p>
+            </div>
+            <div class="footer-right">
+                <a href="/admin/spots">Tourist Spots</a>
+                <a href="/admin/hotels">Hotels</a>
+                <a href="/admin/foods">Restaurants</a>
+                <a href="/admin/feedback">Feedback</a>
+            </div>
+        </footer>
+    </main>
+
+</div>
+
+<script>
+
+function closeAdminWelcome(){ document.getElementById('adminWelcome')?.remove(); localStorage.setItem('spottour-admin-welcome-closed','1'); }
+if(localStorage.getItem('spottour-admin-welcome-closed') === '1') document.getElementById('adminWelcome')?.remove();
+
+function toggleSidebar()
+{
+    const sidebar = document.getElementById('sidebar');
+    const trigger = document.querySelector('.menu-toggle');
+    if (window.matchMedia('(max-width: 900px)').matches) {
+        sidebar.classList.toggle('show');
+        trigger.setAttribute('aria-expanded', sidebar.classList.contains('show'));
+    } else {
+        sidebar.classList.toggle('collapsed');
+        trigger.setAttribute('aria-expanded', !sidebar.classList.contains('collapsed'));
+    }
+}
+
+document.querySelectorAll('.sidebar-menu .workspace-nav').forEach((link) => {
+    const path = new URL(link.href).pathname;
+    const current = window.location.pathname;
+    if (current === path || (path !== '/admin' && current.startsWith(path + '/'))) link.classList.add('is-active');
+});
+
+function toggleNotifications(event){
+
+    event.stopPropagation();
+
+    document
+        .getElementById('notificationDropdown')
+        .classList
+        .toggle('show');
+
+}
+
+document.addEventListener('click', function(){
+
+    document
+        .getElementById('notificationDropdown')
+        .classList
+        .remove('show');
+
+});
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+const registrationChart =
+document.getElementById('registrationChart');
+
+if(registrationChart){
+
+new Chart(registrationChart,{
+
+    type:'line',
+
+    data:{
+
+        labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+
+        datasets:[
+
+        {
+
+            label:'Users',
+
+            data:[0,0,0,0,0,3,0,1,0,1,0,0],
+
+            borderColor:'#2563eb',
+
+            backgroundColor:'rgba(37,99,235,.15)',
+
+            fill:true,
+
+            tension:.4
+
+        },
+
+        {
+
+            label:'Owners',
+
+            data:[0,0,0,0,0,2,0,0,2,0,0,0],
+
+            borderColor:'#10b981',
+
+            backgroundColor:'rgba(16,185,129,.15)',
+
+            fill:true,
+
+            tension:.4
+
+        }
+
+        ]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                position:'bottom'
+            }
+
+        }
+
+    }
+
+});
+
+}
+
+const bookingChart =
+document.getElementById('bookingChart');
+
+if(bookingChart){
+
+new Chart(bookingChart,{
+
+    type:'bar',
+
+    data:{
+
+        labels:["Spot","Hotel","Restaurant"],
+
+        datasets:[{
+
+            label:'Bookings',
+
+            data:[3,3,2],
+
+            backgroundColor:[
+
+                '#2563eb',
+
+                '#10b981',
+
+                '#f59e0b'
+
+            ],
+
+            borderRadius:10
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+
+                display:false
+
+            }
+
+        },
+
+        scales:{
+
+            y:{
+
+                beginAtZero:true
+
+            }
+
+        }
+
+    }
+
+});
+
+}
+
+const revenueChart =
+document.getElementById('revenueChart');
+
+if(revenueChart){
+
+new Chart(revenueChart,{
+
+    type:'line',
+
+    data:{
+
+        labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+
+        datasets:[{
+
+            label:'Revenue',
+
+            data:[0,0,0,0,0,1500,0,0,14000,0,0,0],
+
+            borderColor:'#22c55e',
+
+            backgroundColor:'rgba(34,197,94,.15)',
+
+            fill:true,
+
+            tension:.4,
+
+            pointRadius:5,
+
+            pointHoverRadius:7
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                position:'bottom'
+            }
+
+        },
+
+        scales:{
+
+            y:{
+
+                beginAtZero:true,
+
+                ticks:{
+
+                    callback:function(value){
+
+                        return 'PHP '+value.toLocaleString();
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+}
+
+</script>
+
+</body>
+</html>

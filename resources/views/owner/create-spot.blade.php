@@ -16,19 +16,28 @@
     <div class="spot-form-card">
 
         <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
         <h1>Add Tourist Spot</h1>
 
         <form
             method="POST"
-            action="/owner/spots/store"
+            action="{{ Auth::user()->role === 'admin' ? '/admin/spots/store' : '/owner/spots/store' }}"
             enctype="multipart/form-data">
 
             @csrf
+
+            @if(Auth::user()->role === 'admin')
+            <div class="form-group">
+                <label>Assign to owner</label>
+                <select name="owner_id" required>
+                    @foreach($owners ?? [] as $owner)
+                        <option value="{{ $owner->id }}">{{ $owner->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
 
             <!-- SPOT NAME -->
 
@@ -83,6 +92,11 @@
                     name="price"
                     placeholder="0.00">
 
+            </div>
+
+            <div class="form-group">
+                <label>Bookings accepted per day</label>
+                <input type="number" name="daily_booking_limit" min="1" value="{{ old('daily_booking_limit') }}" placeholder="Leave blank for no daily limit">
             </div>
 
             <!-- MAP -->
@@ -235,9 +249,15 @@
 
             </div>
 
+            <div class="form-group">
+                <label>Spot Gallery</label>
+                <input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple>
+                <small>Add multiple photos of the cottages, amenities, and views. The image above remains the cover.</small>
+            </div>
+
             <button
                 type="submit"
-                class="save-btn">
+                class="form-save-btn">
 
                 Save Spot
 

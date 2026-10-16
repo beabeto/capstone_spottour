@@ -7,10 +7,11 @@
 <title>Edit Comment</title>
 
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
-<body>
+<body class="dashboard-body listing-detail">
 
 <div class="page-container">
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
 
 @php
@@ -18,41 +18,47 @@ $user = Auth::user();
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar workspace-sidebar" id="sidebar">
 
        <div class="sidebar-logo">
 
     <div class="logo-header">
 
-        <h2>SpotTour</h2>
+        <h2>Spot<span>Tour</span></h2>
 
         <button
             class="menu-toggle"
-            onclick="toggleSidebar()">
-            ☰
+            onclick="toggleSidebar()"
+            aria-label="Toggle sidebar"
+            aria-expanded="true">
+
         </button>
 
     </div>
 
-   
+
 
 </div>
 
         <ul class="sidebar-menu">
 
-            <li><a href="/admin">🏠 <span>Dashboard</span></a></li>
-            <li><a href="/admin/spots">📍 <span>Spot</span></a></li>
-            <li><a href="/admin/hotels">🏨 <span>Hotel</span></a></li>
-            <li><a href="/admin/foods">🍽 <span>Food</span></a></li>
-            <li><a href="/admin/users">👥 <span>Users</span></a></li>
-            <li><a href="/admin/owners">🧑‍💼 <span>Owners</span></a></li>
-            <li><a href="/admin/bookings">📖 <span>Booking</span></a></li>
-            <li><a href="/admin/profile">👤 <span>Profile</span></a></li>
+            <li><a href="/admin" class="workspace-nav dashboard-nav"><i></i><span>Dashboard</span></a></li>
+            <li><a href="/admin/spots" class="workspace-nav spots-nav"><i></i><span>Spots</span></a></li>
+            <li><a href="/admin/hotels" class="workspace-nav hotels-nav"><i></i><span>Hotels</span></a></li>
+            <li><a href="/admin/foods" class="workspace-nav foods-nav"><i></i><span>Restaurants</span></a></li>
+            <li><a href="/admin/users" class="workspace-nav users-nav"><i></i><span>Travellers</span></a></li>
+            <li><a href="/admin/owners" class="workspace-nav owners-nav"><i></i><span>Owners</span></a></li>
+            <li><a href="/admin/bookings" class="workspace-nav bookings-nav"><i></i><span>Bookings</span></a></li>
+            <li><a href="/admin/day-plans" class="workspace-nav calendar-nav"><i></i><span>Day plans</span></a></li>
+            <li><a href="/admin/reports" class="workspace-nav calendar-nav"><i></i><span>Visitor report</span></a></li>
+            <li><a href="/admin/calendar" class="workspace-nav calendar-nav"><i></i><span>Calendar</span></a></li>
             <li>
 
-    <a href="/admin/feedback">
+    <a href="/admin/feedback" class="workspace-nav feedback-nav">
 
-        ⭐
+        <i></i>
+
+
 
         <span>
 
@@ -73,7 +79,8 @@ $user = Auth::user();
     </a>
 
 </li>
-            <li><a href="/logout">🚪 <span>Logout</span></a></li>
+            <li><a href="/admin/chats" class="workspace-nav"><i></i><span>Traveller chat</span>@php $chatWaiting = \App\Models\ChatThread::where('assignee_role', 'admin')->where('staff_unread', '>', 0)->count(); @endphp@if($chatWaiting > 0)<span class="menu-badge">{{ $chatWaiting }}</span>@endif</a></li>
+            <li><a href="/logout" onclick="localStorage.removeItem('spottour-admin-welcome-closed')" class="logout-link workspace-nav logout-nav"><i></i><span>Logout</span></a></li>
 
         </ul>
 
@@ -86,62 +93,25 @@ $user = Auth::user();
         <!-- TOPBAR -->
 
 <div class="topbar-right">
+    <button type="button" class="header-menu" onclick="toggleSidebar()" aria-label="Open menu"></button>
+    <div class="workspace-title"><h1>Admin Dashboard</h1><p class="workspace-subtitle">Control center</p></div>
 
-    <div class="notification-wrapper">
+    <div class="topbar-actions">
 
-        <button
-            class="notification-bell"
-            onclick="toggleNotifications(event)">
+    @include('partials.notification-menu', [
+        'notifications' => $notifications,
+        'unreadCount' => $unreadCount,
+        'allUrl' => '/admin/notifications',
+        'pendingSummary' => [
+            ['url' => '/admin/bookings', 'label' => $newBookings.' bookings waiting'],
+            ['url' => '/admin/spots', 'label' => $newSpots.' spots to review'],
+            ['url' => '/admin/hotels', 'label' => $newHotels.' hotels to review'],
+            ['url' => '/admin/foods', 'label' => $newFoods.' restaurants to review'],
+            ['url' => '/admin/feedback', 'label' => $newFeedback.' feedback notes'],
+        ],
+    ])
 
-            🔔
-
-            @if($totalNotifications > 0)
-
-                <span class="notification-badge">
-
-                    {{ $totalNotifications }}
-
-                </span>
-
-            @endif
-
-        </button>
-
-        <div
-            id="notificationDropdown"
-            class="notification-dropdown">
-
-            <h4>Notifications</h4>
-
-            <a href="/admin/users">
-                👤 {{ $newUsers }} New Users
-            </a>
-
-            <a href="/admin/spots">
-                📍 {{ $newSpots }} Pending Spots
-            </a>
-
-            <a href="/admin/hotels">
-                🏨 {{ $newHotels }} Pending Hotels
-            </a>
-
-            <a href="/admin/foods">
-                🍽 {{ $newFoods }} Pending Restaurants
-            </a>
-
-            <a href="/admin/bookings">
-                📖 {{ $newBookings }} Pending Bookings
-            </a>
-
-            <a href="/admin/feedback">
-                ⭐ {{ $newFeedback }} New Feedback
-            </a>
-
-        </div>
-
-    </div>
-
-    <div class="admin-user">
+    <div class="admin-user account-chip is-admin" role="link" tabindex="0" onclick="window.location='/admin/profile'" onkeydown="if(event.key==='Enter')window.location='/admin/profile'">
 
         @if($user && $user->profile_image)
 
@@ -165,82 +135,149 @@ $user = Auth::user();
 
             </span>
 
-            <small class="admin-role">
-
-                {{ ucfirst($user->role) }}
-
-            </small>
+            <small class="admin-role">Administrator</small>
 
         </div>
 
     </div>
 
+    </div>
+
 </div>
+
+        <section class="owner-welcome owner-welcome-top" id="adminWelcome">
+            <button type="button" class="welcome-close" aria-label="Close welcome message" onclick="closeAdminWelcome()">&times;</button>
+            <h2>Welcome back, {{ $user->name }}!</h2>
+            <p>Review listings, bookings, and feedback from your administrator workspace.</p>
+        </section>
 
         <!-- CARDS -->
 
+        @php
+            $spotBookingTotal = $bookingPlaces->where('kind', 'Tourist spot')->sum('bookings');
+            $hotelBookingTotal = $bookingPlaces->where('kind', 'Hotel')->sum('bookings');
+            $foodBookingTotal = $bookingPlaces->where('kind', 'Restaurant')->sum('bookings');
+        @endphp
         <div class="dashboard-cards">
 
-            <div class="stat-card">
-                <h3>Total Users</h3>
-    <p>
-        {{ $totalUsers }}
-    </p>
-            </div>
+            <a class="stat-card" href="/admin/users">
+                <h3>Travellers</h3>
+                <p>{{ $totalUsers }}</p>
+                <small>Traveller accounts only. Owners are not included here.</small>
+            </a>
 
-            <div class="stat-card">
+            <a class="stat-card" href="/admin/owners">
                 <h3>Total Owners</h3>
-    <p>
-        {{ $totalOwners }}
-    </p>
-            </div>
+                <p>{{ $totalOwners }}</p>
+                <small>Business accounts that manage spots, hotels, or restaurants.</small>
+            </a>
 
-            <div class="stat-card">
+            <a class="stat-card" href="/admin/bookings">
                 <h3>Total Bookings</h3>
-               <p> {{ $totalBookings }}</p>
-            </div>
+                <p>{{ $totalBookings }}</p>
+                <small>{{ $spotBookingTotal }} spots · {{ $hotelBookingTotal }} hotels · {{ $foodBookingTotal }} restaurants</small>
+            </a>
 
-            <div class="stat-card">
+            <a class="stat-card" href="/admin/feedback">
                 <h3>Feedback</h3>
                 <p>{{ $newFeedback }}</p>
-            </div>
+                <small>Messages that still need a reply.</small>
+            </a>
 
-            <div class="stat-card">
-
-    <h3>💰 Today's Revenue</h3>
-
-    <p>
-
-        ₱{{ number_format($todayRevenue,2) }}
-
-    </p>
-
-</div>
-
-<div class="stat-card">
-
-    <h3>📅 Monthly Revenue</h3>
-
-    <p>
-
-        ₱{{ number_format($monthlyRevenue,2) }}
-
-    </p>
-
-</div>
-
-<div class="stat-card">
-
-    <h3>🏦 Total Revenue</h3>
-
-    <p>
-
-        ₱{{ number_format($totalRevenue,2) }}
-
-    </p>
-
-</div>
         </div>
+
+        <section class="place-bookings" aria-label="Bookings by establishment">
+            <div class="section-title"><h2>Bookings by establishment</h2></div>
+            <div class="table-card">
+                <table>
+                    <thead><tr><th>Establishment</th><th>Type</th><th>Bookings</th><th>Arrived</th><th>Units</th><th>Approved revenue</th></tr></thead>
+                    <tbody>
+                    @forelse($bookingPlaces as $place)
+                        <tr>
+                            <td><strong>{{ $place['name'] }}</strong></td>
+                            <td>{{ $place['kind'] }}</td>
+                            <td>{{ $place['bookings'] }}</td>
+                            <td>{{ $place['arrived'] }}</td>
+                            <td>{{ $place['units'] }}</td>
+                            <td>PHP {{ number_format($place['revenue'], 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6">No bookings yet.</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="admin-revenue" aria-label="Revenue">
+            <div>
+                <span>Today</span>
+                <strong>PHP {{ number_format($todayRevenue, 2) }}</strong>
+            </div>
+            <div>
+                <span>This month</span>
+                <strong>PHP {{ number_format($monthlyRevenue, 2) }}</strong>
+            </div>
+            <div>
+                <span>Total revenue</span>
+                <strong>PHP {{ number_format($totalRevenue, 2) }}</strong>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Upcoming reservations</h2>
+                <a href="/admin/calendar">View calendar</a>
+            </div>
+            <div class="schedule-list">
+                @forelse($upcomingBookings as $booking)
+                    <a class="schedule-card" href="/admin/bookings">
+                        <div class="schedule-date">
+                            <h3>{{ \Carbon\Carbon::parse($booking->date)->format('d') }}</h3>
+                            <span>{{ \Carbon\Carbon::parse($booking->date)->format('M') }}</span>
+                        </div>
+                        <div class="schedule-content">
+                            <h4>{{ $booking->customer }}</h4>
+                            <p>{{ $booking->listing }}</p>
+                            <small>{{ $booking->category }} · {{ \Carbon\Carbon::parse($booking->date)->format('l') }}</small>
+                        </div>
+                        <div class="schedule-status">
+                            <span class="status {{ $booking->status }}">{{ ucfirst(str_replace('_', ' ', $booking->status)) }}</span>
+                        </div>
+                    </a>
+                @empty
+                    <div class="empty-review">No upcoming reservations.</div>
+                @endforelse
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Traveller day plans</h2>
+                <a href="/admin/day-plans">View all</a>
+            </div>
+            <div class="schedule-list">
+                @forelse($dayPlans as $plan)
+                    <a class="schedule-card" href="/admin/day-plans">
+                        <div class="schedule-date">
+                            <h3>{{ $plan->plan_date->format('d') }}</h3>
+                            <span>{{ $plan->plan_date->format('M') }}</span>
+                        </div>
+                        <div class="schedule-content">
+                            <h4>{{ $plan->user?->name ?? 'Traveller' }}</h4>
+                            <p>
+                                {{ $plan->spot?->name ? 'Spot: '.$plan->spot->name : '' }}
+                                {{ $plan->food?->name ? ' · Meal: '.$plan->food->name : '' }}
+                                {{ $plan->hotel?->name ? ' · Stay: '.$plan->hotel->name : '' }}
+                            </p>
+                            <small>{{ $plan->note ?: 'Surigao day plan' }}</small>
+                        </div>
+                    </a>
+                @empty
+                    <div class="empty-review">No upcoming day plans yet.</div>
+                @endforelse
+            </div>
+        </section>
 
         <div class="approval-section">
 
@@ -248,7 +285,7 @@ $user = Auth::user();
 
         <h2>
 
-            ⏳ Pending Approvals
+             Pending Approvals
 
         </h2>
 
@@ -260,7 +297,7 @@ $user = Auth::user();
 
             <h3>
 
-                📍 Spots
+                 Spots
 
             </h3>
 
@@ -276,7 +313,7 @@ $user = Auth::user();
 
             <h3>
 
-                🏨 Hotels
+                 Hotels
 
             </h3>
 
@@ -288,13 +325,13 @@ $user = Auth::user();
 
         </a>
 
-        
+
 
         <a href="/admin/foods" class="approval-card">
 
             <h3>
 
-                🍽 Restaurants
+                 Restaurants
 
             </h3>
 
@@ -306,7 +343,7 @@ $user = Auth::user();
 
         </a>
 
-        
+
 
     </div>
 
@@ -316,43 +353,23 @@ $user = Auth::user();
 
     <div class="graph-card">
 
-        <h2>
-
-            👥 Monthly Registrations
-
-        </h2>
+        <div class="graph-heading"><h2>Monthly Registrations</h2><select class="analytics-period" aria-label="Registration reporting period"><option>This month</option><option>This year</option></select></div>
 
         <canvas id="registrationChart"></canvas>
 
     </div>
 
-</div>
-
-       <div class="dashboard-graphs">
-
     <div class="graph-card">
 
-        <h2>
-
-            📖 Booking Analytics
-
-        </h2>
+        <div class="graph-heading"><h2>Booking Analytics</h2><select class="analytics-period" aria-label="Booking reporting period"><option>All listings</option><option>Approved only</option></select></div>
 
         <canvas id="bookingChart"></canvas>
 
     </div>
 
-</div>
-
-<div class="dashboard-graphs">
-
     <div class="graph-card">
 
-        <h2>
-
-            💰 Monthly Revenue
-
-        </h2>
+        <div class="graph-heading"><h2>Monthly Revenue</h2><select class="analytics-period" aria-label="Revenue reporting period"><option>This year</option><option>This month</option><option>Today</option></select></div>
 
         <canvas id="revenueChart"></canvas>
 
@@ -366,7 +383,7 @@ $user = Auth::user();
 
         <h2>
 
-            🏆 Top Performing Listings
+             Top Performing Listings
 
         </h2>
 
@@ -378,7 +395,7 @@ $user = Auth::user();
 
         <div class="performer-card">
 
-            <h3>📍 Top Tourist Spot</h3>
+            <h3> Top Tourist Spot</h3>
 
             @if($topSpot)
 
@@ -410,7 +427,7 @@ $user = Auth::user();
 
         <div class="performer-card">
 
-            <h3>🏨 Top Hotel</h3>
+            <h3> Top Hotel</h3>
 
             @if($topHotel)
 
@@ -442,7 +459,7 @@ $user = Auth::user();
 
         <div class="performer-card">
 
-            <h3>🍽 Top Restaurant</h3>
+            <h3> Top Restaurant</h3>
 
             @if($topFood)
 
@@ -473,18 +490,18 @@ $user = Auth::user();
     </div>
 
 </div>
-        
+
 <div class="section-title">
 
     <h2>
 
-        🕒 Recent Activities
+         Recent Activities
 
     </h2>
 
     <a href="/admin/activities" class="view-all-btn">
 
-        View All →
+        View All
 
     </a>
 
@@ -493,52 +510,7 @@ $user = Auth::user();
     <div class="activity-list">
 
         @forelse($activities as $activity)
-
-        <div class="activity-card">
-
-           <div class="activity-avatar">
-
-@if(!empty($activity['profile_image']))
-
-<img
-src="{{ asset('uploads/profile/'.$activity['profile_image']) }}"
-alt="Profile">
-
-@else
-
-<div class="activity-icon">
-
-    {{ $activity['icon'] }}
-
-</div>
-
-@endif
-
-</div>
-            <div class="activity-content">
-
-                <h4>
-
-                    {{ $activity['title'] }}
-
-                </h4>
-
-                <p>
-
-                    {{ $activity['message'] }}
-
-                </p>
-
-                <small>
-
-                    {{ \Carbon\Carbon::parse($activity['date'])->diffForHumans() }}
-
-                </small>
-
-            </div>
-
-        </div>
-
+        @include('admin.partials.activity-row', ['activity' => $activity])
         @empty
 
         <div class="empty-state">
@@ -551,41 +523,46 @@ alt="Profile">
 
     </div>
 
-</div>
-
+        <footer class="dashboard-footer">
+            <div class="footer-left">
+                <h3>Spot<span>Tour</span></h3>
+                <p>Explore - Book - Travel</p>
+            </div>
+            <div class="footer-right">
+                <a href="/admin/spots">Tourist Spots</a>
+                <a href="/admin/hotels">Hotels</a>
+                <a href="/admin/foods">Restaurants</a>
+                <a href="/admin/feedback">Feedback</a>
+            </div>
+        </footer>
     </main>
 
 </div>
 
 <script>
 
+function closeAdminWelcome(){ document.getElementById('adminWelcome')?.remove(); localStorage.setItem('spottour-admin-welcome-closed','1'); }
+if(localStorage.getItem('spottour-admin-welcome-closed') === '1') document.getElementById('adminWelcome')?.remove();
+
 function toggleSidebar()
 {
-    document
-        .getElementById('sidebar')
-        .classList
-        .toggle('collapsed');
+    const sidebar = document.getElementById('sidebar');
+    const trigger = document.querySelector('.menu-toggle');
+    if (window.matchMedia('(max-width: 900px)').matches) {
+        sidebar.classList.toggle('show');
+        trigger.setAttribute('aria-expanded', sidebar.classList.contains('show'));
+    } else {
+        sidebar.classList.toggle('collapsed');
+        trigger.setAttribute('aria-expanded', !sidebar.classList.contains('collapsed'));
+    }
 }
 
-function toggleNotifications(event){
-
-    event.stopPropagation();
-
-    document
-        .getElementById('notificationDropdown')
-        .classList
-        .toggle('show');
-
-}
-
-document.addEventListener('click', function(){
-
-    document
-        .getElementById('notificationDropdown')
-        .classList
-        .remove('show');
-
+document.querySelectorAll('.sidebar-menu .workspace-nav').forEach((link) => {
+    const path = new URL(link.href).pathname;
+    const current = window.location.pathname;
+    if (current === path || (path !== '/admin' && current.startsWith(path + '/'))) link.classList.add('is-active');
 });
+
 
 
 
@@ -612,8 +589,7 @@ new Chart(registrationChart,{
 
         {
 
-            label:'Users',
-
+            label:'Travellers',
             data:@json($userRegistrationData),
 
             borderColor:'#2563eb',
@@ -786,7 +762,7 @@ new Chart(revenueChart,{
 
                     callback:function(value){
 
-                        return '₱'+value.toLocaleString();
+                        return 'PHP '+value.toLocaleString();
 
                     }
 

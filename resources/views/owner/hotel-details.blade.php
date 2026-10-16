@@ -22,9 +22,7 @@ href="{{ asset('css/style.css') }}">
 <!-- BACK -->
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <!-- HERO -->
@@ -49,55 +47,22 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $hotel->location }}
+             {{ $hotel->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $hotel->ratings()->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $hotel->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
 
 </div>
 
-<!-- FAVORITE BOOKMARK CHECKLIST -->
-
-<div class="spot-actions-top">
-
-    <a
-    href="/hotel/favorite/{{ $hotel->id }}"
-    class="favorite-btn">
-
-        ❤️ Favorite
-
-    </a>
-
-    <a
-    href="/hotel/bookmark/{{ $hotel->id }}"
-    class="bookmark-btn">
-
-        🔖 Bookmark
-
-    </a>
-
-    <a
-    href="/hotel/checklist/{{ $hotel->id }}"
-    class="checklist-btn">
-
-        ✅ Checklist
-
-    </a>
-
+<div class="owner-listing-actions">
+    <a href="/owner/hotels/edit/{{ $hotel->id }}" class="edit-btn">Edit hotel</a>
+    <a href="/owner/hotels/{{ $hotel->id }}/rooms" class="view-btn">Manage rooms</a>
+    <a href="/owner/hotels/delete/{{ $hotel->id }}" class="deletes-btn" onclick="return confirm('Delete this hotel?')">Delete</a>
 </div>
 
 <!-- ABOUT -->
@@ -118,9 +83,9 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        💰 Price Per Night:
+         Price Per Night:
 
-        ₱{{ number_format(
+        PHP {{ number_format(
             $hotel->price_per_night,
             2
         ) }}
@@ -129,7 +94,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🛏 Available Rooms:
+         Available Rooms:
 
         {{ $hotel->available_rooms }}
 
@@ -137,7 +102,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🏨 Amenities:
+         Amenities:
 
         {{ $hotel->amenities }}
 
@@ -157,7 +122,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $hotel->location }}
+         {{ $hotel->location }}
 
     </p>
 
@@ -168,7 +133,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -176,130 +141,12 @@ href="{{ asset('css/style.css') }}">
 
 </div>
 
-<!-- BOOKING -->
-
-<div class="spot-card">
-
-    <h2>
-
-        Reserve This Hotel
-
-    </h2>
-
-    <form
-    method="GET"
-    action="/hotel/booking/confirm">
-
-        <input
-        type="hidden"
-        name="hotel_id"
-        value="{{ $hotel->id }}">
-
-        <label>
-
-            Check In
-
-        </label>
-
-        <input
-        type="date"
-        name="check_in"
-        min="{{ date('Y-m-d') }}"
-        required>
-
-        <label>
-
-            Check Out
-
-        </label>
-
-        <input
-        type="date"
-        name="check_out"
-        min="{{ date('Y-m-d') }}"
-        required>
-
-        <label>
-
-            Number Of Rooms
-
-        </label>
-
-        <input
-        type="number"
-        name="rooms"
-        min="1"
-        max="{{ $hotel->available_rooms }}"
-        value="1">
-
-        <p>
-
-            Available Rooms:
-            {{ $hotel->available_rooms }}
-
-        </p>
-
-        <p>
-
-            Price Per Night:
-            ₱{{ number_format(
-                $hotel->price_per_night,
-                2
-            ) }}
-
-        </p>
-
-        <button
-        type="submit">
-
-            Proceed To Reservation
-
-        </button>
-
-    </form>
-
-</div>
-
 <!-- HOTEL RATING -->
 
 <div class="spot-card">
 
-    <h2>
-
-        Rate This Hotel
-
-    </h2>
-
-    <form
-    method="POST"
-    action="/hotel/rate">
-
-        @csrf
-
-        <input
-        type="hidden"
-        name="hotel_id"
-        value="{{ $hotel->id }}">
-
-        <select
-        name="rating">
-
-            <option value="1">⭐ 1 Star</option>
-            <option value="2">⭐⭐ 2 Stars</option>
-            <option value="3">⭐⭐⭐ 3 Stars</option>
-            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
-
-        </select>
-
-        <button
-        type="submit">
-
-            Submit Rating
-
-        </button>
-
-    </form>
+    <h2>Guest ratings</h2>
+    @include('partials.rating-board', ['ratings' => $hotel->ratings])
 
 </div>
 
@@ -315,7 +162,7 @@ href="{{ asset('css/style.css') }}">
 
     <form
     method="POST"
-    action="/hotel/comment">
+    action="/hotel/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -329,6 +176,8 @@ href="{{ asset('css/style.css') }}">
         rows="4"
         placeholder="Write your review..."
         required></textarea>
+
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button
         type="submit">
@@ -377,7 +226,7 @@ href="{{ asset('css/style.css') }}">
 class="menu-btn"
 onclick="toggleMenu({{ $comment->id }})">
 
-⋮
+
 
 </button>
 
@@ -414,6 +263,8 @@ class="comment-dropdown">
 
         </p>
 
+        @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
+
         <small>
 
             {{ $comment->created_at->diffForHumans() }}
@@ -421,14 +272,7 @@ class="comment-dropdown">
         </small>
 
         <div class="comment-rating">
-
-            ⭐
-
-            {{ number_format(
-                $comment->ratings->avg('rating') ?? 0,
-                1
-            ) }}
-
+            @include('partials.score-stars', ['score' => $comment->ratings->avg('rating') ?? 0])
         </div>
 
         <div class="comment-actions">
@@ -436,7 +280,7 @@ class="comment-dropdown">
             <a
             href="/hotel/comment/{{ $comment->id }}/like">
 
-                👍
+
 
                 {{ $comment->reactions
                 ->where('type','like')
@@ -447,7 +291,7 @@ class="comment-dropdown">
             <a
             href="/hotel/comment/{{ $comment->id }}/dislike">
 
-                👎
+
 
                 {{ $comment->reactions
                 ->where('type','dislike')
@@ -457,37 +301,6 @@ class="comment-dropdown">
 
         </div>
 
-        <!-- RATE COMMENT -->
-
-        <form
-        method="POST"
-        action="/hotel/comment/rate">
-
-            @csrf
-
-            <input
-            type="hidden"
-            name="comment_id"
-            value="{{ $comment->id }}">
-
-            <select
-            name="rating">
-
-                <option value="1">⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="5">⭐⭐⭐⭐⭐</option>
-
-            </select>
-
-            <button>
-
-                Rate Comment
-
-            </button>
-
-        </form>
 
         <!-- REPLY -->
 
@@ -498,7 +311,7 @@ style="display:none;">
 
 <form
 method="POST"
-action="/hotel/comment/reply">
+action="/hotel/comment/reply" enctype="multipart/form-data">
 
     @csrf
 
@@ -513,6 +326,8 @@ action="/hotel/comment/reply">
     placeholder="Write a reply..."
     required></textarea>
 
+    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+
     <button type="submit">
 
         Reply
@@ -522,7 +337,7 @@ action="/hotel/comment/reply">
 </form>
 
 </div>
-    
+
 @foreach($comment->replies as $reply)
 
 <div class="reply-card">
@@ -551,7 +366,7 @@ action="/hotel/comment/reply">
             class="menu-btn"
             onclick="toggleReplyMenu({{ $reply->id }})">
 
-                ⋮
+
 
             </button>
 
@@ -580,13 +395,15 @@ action="/hotel/comment/reply">
 
         </div>
 
-        
+
 
     </div>
 
     <div class="reply-content">
 
         {{ $reply->reply }}
+
+        @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
 
     </div>
 
@@ -603,7 +420,7 @@ action="/hotel/comment/reply">
 
         <form
         method="POST"
-        action="/hotel/comment/reply">
+        action="/hotel/comment/reply" enctype="multipart/form-data">
 
             @csrf
 
@@ -622,6 +439,8 @@ action="/hotel/comment/reply">
             rows="2"
             placeholder="Reply to {{ $reply->user->name }}"
             required></textarea>
+
+            <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
             <button type="submit">
 

@@ -8,16 +8,14 @@
 href="{{ asset('css/style.css') }}">
 
 </head>
-<body>
+<body class="owner-listing-page">
 
 <div class="page-container">
 
 <div class="header-row">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <h1>
@@ -125,7 +123,7 @@ status-pending
 </td>
 
 <td>
-
+<div class="listing-action-row listing-action-top">
 <a
 href="/owner/foods/{{ $food->id }}"
 class="view-btn">
@@ -136,12 +134,14 @@ class="view-btn">
 
 <a
 href="/owner/foods/{{ $food->id }}/menus"
-class="menu-btn">
+class="listing-menu-btn">
 
-    🍽 Menu
+     Menu
 
 </a>
+</div>
 
+<div class="listing-action-row listing-action-bottom">
 <a
 href="/owner/foods/edit/{{ $food->id }}"
 class="edit-btn">
@@ -158,6 +158,7 @@ onclick="return confirm('Delete this food establishment?')">
     Delete
 
 </a>
+</div>
 
 </td>
 

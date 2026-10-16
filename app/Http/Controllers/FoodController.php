@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Food;
+use App\Models\User;
 use App\Models\FoodMenu;
 use App\Models\FoodComment;
 use App\Models\FoodReply;
+use App\Models\FoodReplyRating;
 use App\Models\FoodRating;
 use Illuminate\Http\Request;
+use App\Support\BookingNotice;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class FoodController extends Controller
 {
@@ -27,10 +31,13 @@ class FoodController extends Controller
 
     public function ownerShow($id)
 {
-    $food = Food::with(
+    $food = Food::with([
         'menus',
-        'comments.user'
-    )->findOrFail($id);
+        'ratings.user',
+        'comments.user',
+        'comments.replies.user',
+        'comments.ratings',
+    ])->findOrFail($id);
 
     return view(
         'owner.food-details',
@@ -42,9 +49,12 @@ class FoodController extends Controller
 
     public function create()
     {
-        return view(
-            'owner.create-food'
-        );
+        abort_if(request()->is('admin/*') && Auth::user()->role !== 'admin', 403);
+        $owners = Auth::user()->role === 'admin'
+            ? User::where('role', 'owner')->orderBy('name')->get()
+            : collect();
+
+        return view('owner.create-food', compact('owners'));
     }
 
     public function store(Request $request)
@@ -55,9 +65,29 @@ class FoodController extends Controller
 
             'location' => 'required',
 
-            'description' => 'required'
+            'description' => 'required',
+
+            'available_tables' => 'required|integer|min:1',
+
+            'venue_capacity' => 'required|integer|min:1',
+
+            'daily_booking_limit' => 'nullable|integer|min:1',
+
+            'map_link' => 'nullable|url',
+
+            'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'owner_id' => Auth::user()->role === 'admin' ? 'required|exists:users,id,role,owner' : 'nullable',
+            'menus' => 'required|array|min:1',
+            'menus.*.name' => 'required|string|max:120',
+            'menus.*.category' => ['required', Rule::in(array_keys(FoodMenu::categories()))],
+            'menus.*.price' => 'required|numeric|min:0',
+            'menus.*.description' => 'nullable|string|max:1000',
+            'menus.*.image' => 'nullable|image|max:5120',
 
         ]);
+
+        $isAdmin = Auth::user()->role === 'admin';
 
         $image = null;
 
@@ -77,9 +107,25 @@ class FoodController extends Controller
             );
         }
 
-        Food::create([
+        $gallery = [];
+        foreach ($request->file('gallery_images', []) as $file) {
+            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/foods'), $name);
+            $gallery[] = $name;
+        }
 
-            'owner_id' => Auth::id(),
+        $coords = \App\Support\PlaceMap::locate(
+            null,
+            null,
+            $request->map_link,
+            (string) $request->name,
+            (string) $request->location
+        );
+
+        $food = Food::create([
+
+            'owner_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
+            'status' => $isAdmin ? 'approved' : 'pending',
 
             'name' => $request->name,
 
@@ -91,20 +137,56 @@ class FoodController extends Controller
                 $request->available_tables,
 
             'venue_capacity' =>
-                $request->venue_capacity,
+                $request->integer('venue_capacity'),
+
+            'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
 
             'map_link' =>
                 $request->map_link,
 
-            'image' => $image
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
+
+            'image' => $image,
+            'gallery_images' => $gallery,
 
         ]);
 
-        return redirect(
-            '/owner/foods'
-        )->with(
+        $directory = public_path('uploads/menus');
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        foreach ($request->input('menus') as $index => $menu) {
+            $imageName = null;
+            $menuImage = $request->file("menus.$index.image");
+            if ($menuImage) {
+                $imageName = time().'_'.uniqid().'_'.$menuImage->getClientOriginalName();
+                $menuImage->move($directory, $imageName);
+            }
+
+            FoodMenu::create([
+                'food_id' => $food->id,
+                'name' => $menu['name'],
+                'description' => $menu['description'] ?? null,
+                'price' => $menu['price'],
+                'category' => $menu['category'],
+                'image' => $imageName,
+            ]);
+        }
+
+        if (!$isAdmin) {
+            BookingNotice::admins(
+                Auth::user()->name.' submitted the restaurant "'.$food->name.'" for review.',
+                ['food_id' => $food->id],
+                [],
+                'listing'
+            );
+        }
+
+        return redirect($isAdmin ? '/admin/foods' : '/owner/foods')->with(
             'success',
-            'Food Establishment Added.'
+            'Restaurant saved with its menu.'
         );
     }
 
@@ -113,6 +195,7 @@ class FoodController extends Controller
     public function menus($id)
 {
     $food = Food::findOrFail($id);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
     $menus = FoodMenu::where(
         'food_id',
@@ -131,6 +214,7 @@ class FoodController extends Controller
 public function createMenu($foodId)
 {
     $food = Food::findOrFail($foodId);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
     return view(
         'owner.create-menu',
@@ -140,6 +224,8 @@ public function createMenu($foodId)
 
 public function storeMenu(Request $request, $foodId)
 {
+    $food = Food::findOrFail($foodId);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
     $image = null;
 
     if($request->hasFile('image'))
@@ -173,7 +259,7 @@ public function storeMenu(Request $request, $foodId)
     ]);
 
     return redirect(
-        '/owner/foods/'.$foodId.'/menus'
+        (Auth::user()?->role === 'admin' ? '/admin/foods/' : '/owner/foods/').$foodId.'/menus'
     )->with(
         'success',
         'Menu Item Added Successfully.'
@@ -183,13 +269,15 @@ public function storeMenu(Request $request, $foodId)
 public function deleteMenu($id)
 {
     $menu = FoodMenu::findOrFail($id);
+    $food = Food::findOrFail($menu->food_id);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
     $foodId = $menu->food_id;
 
     $menu->delete();
 
     return redirect(
-        '/owner/foods/'.$foodId.'/menus'
+        (Auth::user()?->role === 'admin' ? '/admin/foods/' : '/owner/foods/').$foodId.'/menus'
     )->with(
         'success',
         'Menu Item Deleted.'
@@ -199,6 +287,8 @@ public function deleteMenu($id)
 public function editMenu($id)
 {
     $menu = FoodMenu::findOrFail($id);
+    $food = Food::findOrFail($menu->food_id);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
     return view(
         'owner.edit-menu',
@@ -212,6 +302,8 @@ public function updateMenu(
 )
 {
     $menu = FoodMenu::findOrFail($id);
+    $food = Food::findOrFail($menu->food_id);
+    abort_unless($food->owner_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
     $image = $menu->image;
 
@@ -244,7 +336,7 @@ public function updateMenu(
     ]);
 
     return redirect(
-        '/owner/foods/'.$menu->food_id.'/menus'
+        (Auth::user()?->role === 'admin' ? '/admin/foods/' : '/owner/foods/').$menu->food_id.'/menus'
     )->with(
         'success',
         'Menu Updated Successfully.'
@@ -256,10 +348,11 @@ public function adminIndex()
     $foods = Food::with('owner')
         ->latest()
         ->get();
+    $deletedFoods = Food::onlyTrashed()->with('owner')->latest('deleted_at')->get();
 
     return view(
         'admin.foods',
-        compact('foods')
+        compact('foods', 'deletedFoods')
     );
 }
 
@@ -269,8 +362,9 @@ public function adminShow($id)
         'owner',
         'menus',
         'comments.user',
+        'comments.replies.user',
         'comments.ratings',
-        'ratings'
+        'ratings.user'
     )->findOrFail($id);
 
     return view(
@@ -287,6 +381,13 @@ public function approve($id)
         'status' => 'approved'
     ]);
 
+    BookingNotice::send(
+        (int) $food->owner_id,
+        'Your restaurant "'.$food->name.'" was approved.',
+        ['food_id' => $food->id],
+        'listing'
+    );
+
     return back()->with(
         'success',
         'Food Establishment Approved.'
@@ -300,6 +401,13 @@ public function reject($id)
     $food->update([
         'status' => 'rejected'
     ]);
+
+    BookingNotice::send(
+        (int) $food->owner_id,
+        'Your restaurant "'.$food->name.'" was rejected.',
+        ['food_id' => $food->id],
+        'listing'
+    );
 
     return back()->with(
         'success',
@@ -319,15 +427,27 @@ public function adminDelete($id)
     );
 }
 
+public function restore($id)
+{
+    $food = Food::onlyTrashed()->findOrFail($id);
+    abort_if($food->deleted_at->lt(now()->subDays(30)), 410, 'This restaurant can no longer be restored.');
+    $food->restore();
+    return redirect('/admin/foods')->with('success', 'Restaurant restored successfully.');
+}
+
 public function comment(Request $request)
 {
+    $request->validate(['comment' => 'required|string|max:1000', 'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120']);
+    $image = $request->hasFile('image') ? time().'_'.$request->file('image')->getClientOriginalName() : null;
+    if ($image) $request->file('image')->move(public_path('uploads/comments'), $image);
     FoodComment::create([
 
         'food_id' => $request->food_id,
 
         'user_id' => Auth::id(),
 
-        'comment' => $request->comment
+        'comment' => $request->comment,
+        'image' => $image
 
     ]);
 
@@ -340,6 +460,7 @@ public function comment(Request $request)
 public function userIndex()
 {
     $foods = Food::where('status', 'approved')
+        ->withAvg('ratings', 'rating')
         ->latest()
         ->get();
 
@@ -351,7 +472,7 @@ public function userShow($id)
     $food = Food::with(
         'menus',
         'comments.user',
-        'ratings'
+        'ratings.user'
     )->findOrFail($id);
 
     return view('user.food-details', compact('food'));
@@ -362,7 +483,7 @@ public function show($id)
     $food = Food::with(
         'menus',
         'comments.user',
-        'ratings'
+        'ratings.user'
     )->findOrFail($id);
 
     return view('user.food-details', compact('food'));
@@ -373,13 +494,17 @@ public function reply(Request $request)
     $request->validate([
         'comment_id' => 'required|exists:food_comments,id',
         'reply' => 'required|string',
+        'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
     ]);
 
+    $image = $request->hasFile('image') ? time().'_'.$request->file('image')->getClientOriginalName() : null;
+    if ($image) $request->file('image')->move(public_path('uploads/comments'), $image);
     FoodReply::create([
         'food_comment_id' => $request->comment_id,
         'user_id' => Auth::id(),
         'parent_reply_id' => $request->parent_reply_id,
         'reply' => $request->reply,
+        'image' => $image,
     ]);
 
     return back()->with(
@@ -465,5 +590,24 @@ public function rate(Request $request)
         'success',
         'Rating submitted successfully.'
     );
+}
+
+public function rateReply(Request $request)
+{
+    $request->validate(['reply_id' => 'required|exists:food_replies,id', 'rating' => 'required|integer|between:1,5']);
+    FoodReplyRating::updateOrCreate(['reply_id' => $request->reply_id, 'user_id' => Auth::id()], ['rating' => $request->rating]);
+    return back()->with('success', 'Reply rating saved.');
+}
+
+public function updateDailyLimit(Request $request, $id)
+{
+    $food = Food::findOrFail($id);
+    abort_unless((int) $food->owner_id === (int) Auth::id(), 403);
+    $request->validate(['daily_booking_limit' => 'nullable|integer|min:1']);
+    $food->update([
+        'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
+    ]);
+
+    return back()->with('success', 'Daily booking limit saved.');
 }
 }

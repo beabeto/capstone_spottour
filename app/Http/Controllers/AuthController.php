@@ -21,6 +21,9 @@ use App\Models\HotelChecklist;
 use App\Models\FoodChecklist;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -32,15 +35,20 @@ class AuthController extends Controller
     public function register(Request $request)
 {
     $request->validate([
-        'name' => 'required',
+        'name' => 'required|string|max:100',
         'email' => 'required|email|unique:users',
+        'gender' => 'required|in:male,female,prefer_not_to_say',
+        'birth_date' => 'required|date|before:today',
         'password' => 'required|min:8|confirmed',
-        'role' => 'required'
+        'role' => 'required|in:user,owner',
+        'business_type' => 'nullable|required_if:role,owner',
     ]);
 
     User::create([
         'name' => $request->name,
         'email' => $request->email,
+        'gender' => $request->gender,
+        'birth_date' => $request->birth_date,
         'password' => Hash::make($request->password),
         'role' => $request->role,
         'business_type' => $request->business_type
@@ -82,6 +90,61 @@ class AuthController extends Controller
         'Invalid Credentials'
     );
 }
+
+    public function showForgotPassword()
+    {
+        return view('auth.password-reset');
+    }
+
+    public function sendPasswordResetCode(Request $request)
+    {
+        $request->validate(['email' => ['required', 'email']]);
+        $email = Str::lower($request->email);
+        $user = User::where('email', $email)->first();
+
+        // Do not reveal whether an address has an account.
+        if ($user) {
+            $code = (string) random_int(100000, 999999);
+            DB::table('password_reset_codes')->where('email', $email)->delete();
+            DB::table('password_reset_codes')->insert([
+                'email' => $email,
+                'code_hash' => Hash::make($code),
+                'expires_at' => now()->addMinutes(15),
+                'attempts' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            Mail::raw("Your SpotTour password reset code is {$code}. It expires in 15 minutes. Do not share this code.", function ($message) use ($email) {
+                $message->to($email)->subject('Your SpotTour password reset code');
+            });
+        }
+
+        return redirect('/password/reset?email='.urlencode($email))
+            ->with('success', 'If that email has an account, we sent a six-digit reset code.');
+    }
+
+    public function resetPasswordWithCode(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'code' => ['required', 'digits:6'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $email = Str::lower($request->email);
+        $record = DB::table('password_reset_codes')->where('email', $email)->first();
+
+        if (!$record || now()->greaterThan($record->expires_at) || $record->attempts >= 5 || !Hash::check($request->code, $record->code_hash)) {
+            if ($record) DB::table('password_reset_codes')->where('id', $record->id)->increment('attempts');
+            return back()->withInput($request->only('email'))->withErrors(['code' => 'The code is invalid or has expired. Request a new code and try again.']);
+        }
+
+        User::where('email', $email)->update(['password' => Hash::make($request->password)]);
+        DB::table('password_reset_codes')->where('email', $email)->delete();
+
+        return redirect('/')->with('success', 'Password changed. You can now sign in.');
+    }
 
     public function logout()
 {
@@ -148,8 +211,14 @@ public function updateProfile(Request $request)
     $user = Auth::user();
 
     $request->validate([
-        'name' => 'required',
-        'email' => 'required|email',
+        'name' => 'required|string|max:100',
+        'email' => 'required|email|unique:users,email,'.$user->id,
+        'gender' => 'nullable|in:male,female,prefer_not_to_say',
+        'birth_date' => 'nullable|date|before:today',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+        'gcash_number' => ['nullable', 'regex:/^09[0-9]{9}$/'],
+        'gcash_name' => 'nullable|string|max:100',
+        'gcash_qr' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
     ]);
 
     if($request->hasFile('profile_image'))
@@ -166,9 +235,18 @@ public function updateProfile(Request $request)
         $user->profile_image = $image;
     }
 
+    if($request->hasFile('gcash_qr'))
+    {
+        $qr = time().'_gcash_qr.'.$request->gcash_qr->extension();
+        $request->gcash_qr->move(public_path('uploads/gcash-qr'), $qr);
+        $user->gcash_qr = $qr;
+    }
+
     $user->name = $request->name;
 
     $user->email = $request->email;
+    $user->gender = $request->gender;
+    $user->birth_date = $request->birth_date;
 
     $user->gcash_number =
         $request->gcash_number;
@@ -181,14 +259,6 @@ public function updateProfile(Request $request)
 
     $user->bank_account_number =
         $request->bank_account_number;
-
-    if($request->filled('password'))
-    {
-        $user->password =
-            Hash::make(
-                $request->password
-            );
-    }
 
     $user->save();
 

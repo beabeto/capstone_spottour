@@ -12,7 +12,8 @@ class SpotComment extends Model
 
         'user_id',
 
-        'comment'
+        'comment',
+        'image'
 
     ];
 

@@ -1,247 +1,43 @@
-```blade
-<!DOCTYPE html>
-
-<html>
-<head>
-
-<title>Hotel Payment</title>
-
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
-
-</head>
-
-<body class="dashboard-body">
-
-<div class="back-btn">
-
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
-
-</div>
-
-<div class="payment-container">
-
-<div class="payment-card">
-
-    <h1>
-
-        🏨 Hotel Payment
-
-    </h1>
-
-    @if($hotel->image)
-
-    <img
-    src="{{ asset('uploads/hotels/'.$hotel->image) }}"
-    class="payment-image">
-
-    @endif
-
-    <div class="payment-summary">
-
-        <h2>
-
-            {{ $hotel->name }}
-
-        </h2>
-
-        <p>
-
-            📍 {{ $hotel->location }}
-
-        </p>
-
-        <hr>
-
-        <p>
-
-            <strong>Check In:</strong>
-
-            {{ \Carbon\Carbon::parse(
-                $check_in
-            )->format('F d, Y') }}
-
-        </p>
-
-        <p>
-
-            <strong>Check Out:</strong>
-
-            {{ \Carbon\Carbon::parse(
-                $check_out
-            )->format('F d, Y') }}
-
-        </p>
-
-        <p>
-
-            <strong>Rooms:</strong>
-
-            {{ $rooms }}
-
-        </p>
-
-        @php
-
-        $nights =
-            \Carbon\Carbon::parse($check_in)
-            ->diffInDays(
-                \Carbon\Carbon::parse($check_out)
-            );
-
-        $total =
-            $hotel->price_per_night *
-            $rooms *
-            $nights;
-
-        @endphp
-
-        <p class="payment-total">
-
-            Total Payment:
-
-            ₱{{ number_format(
-                $total,
-                2
-            ) }}
-
-        </p>
-
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Complete payment | SpotTour</title><link rel="stylesheet" href="{{ asset('css/style.css') }}"><link rel="stylesheet" href="{{ asset('css/listing-details.css') }}?v={{ filemtime(public_path('css/listing-details.css')) }}"></head><body class="dashboard-body payment-page">
+@php
+    $roomId = (int) request('hotel_room_id', old('hotel_room_id'));
+    $packageId = (int) request('package_id', old('package_id'));
+    $nights = \Carbon\Carbon::parse($check_in)->diffInDays(\Carbon\Carbon::parse($check_out));
+    $roomType = $hotel->rooms->firstWhere('id', $roomId);
+    $nightly = $roomType?->price_per_night ?? $hotel->price_per_night;
+    $extra = optional($hotel->packages->firstWhere('id', $packageId))->price ?? 0;
+    $total = $nightly * $rooms * $nights + $extra;
+@endphp
+<main class="checkout-shell">
+    <div class="checkout-toolbar"><button type="button" class="back-link" onclick="window.history.back()">Back</button></div>
+    <div class="checkout-heading"><span class="eyebrow">Secure payment</span><h1>Confirm your stay</h1><p>Choose how you will pay. GCash or Maya opens the wallet checkout next. Cash and bank stay with the owner for verification.</p></div>
+    <div class="checkout-layout">
+        <section class="order-card">
+            @if($hotel->image)<img src="{{ asset('uploads/hotels/'.$hotel->image) }}" class="checkout-image" alt="{{ $hotel->name }}">@endif
+            <div class="order-card-content">
+                <span class="order-type">Hotel reservation</span>
+                <h2>{{ $hotel->name }}</h2>
+                <p class="muted-text">{{ $hotel->location }}</p>
+                <dl class="summary-list">
+                    <div><dt>Check in</dt><dd>{{ \Carbon\Carbon::parse($check_in)->format('M d, Y') }}</dd></div>
+                    <div><dt>Check out</dt><dd>{{ \Carbon\Carbon::parse($check_out)->format('M d, Y') }}</dd></div>
+                    <div><dt>Stay</dt><dd>{{ $nights }} night{{ $nights == 1 ? '' : 's' }} / {{ $rooms }} room{{ $rooms == 1 ? '' : 's' }}</dd></div>
+                </dl>
+                <div class="amount-row"><span>Total due</span><strong>&#8369;{{ number_format($total, 2) }}</strong></div>
+            </div>
+        </section>
+        <section class="payment-form-card">
+            <form method="POST" action="/hotel/booking/store" enctype="multipart/form-data" class="checkout-form">
+                @csrf
+                <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
+                <input type="hidden" name="check_in" value="{{ $check_in }}">
+                <input type="hidden" name="check_out" value="{{ $check_out }}">
+                <input type="hidden" name="rooms" value="{{ $rooms }}">
+                <input type="hidden" name="hotel_room_id" value="{{ $roomId ?: '' }}">
+                <input type="hidden" name="package_id" value="{{ $packageId ?: '' }}">
+                @include('user.partials.payment-choice', ['owner' => $hotel->owner, 'amount' => $total])
+                <button type="submit" class="submit-payment-btn">Continue</button>
+            </form>
+        </section>
     </div>
-
-    <div class="payment-method">
-
-        <h3>
-
-            📱 GCash Payment
-
-        </h3>
-
-        <div class="gcash-box">
-
-            <p>
-
-                <strong>GCash Number</strong>
-
-            </p>
-
-            <h2>
-
-                {{ $hotel->owner->gcash_number }}
-
-            </h2>
-
-            <p>
-
-                <strong>Account Name</strong>
-
-            </p>
-
-            <h3>
-
-                {{ $hotel->owner->gcash_name }}
-
-            </h3>
-
-        </div>
-
-        <div class="payment-note">
-
-            ⚠️ Send the exact amount shown above,
-            then upload your payment receipt.
-
-        </div>
-
-    </div>
-
-    <form
-    method="POST"
-    action="/hotel/booking/store"
-    enctype="multipart/form-data">
-
-        @csrf
-
-        <input
-        type="hidden"
-        name="hotel_id"
-        value="{{ $hotel->id }}">
-
-        <input
-        type="hidden"
-        name="check_in"
-        value="{{ $check_in }}">
-
-        <input
-        type="hidden"
-        name="check_out"
-        value="{{ $check_out }}">
-
-        <input
-        type="hidden"
-        name="rooms"
-        value="{{ $rooms }}">
-
-        <input
-        type="hidden"
-        name="total_price"
-        value="{{ $total }}">
-
-        <label>
-
-            👤 Your GCash Name
-
-        </label>
-
-        <input
-        type="text"
-        name="payer_name"
-        placeholder="Enter your GCash account name"
-        required>
-
-        <label>
-
-            📱 Your GCash Number
-
-        </label>
-
-        <input
-        type="text"
-        name="payer_number"
-        placeholder="09XXXXXXXXX"
-        maxlength="11"
-        required>
-
-        <label>
-
-            📸 Upload Receipt
-
-        </label>
-
-        <input
-        type="file"
-        name="receipt"
-        accept="image/*"
-        required>
-
-        <button
-        type="submit"
-        class="submit-payment-btn">
-
-            ✅ Submit Hotel Payment
-
-        </button>
-
-    </form>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
-```
+</main></body></html>

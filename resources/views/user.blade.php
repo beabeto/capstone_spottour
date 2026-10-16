@@ -11,7 +11,8 @@
     <title>SpotTour Dashboard</title>
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}?v={{ filemtime(public_path('css/user-dashboard.css')) }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 </head>
 
@@ -41,7 +42,7 @@ $unreadCount = \App\Models\Notification::where(
 
         <a href="/user">
 
-            🌴 <strong>SpotTour</strong>
+             <strong>Spot<span>Tour</span></strong>
 
         </a>
 
@@ -51,20 +52,21 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="dashboard-search">
 
-    <form action="/search" method="GET">
+    <form action="/search" method="GET" autocomplete="off">
 
         <input
             type="text"
             name="keyword"
-            placeholder="Search spots, hotels or restaurants">
+            value="{{ request('keyword') }}"
+            placeholder="Search spots, hotels or restaurants"
+            id="dashboardSearch"
+            aria-expanded="false">
 
-        <button type="submit">
-
-            🔍
-
-        </button>
+        <button type="submit" aria-label="Search">Search</button>
 
     </form>
+
+    <div class="search-suggestions" id="searchSuggestions" role="listbox"></div>
 
 </div>
 
@@ -76,7 +78,7 @@ $unreadCount = \App\Models\Notification::where(
 
             <a href="/spots">
 
-                📍 Spots
+                 Spots
 
             </a>
 
@@ -86,7 +88,7 @@ $unreadCount = \App\Models\Notification::where(
 
             <a href="/hotels">
 
-                🏨 Hotels
+                 Hotels
 
             </a>
 
@@ -96,7 +98,17 @@ $unreadCount = \App\Models\Notification::where(
 
             <a href="/foods">
 
-                🍽 Restaurants
+                 Restaurants
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="/user/plan">
+
+                 Day plan
 
             </a>
 
@@ -110,118 +122,75 @@ $unreadCount = \App\Models\Notification::where(
 
         <!-- Notification -->
 
-        <div class="notification">
-
-            <a
-                href="/user/notifications"
-                class="notification-icon">
-
-                🔔
-
-                @if($unreadCount)
-
-                <span class="badge">
-
-                    {{ $unreadCount }}
-
-                </span>
-
-                @endif
-
-            </a>
-
-        </div>
+        @include('partials.notification-menu', ['notifications' => $notifications, 'unreadCount' => $unreadCount, 'allUrl' => '/user/notifications'])
 
         <!-- Profile -->
 
         <div class="user-dropdown">
 
-            <div
+            <button type="button"
+                class="user-info account-chip is-traveller"
+                onclick="toggleUserMenu()"
+                aria-expanded="false"
+                aria-controls="userMenu">
 
-                class="user-info"
-
-                onclick="toggleUserMenu()">
-
-                @if(Auth::user()->profile_image)
-
-                    <img
-
-                        src="{{ asset('uploads/profile/'.Auth::user()->profile_image) }}"
-
-                        class="profile-mini">
-
+                @if(Auth::user()?->profile_image)
+                    <img src="{{ asset('uploads/profile/'.Auth::user()?->profile_image) }}" class="profile-mini" alt="">
                 @else
-
-                    <img
-
-                        src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-
-                        class="profile-mini">
-
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-mini" alt="">
                 @endif
 
-                <span>
-
-                    {{ Auth::user()->name }}
-
+                <span class="account-chip-text">
+                    <strong>{{ Auth::user()?->name }}</strong>
+                    <small>Traveller</small>
                 </span>
+            </button>
 
-                ▼
+            <div class="user-menu" id="userMenu">
+                <div class="user-menu-profile">
+                    @if(Auth::user()?->profile_image)
+                        <img src="{{ asset('uploads/profile/'.Auth::user()?->profile_image) }}" alt="">
+                    @else
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="">
+                    @endif
+                    <div>
+                        <strong>{{ Auth::user()?->name }}</strong>
+                        <small>{{ Auth::user()?->email }}</small>
+                    </div>
+                </div>
 
-            </div>
-
-            <!-- Dropdown -->
-
-            <div
-
-                class="user-menu"
-
-                id="userMenu">
-
-                <a href="/user/profile">
-
-                    👤 Profile
-
+                <a href="/user/profile" class="menu-item profile-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19.2c1.4-2.8 3.7-4.2 6.5-4.2s5.1 1.4 6.5 4.2"/></svg></span>
+                    <span class="menu-item-copy"><strong>Profile</strong><small>Name, photo, and account details</small></span>
                 </a>
-
-                <a href="/user/bookings">
-
-                    📖 My Bookings
-
+                <a href="/user/plan" class="menu-item bookings-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5h14M7 4.5v4M17 4.5v4M5 10h14v9.5H5z"/></svg></span>
+                    <span class="menu-item-copy"><strong>Day plan</strong><small>Spot, meal, and stay on one map</small></span>
                 </a>
-
-                <a href="/user/favorites">
-
-                    ❤️ Favorites
-
+                <a href="/user/bookings" class="menu-item bookings-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M4 10h16"/></svg></span>
+                    <span class="menu-item-copy"><strong>My Bookings</strong><small>Reservations and PDF confirmations</small></span>
                 </a>
-
-                <a href="/user/bookmarks">
-
-                    🔖 Bookmarks
-
+                <a href="/user/favorites" class="menu-item favorites-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19.2s-6.2-3.8-6.2-8.1A3.5 3.5 0 0 1 12 8.4a3.5 3.5 0 0 1 6.2 2.7c0 4.3-6.2 8.1-6.2 8.1z"/></svg></span>
+                    <span class="menu-item-copy"><strong>Favorites</strong><small>Places you liked</small></span>
                 </a>
-
-                <a href="/user/checklist">
-
-                    ✅ Checklist
-
+                <a href="/user/bookmarks" class="menu-item bookmarks-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-3.2L6 20V5.5a1 1 0 0 1 1-1z"/></svg></span>
+                    <span class="menu-item-copy"><strong>Bookmarks</strong><small>Places saved for later</small></span>
                 </a>
-
-                <a href="/user/feedback">
-
-                    💬 Feedback
-
+                <a href="/user/checklist" class="menu-item checklist-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="M8 12.2l2.4 2.4L16 9.2"/></svg></span>
+                    <span class="menu-item-copy"><strong>Checklist</strong><small>Places you plan to visit</small></span>
                 </a>
-
-                <hr>
-
-                <a href="/logout">
-
-                    🚪 Logout
-
+                <a href="/user/feedback" class="menu-item feedback-item">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5h14a1 1 0 0 1 1 1v7.2a1 1 0 0 1-1 1H10l-4.2 3.2V7.5a1 1 0 0 1 1-1z"/></svg></span>
+                    <span class="menu-item-copy"><strong>Feedback</strong><small>Message the administrator</small></span>
                 </a>
-
+                <a href="/logout" class="logout-menu menu-item" onclick="localStorage.removeItem('spottour-welcome-closed')">
+                    <span class="menu-item-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5.5H6.5A1.5 1.5 0 0 0 5 7v10a1.5 1.5 0 0 0 1.5 1.5H10"/><path d="M13 8.5 16.5 12 13 15.5M9.5 12H16"/></svg></span>
+                    <span class="menu-item-copy"><strong>Logout</strong><small>Sign out of SpotTour</small></span>
+                </a>
             </div>
 
         </div>
@@ -242,14 +211,18 @@ $unreadCount = \App\Models\Notification::where(
 
 <div class="welcome-section">
 
+    <button type="button" class="welcome-close" onclick="closeWelcome()" aria-label="Close welcome message">&times;</button>
+
     <div class="welcome-content">
 
         <div>
 
+            <p class="welcome-kicker">Your Surigao trip</p>
+
             <h1>
 
                 Welcome Back,
-                {{ Auth::user()->name }} 👋
+                {{ Auth::user()?->name }}!
 
             </h1>
 
@@ -263,10 +236,10 @@ $unreadCount = \App\Models\Notification::where(
 
         </div>
 
-        @if(Auth::user()->profile_image)
+        @if(Auth::user()?->profile_image)
 
             <img
-                src="{{ asset('uploads/profile/'.Auth::user()->profile_image) }}"
+                src="{{ asset('uploads/profile/'.Auth::user()?->profile_image) }}"
                 class="welcome-avatar">
 
         @else
@@ -280,6 +253,40 @@ $unreadCount = \App\Models\Notification::where(
     </div>
 
 </div>
+
+
+<section class="city-map" id="surigao-map">
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>Surigao City map</h2>
+
+            <p>Pins for the spots, hotels, and restaurants listed on SpotTour.</p>
+
+        </div>
+
+        <select id="map-filter" class="map-filter" aria-label="Places to show on the map">
+            <option value="all">All places</option>
+            <option value="spot">Spots</option>
+            <option value="hotel">Hotels</option>
+            <option value="restaurant">Restaurants</option>
+        </select>
+
+    </div>
+
+    <div class="city-map-card">
+
+        <div id="place-map"></div>
+
+        <p class="map-empty" hidden>No listed places have a map location yet.</p>
+
+    </div>
+
+</section>
+
+<script type="application/json" id="place-pins">@json($mapPlaces)</script>
 
 
 <!-- =====================================
@@ -309,11 +316,11 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="explore-card">
 
-        <div class="explore-icon">
+        @if($spots->first()?->image)
+        <img src="{{ asset('uploads/spots/'.$spots->first()->image) }}" alt="{{ $spots->first()->name }}" class="explore-data-image">
+        @endif
 
-            📍
-
-        </div>
+        <div class="explore-icon" aria-hidden="true">&#127754;</div>
 
         <h3>
 
@@ -334,7 +341,7 @@ $unreadCount = \App\Models\Notification::where(
             href="/spots"
             class="explore-btn">
 
-            Explore Spots →
+            Explore Spots
 
         </a>
 
@@ -345,11 +352,11 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="explore-card">
 
-        <div class="explore-icon">
+        @if($hotels->first()?->image)
+        <img src="{{ asset('uploads/hotels/'.$hotels->first()->image) }}" alt="{{ $hotels->first()->name }}" class="explore-data-image">
+        @endif
 
-            🏨
-
-        </div>
+        <div class="explore-icon" aria-hidden="true">&#127976;</div>
 
         <h3>
 
@@ -370,7 +377,7 @@ $unreadCount = \App\Models\Notification::where(
             href="/hotels"
             class="explore-btn">
 
-            Explore Hotels →
+            Explore Hotels
 
         </a>
 
@@ -381,11 +388,11 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="explore-card">
 
-        <div class="explore-icon">
+        @if($foods->first()?->image)
+        <img src="{{ asset('uploads/foods/'.$foods->first()->image) }}" alt="{{ $foods->first()->name }}" class="explore-data-image">
+        @endif
 
-            🍽
-
-        </div>
+        <div class="explore-icon" aria-hidden="true">&#127860;</div>
 
         <h3>
 
@@ -396,7 +403,7 @@ $unreadCount = \App\Models\Notification::where(
         <p>
 
             Discover restaurants,
-            cafés,
+            cafes,
             and local food establishments.
 
         </p>
@@ -405,7 +412,7 @@ $unreadCount = \App\Models\Notification::where(
             href="/foods"
             class="explore-btn">
 
-            Explore Restaurants →
+            Explore Restaurants
 
         </a>
 
@@ -413,6 +420,7 @@ $unreadCount = \App\Models\Notification::where(
 
 </div>
 
+@if(false)
 <!-- =====================================
         DASHBOARD STATISTICS
 ====================================== -->
@@ -439,11 +447,7 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="stat-card">
 
-        <div class="stat-icon">
-
-            📖
-
-        </div>
+        <div class="stat-icon" aria-hidden="true">&#128197;</div>
 
         <h2>
 
@@ -463,11 +467,7 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="stat-card">
 
-        <div class="stat-icon">
-
-            ❤️
-
-        </div>
+        <div class="stat-icon" aria-hidden="true">&#9825;</div>
 
         <h2>
 
@@ -487,11 +487,7 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="stat-card">
 
-        <div class="stat-icon">
-
-            🔖
-
-        </div>
+        <div class="stat-icon" aria-hidden="true">&#128278;</div>
 
         <h2>
 
@@ -511,11 +507,7 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="stat-card">
 
-        <div class="stat-icon">
-
-            ✅
-
-        </div>
+        <div class="stat-icon" aria-hidden="true">&#10003;</div>
 
         <h2>
 
@@ -535,11 +527,7 @@ $unreadCount = \App\Models\Notification::where(
 
     <div class="stat-card">
 
-        <div class="stat-icon">
-
-            ⭐
-
-        </div>
+        <div class="stat-icon" aria-hidden="true">&#9733;</div>
 
         <h2>
 
@@ -557,162 +545,87 @@ $unreadCount = \App\Models\Notification::where(
 
 </div>
 
+@endif
+
 <!-- =====================================
-        UPCOMING BOOKING
+        UPCOMING TRIPS
 ====================================== -->
 
-<div class="section-header">
-
-    <h2>
-
-        Upcoming Booking
-
-    </h2>
-
-    <p>
-
-        Your next reservation.
-
-    </p>
-
-</div>
-
-@if($nextBooking)
-
-<div class="booking-preview-card">
-
-    <div class="booking-preview-image">
-
-        @if($nextBooking->type == 'spot' && $nextBooking->spot)
-
-<img
-src="{{ asset('uploads/spots/'.$nextBooking->spot->image) }}">
-
-@elseif($nextBooking->type == 'hotel' && $nextBooking->hotel)
-
-<img
-src="{{ asset('uploads/hotels/'.$nextBooking->hotel->image) }}">
-
-@elseif($nextBooking->type == 'food' && $nextBooking->food)
-
-<img
-src="{{ asset('uploads/foods/'.$nextBooking->food->image) }}">
-
-@else
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-
-@endif
-
+<section class="dashboard-panel">
+    <div class="section-header panel-header">
+        <div>
+            <h2>Upcoming bookings</h2>
+            <p>Your next spot, hotel, and restaurant reservations.</p>
+        </div>
+        <a href="/user/bookings" class="view-all-link">View all</a>
     </div>
 
-    <div class="booking-preview-content">
+    @forelse(($upcomingBookings ?? collect($nextBooking ? [$nextBooking] : [])) as $booking)
+        @php
+            $image = match ($booking->type) {
+                'spot' => $booking->spot?->image ? asset('uploads/spots/'.$booking->spot->image) : null,
+                'hotel' => $booking->hotel?->image ? asset('uploads/hotels/'.$booking->hotel->image) : null,
+                'food' => $booking->food?->image ? asset('uploads/foods/'.$booking->food->image) : null,
+                default => null,
+            };
+            $kind = match ($booking->type) {
+                'spot' => 'Tourist spot',
+                'hotel' => 'Hotel',
+                default => 'Restaurant',
+            };
+        @endphp
+        <article class="trip-row">
+            <div class="trip-thumb">
+                @if($image)
+                    <img src="{{ $image }}" alt="{{ $booking->listing }}">
+                @else
+                    <span class="trip-thumb-fallback">{{ strtoupper(substr($kind, 0, 1)) }}</span>
+                @endif
+            </div>
+            <div class="trip-copy">
+                <span class="trip-kind">{{ $kind }}</span>
+                <h3>{{ $booking->listing }}</h3>
+                <p>{{ \Carbon\Carbon::parse($booking->date)->format('M d, Y') }} · {{ ucfirst(str_replace('_', ' ', $booking->status)) }}</p>
+            </div>
+            <a href="{{ $booking->url ?? '/user/bookings' }}" class="trip-action">View</a>
+        </article>
+    @empty
+        <div class="trip-empty">
+            <h3>No upcoming booking</h3>
+            <p>Book a tourist spot, hotel, or restaurant to start your trip.</p>
+            <a href="/spots" class="explore-btn">Explore places</a>
+        </div>
+    @endforelse
 
-        <span class="booking-category">
+    @if(! empty($nextPlan))
+        <div class="panel-divider"></div>
+        <div class="section-header panel-header is-compact">
+            <div>
+                <h2>Next day plan</h2>
+                <p>Book each stop from your schedule.</p>
+            </div>
+            <a href="/user/plan" class="view-all-link">Open plan</a>
+        </div>
+        <article class="trip-row is-plan">
+            <div class="trip-thumb is-plan-mark"><span>Plan</span></div>
+            <div class="trip-copy">
+                <span class="trip-kind">Day plan</span>
+                <h3>{{ $nextPlan->plan_date->format('M d, Y') }}</h3>
+                <p>
+                    {{ collect([
+                        $nextPlan->spot?->name ? 'Morning: '.$nextPlan->spot->name : null,
+                        $nextPlan->food?->name ? 'Meal: '.$nextPlan->food->name : null,
+                        $nextPlan->hotel?->name ? 'Stay: '.$nextPlan->hotel->name : null,
+                    ])->filter()->implode(' · ') }}
+                </p>
+                @if($nextPlan->note)<p class="trip-note">{{ $nextPlan->note }}</p>@endif
+            </div>
+            <a href="/user/plan" class="trip-action">Open</a>
+        </article>
+    @endif
+</section>
 
-            @if($nextBooking->type == 'spot')
-
-                📍 Tourist Spot
-
-            @elseif($nextBooking->type == 'hotel')
-
-                🏨 Hotel
-
-            @else
-
-                🍽 Restaurant
-
-            @endif
-
-        </span>
-
-        <h3>
-
-            @if($nextBooking->type == 'spot')
-
-    {{ optional($nextBooking->spot)->name ?? 'Tourist Spot' }}
-
-@elseif($nextBooking->type == 'hotel')
-
-    {{ optional($nextBooking->hotel)->name ?? 'Hotel' }}
-
-@elseif($nextBooking->type == 'food')
-
-    {{ optional($nextBooking->food)->name ?? 'Restaurant' }}
-
-@else
-
-    Booking
-
-@endif
-
-        </h3>
-
-        <p>
-
-            📅
-
-            {{ \Carbon\Carbon::parse($nextBooking->date)->format('F d, Y') }}
-
-        </p>
-
-        <span class="booking-status">
-
-            {{ ucfirst($nextBooking->status) }}
-
-        </span>
-
-        <br><br>
-
-        <a
-        href="/user/bookings"
-        class="explore-btn">
-
-            View Booking →
-
-        </a>
-
-    </div>
-
-</div>
-
-@else
-
-<div class="empty-dashboard-card">
-
-    <div class="empty-icon">
-
-        📅
-
-    </div>
-
-    <h3>
-
-        No Upcoming Booking
-
-    </h3>
-
-    <p>
-
-        Book a tourist spot,
-        hotel,
-        or restaurant to start your adventure.
-
-    </p>
-
-    <a
-    href="/spots"
-    class="explore-btn">
-
-        Explore Now →
-
-    </a>
-
-</div>
-
-@endif
-
+@if(false)
 <!-- =====================================
         RECENT NOTIFICATIONS
 ====================================== -->
@@ -729,7 +642,7 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
     href="/user/notifications"
     class="view-all-link">
 
-        View All →
+        View All
 
     </a>
 
@@ -747,19 +660,19 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
         @if($notification->food_id)
 
-            🍽
+
 
         @elseif($notification->hotel_id)
 
-            🏨
+
 
         @elseif($notification->spot_id)
 
-            📍
+
 
         @else
 
-            🔔
+
 
         @endif
 
@@ -801,7 +714,7 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
     <div class="empty-icon">
 
-        🔔
+
 
     </div>
 
@@ -821,6 +734,8 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
 @endif
 
+@endif
+
 <!-- =====================================
         FOOTER
 ====================================== -->
@@ -831,13 +746,13 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
         <h3>
 
-            🌴 SpotTour
+             Spot<span>Tour</span>
 
         </h3>
 
         <p>
 
-            Explore • Book • Travel
+            Explore - Book - Travel
 
         </p>
 
@@ -863,6 +778,12 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
         </a>
 
+        <a href="#surigao-map">
+
+            Map
+
+        </a>
+
         <a href="/user/feedback">
 
             Feedback
@@ -881,14 +802,180 @@ src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
         JAVASCRIPT
 ====================================== -->
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 
 function toggleUserMenu()
 {
-    document
-        .getElementById('userMenu')
-        .classList
-        .toggle('show-menu');
+    const menu = document.getElementById('userMenu');
+    const trigger = document.querySelector('.user-info');
+    document.getElementById('notificationMenu').classList.remove('show-notification-menu');
+    document.querySelector('.notification-icon').setAttribute('aria-expanded', 'false');
+    menu.classList.toggle('show-menu');
+    trigger.setAttribute('aria-expanded', menu.classList.contains('show-menu'));
+}
+
+function toggleNotificationMenu()
+{
+    const menu = document.getElementById('notificationMenu');
+    const trigger = document.querySelector('.notification-icon');
+    document.getElementById('userMenu').classList.remove('show-menu');
+    document.querySelector('.user-info').setAttribute('aria-expanded', 'false');
+    menu.classList.toggle('show-notification-menu');
+    trigger.setAttribute('aria-expanded', menu.classList.contains('show-notification-menu'));
+}
+
+function closeWelcome()
+{
+    document.querySelector('.welcome-section')?.remove();
+    localStorage.setItem('spottour-welcome-closed', '1');
+}
+
+if (localStorage.getItem('spottour-welcome-closed') === '1') {
+    document.querySelector('.welcome-section')?.remove();
+}
+
+const dashboardSearch = document.getElementById('dashboardSearch');
+const searchSuggestions = document.getElementById('searchSuggestions');
+let searchTimer;
+
+dashboardSearch?.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    const query = this.value.trim();
+    searchSuggestions.replaceChildren();
+    this.setAttribute('aria-expanded', 'false');
+    if (!query) return;
+
+    searchTimer = setTimeout(async () => {
+        const response = await fetch('/search/suggestions?q=' + encodeURIComponent(query));
+        const matches = await response.json();
+        matches.forEach(match => {
+            const link = document.createElement('a');
+            link.href = match.url;
+            link.innerHTML = '<strong></strong><small></small>';
+            link.querySelector('strong').textContent = match.label;
+            link.querySelector('small').textContent = match.type;
+            searchSuggestions.appendChild(link);
+        });
+        searchSuggestions.classList.toggle('has-suggestions', matches.length > 0);
+        dashboardSearch.setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
+    }, 180);
+});
+
+document.querySelectorAll('.unread-notification').forEach(function(item)
+{
+    item.addEventListener('click', function()
+    {
+        const badge = document.querySelector('.notification-icon .badge');
+        const dot = item.querySelector('.notification-menu-dot');
+
+        if (dot) dot.classList.remove('is-unread');
+        item.classList.remove('unread-notification');
+
+        if (!badge) return;
+
+        const remaining = Math.max(0, Number(badge.textContent.trim()) - 1);
+        if (remaining) {
+            badge.textContent = remaining;
+        } else {
+            badge.remove();
+        }
+    }, { once: true });
+});
+
+const placePins = JSON.parse(document.getElementById('place-pins')?.textContent || '[]');
+const placeMapNode = document.getElementById('place-map');
+
+if (placeMapNode && window.L) {
+    const placeMap = L.map(placeMapNode, { scrollWheelZoom: false }).setView([9.789, 125.495], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(placeMap);
+
+    placeMap.on('click', function () {
+        placeMap.scrollWheelZoom.enable();
+    });
+
+    const pinColors = { spot: '#167b69', hotel: '#1d6f93', restaurant: '#c56a12' };
+
+    function pinIcon(color) {
+        return L.divIcon({
+            className: 'place-pin',
+            html: '<span style="background:' + color + '"></span>',
+            iconSize: [28, 36],
+            iconAnchor: [14, 36],
+            popupAnchor: [0, -32]
+        });
+    }
+
+    const mapMarkers = placePins.map(function (place) {
+        const marker = L.marker([place.lat, place.lng], {
+            icon: pinIcon(pinColors[place.type] || '#167b69')
+        }).addTo(placeMap);
+
+        const popup = document.createElement('div');
+        popup.className = 'place-popup';
+
+        const label = document.createElement('small');
+        label.textContent = place.label;
+
+        const title = document.createElement('strong');
+        title.textContent = place.name;
+
+        const address = document.createElement('p');
+        address.textContent = place.location || '';
+
+        const actions = document.createElement('div');
+        const details = document.createElement('a');
+        details.href = place.url;
+        details.textContent = 'View place';
+
+        const maps = document.createElement('a');
+        maps.href = place.maps;
+        maps.target = '_blank';
+        maps.rel = 'noopener';
+        maps.textContent = 'Google Maps';
+
+        actions.append(details, maps);
+        popup.append(label, title, address, actions);
+        marker.bindPopup(popup);
+
+        return { marker: marker, type: place.type };
+    });
+
+    function showPins(type) {
+        const visible = [];
+
+        mapMarkers.forEach(function (item) {
+            const show = type === 'all' || item.type === type;
+
+            if (show) {
+                item.marker.addTo(placeMap);
+                visible.push(item.marker);
+            } else {
+                placeMap.removeLayer(item.marker);
+            }
+        });
+
+        if (visible.length) {
+            placeMap.fitBounds(L.featureGroup(visible).getBounds().pad(0.25), { maxZoom: 14 });
+        }
+    }
+
+    document.querySelector('.map-empty')?.toggleAttribute('hidden', placePins.length > 0);
+
+    document.getElementById('map-filter')?.addEventListener('change', function () {
+        showPins(this.value);
+    });
+
+    if (mapMarkers.length) {
+        showPins('all');
+    }
+
+    setTimeout(function () { placeMap.invalidateSize(); }, 200);
 }
 
 window.onclick = function(event)
@@ -899,6 +986,13 @@ window.onclick = function(event)
             .getElementById('userMenu')
             .classList
             .remove('show-menu');
+        document.querySelector('.user-info').setAttribute('aria-expanded', 'false');
+    }
+
+    if(!event.target.closest('.notification'))
+    {
+        document.getElementById('notificationMenu').classList.remove('show-notification-menu');
+        document.querySelector('.notification-icon').setAttribute('aria-expanded', 'false');
     }
 }
 

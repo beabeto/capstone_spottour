@@ -11,6 +11,7 @@ class FoodReply extends Model
         'user_id',
         'parent_reply_id',
         'reply',
+        'image',
     ];
 
     public function comment()
@@ -31,5 +32,10 @@ class FoodReply extends Model
     public function replies()
     {
         return $this->hasMany(FoodReply::class, 'parent_reply_id');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(FoodReplyRating::class, 'reply_id');
     }
 }

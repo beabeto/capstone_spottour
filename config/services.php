@@ -28,6 +28,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'paymongo' => [
+        'secret' => env('PAYMONGO_SECRET_KEY'),
+        'live' => str_starts_with((string) env('PAYMONGO_SECRET_KEY'), 'sk_live_'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

@@ -17,9 +17,7 @@ href="{{ asset('css/style.css') }}">
 <div class="spot-form-card">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <h1>Edit Spot</h1>
@@ -73,6 +71,11 @@ step="0.01"
 name="price"
 value="{{ $spot->price }}">
 
+</div>
+
+<div class="form-group">
+<label>Bookings accepted per day</label>
+<input type="number" name="daily_booking_limit" min="1" value="{{ old('daily_booking_limit', $spot->daily_booking_limit) }}" placeholder="Leave blank for no daily limit">
 </div>
 
 <div class="form-group">

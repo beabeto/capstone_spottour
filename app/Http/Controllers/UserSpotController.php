@@ -30,6 +30,9 @@ use App\Models\Notification;
 use App\Models\SpotComment;
 use App\Models\HotelComment;
 use App\Models\FoodComment;
+use App\Models\DayPlan;
+use App\Support\PlaceMap;
+use App\Support\UpcomingReservations;
 
 class UserSpotController extends Controller
 {
@@ -37,16 +40,19 @@ class UserSpotController extends Controller
     public function dashboard()
 {
     $spots = Spot::with('ratings')
+        ->where('status', 'approved')
         ->latest()
         ->take(6)
         ->get();
 
     $hotels = Hotel::with('ratings')
+        ->where('status', 'approved')
         ->latest()
         ->take(6)
         ->get();
 
     $foods = Food::with('ratings')
+        ->where('status', 'approved')
         ->latest()
         ->take(6)
         ->get();
@@ -107,10 +113,12 @@ class UserSpotController extends Controller
         ->take(5)
         ->get();
 
-    $nextBooking = Booking::with('spot')
+    $nextBooking = UpcomingReservations::forUser((int) Auth::id());
+    $upcomingBookings = UpcomingReservations::forUserList((int) Auth::id(), 3);
+    $nextPlan = DayPlan::with(['spot', 'hotel', 'food'])
         ->where('user_id', Auth::id())
-        ->where('status', 'approved')
-        ->orderBy('booking_date')
+        ->whereDate('plan_date', '>=', now()->toDateString())
+        ->orderBy('plan_date')
         ->first();
 
     $recentNotifications = Notification::where(
@@ -120,6 +128,8 @@ class UserSpotController extends Controller
 ->latest()
 ->take(3)
 ->get();    
+
+    $mapPlaces = PlaceMap::pins();
 
     return view(
         'user',
@@ -138,7 +148,10 @@ class UserSpotController extends Controller
             'recentReviews',
             'notifications',
             'nextBooking',
-            'recentNotifications'
+            'upcomingBookings',
+            'nextPlan',
+            'recentNotifications',
+            'mapPlaces'
         )
     );
 }
@@ -170,6 +183,24 @@ class UserSpotController extends Controller
     );
 }
 
+    public function suggestions(Request $request)
+    {
+        $term = trim((string) $request->query('q'));
+
+        if (mb_strlen($term) < 1) {
+            return response()->json([]);
+        }
+
+        $items = collect()
+            ->merge(Spot::where('name', 'like', "%{$term}%")->limit(5)->get(['id', 'name'])->map(fn ($item) => ['label' => $item->name, 'url' => '/spots/'.$item->id, 'type' => 'Tourist spot']))
+            ->merge(Hotel::where('name', 'like', "%{$term}%")->limit(5)->get(['id', 'name'])->map(fn ($item) => ['label' => $item->name, 'url' => '/hotels/'.$item->id, 'type' => 'Hotel']))
+            ->merge(Food::where('name', 'like', "%{$term}%")->limit(5)->get(['id', 'name'])->map(fn ($item) => ['label' => $item->name, 'url' => '/foods/'.$item->id, 'type' => 'Restaurant']))
+            ->take(8)
+            ->values();
+
+        return response()->json($items);
+    }
+
     public function favorite($spotId)
     {
         $favorite = Favorite::where(
@@ -186,7 +217,7 @@ class UserSpotController extends Controller
 
             return back()->with(
                 'success',
-                '💔 Removed from favorites.'
+                'Removed from favorites.'
             );
         }
 
@@ -197,7 +228,7 @@ class UserSpotController extends Controller
 
         return back()->with(
             'success',
-            '❤️ Added to favorites.'
+            'Added to favorites.'
         );
     }
 
@@ -228,7 +259,7 @@ class UserSpotController extends Controller
 
         return back()->with(
             'success',
-            '🔖 Added to bookmarks.'
+            'Added to bookmarks.'
         );
     }
 
@@ -259,7 +290,7 @@ class UserSpotController extends Controller
 
         return back()->with(
             'success',
-            '✅ Added to checklist.'
+            'Added to checklist.'
         );
     }
 
@@ -267,14 +298,17 @@ class UserSpotController extends Controller
 {
     $favorites = Favorite::with('spot')
         ->where('user_id', Auth::id())
+        ->whereHas('spot')
         ->get();
 
     $hotelFavorites = HotelFavorite::with('hotel')
         ->where('user_id', Auth::id())
+        ->whereHas('hotel')
         ->get();
 
     $foodFavorites = FoodFavorite::with('food')
         ->where('user_id', Auth::id())
+        ->whereHas('food')
         ->get();
 
     return view(
@@ -291,14 +325,17 @@ class UserSpotController extends Controller
 {
     $bookmarks = Bookmark::with('spot')
         ->where('user_id', Auth::id())
+        ->whereHas('spot')
         ->get();
 
     $hotelBookmarks = HotelBookmark::with('hotel')
         ->where('user_id', Auth::id())
+        ->whereHas('hotel')
         ->get();
 
     $foodBookmarks = FoodBookmark::with('food')
         ->where('user_id', Auth::id())
+        ->whereHas('food')
         ->get();
 
     return view(
@@ -315,14 +352,17 @@ class UserSpotController extends Controller
 {
     $checklists = Checklist::with('spot')
         ->where('user_id', Auth::id())
+        ->whereHas('spot')
         ->get();
 
     $hotelChecklists = HotelChecklist::with('hotel')
         ->where('user_id', Auth::id())
+        ->whereHas('hotel')
         ->get();
 
     $foodChecklists = FoodChecklist::with('food')
         ->where('user_id', Auth::id())
+        ->whereHas('food')
         ->get();
 
     return view(
@@ -398,7 +438,7 @@ public function foodFavorite($foodId)
 
         return back()->with(
             'success',
-            '💔 Removed from favorites.'
+            'Removed from favorites.'
         );
     }
 
@@ -412,7 +452,7 @@ public function foodFavorite($foodId)
 
     return back()->with(
         'success',
-        '❤️ Added to favorites.'
+        'Added to favorites.'
     );
 }
 
@@ -432,7 +472,7 @@ public function foodBookmark($foodId)
 
         return back()->with(
             'success',
-            '🔖 Removed from bookmarks.'
+            'Removed from bookmarks.'
         );
     }
 
@@ -446,7 +486,7 @@ public function foodBookmark($foodId)
 
     return back()->with(
         'success',
-        '🔖 Added to bookmarks.'
+        'Added to bookmarks.'
     );
 }
 
@@ -466,7 +506,7 @@ public function foodChecklist($foodId)
 
         return back()->with(
             'success',
-            '✅ Removed from checklist.'
+            'Removed from checklist.'
         );
     }
 
@@ -480,7 +520,7 @@ public function foodChecklist($foodId)
 
     return back()->with(
         'success',
-        '✅ Added to checklist.'
+        'Added to checklist.'
     );
 }
 
@@ -500,7 +540,7 @@ public function hotelFavorite($hotelId)
 
         return back()->with(
             'success',
-            '💔 Removed from favorites.'
+            'Removed from favorites.'
         );
     }
 
@@ -514,7 +554,7 @@ public function hotelFavorite($hotelId)
 
     return back()->with(
         'success',
-        '❤️ Added to favorites.'
+        'Added to favorites.'
     );
 }
 
@@ -534,7 +574,7 @@ public function hotelBookmark($hotelId)
 
         return back()->with(
             'success',
-            '🔖 Removed from bookmarks.'
+            'Removed from bookmarks.'
         );
     }
 
@@ -548,7 +588,7 @@ public function hotelBookmark($hotelId)
 
     return back()->with(
         'success',
-        '🔖 Added to bookmarks.'
+        'Added to bookmarks.'
     );
 }
 
@@ -568,7 +608,7 @@ public function hotelChecklist($hotelId)
 
         return back()->with(
             'success',
-            '✅ Removed from checklist.'
+            'Removed from checklist.'
         );
     }
 
@@ -582,7 +622,7 @@ public function hotelChecklist($hotelId)
 
     return back()->with(
         'success',
-        '✅ Added to checklist.'
+        'Added to checklist.'
     );
 }
 

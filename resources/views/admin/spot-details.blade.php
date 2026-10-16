@@ -15,12 +15,10 @@ href="{{ asset('css/style.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body admin-detail-page">
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 @if(session('success'))
@@ -34,19 +32,6 @@ href="{{ asset('css/style.css') }}">
 @endif
 
 <div class="spot-details-container">
-
-
-<!-- BACK BUTTON -->
-
-<div class="back-btn">
-
-    <a href="/admin/spots">
-
-        ← 
-
-    </a>
-
-</div>
 
 
 <!-- HERO SECTION -->
@@ -72,21 +57,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $spot->location }}
+             {{ $spot->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $spot->ratings()->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $spot->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -95,20 +71,11 @@ href="{{ asset('css/style.css') }}">
 
 <!-- ACTION BUTTONS -->
 
-<div class="spot-actions-top">
-
-    <button class="favorite-btn">
-        ❤️ Favorite
-    </button>
-
-    <button class="bookmark-btn">
-        🔖 Bookmark
-    </button>
-
-    <button class="checklist-btn">
-        ✅ Checklist
-    </button>
-
+<div class="owner-listing-actions">
+    @if($spot->status === 'pending')
+    <a href="/admin/spots/approve/{{ $spot->id }}" class="approve-btn">Approve</a>
+    <a href="/admin/spots/reject/{{ $spot->id }}" class="reject-btn">Reject</a>
+    @endif
 </div>
 
 <!-- SPOT INFO -->
@@ -133,7 +100,7 @@ href="{{ asset('css/style.css') }}">
 
         Entrance Fee:
 
-        ₱{{ number_format(
+        PHP {{ number_format(
             $spot->price,
             2
         ) }}
@@ -162,7 +129,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $spot->location }}
+         {{ $spot->location }}
 
     </p>
 
@@ -173,7 +140,7 @@ href="{{ asset('css/style.css') }}">
         target="_blank"
         class="map-btn">
 
-            📍 Open In Google Maps
+             Open In Google Maps
 
         </a>
 
@@ -229,7 +196,7 @@ href="{{ asset('css/style.css') }}">
 
                 <h3>
 
-                    ₱{{ number_format(
+                    PHP {{ number_format(
                         $spot->cottage_price,
                         2
                     ) }}
@@ -262,78 +229,14 @@ href="{{ asset('css/style.css') }}">
 
     </h2>
 
-    <div class="rating-big">
+    @include('partials.rating-board', ['ratings' => $spot->ratings])
 
-        ⭐
-
-        {{ number_format(
-            $spot->ratings()->avg('rating') ?? 0,
-            1
-        ) }}
-
-    </div>
-
-    <p>
-
-        Based on
-
-        {{ $spot->ratings->count() }}
-
-        ratings
-
-    </p>
-
-    <hr><br>
-
-    <form
-    method="POST"
-    action="/spot/rate">
-
+    <form method="POST" action="/spot/rate" class="rating-compose">
         @csrf
-
-        <input
-        type="hidden"
-        name="spot_id"
-        value="{{ $spot->id }}">
-
-        <label>
-
-            Rate This Spot
-
-        </label>
-
-        <select
-        name="rating">
-
-            <option value="1">
-                ⭐ 1 Star
-            </option>
-
-            <option value="2">
-                ⭐⭐ 2 Stars
-            </option>
-
-            <option value="3">
-                ⭐⭐⭐ 3 Stars
-            </option>
-
-            <option value="4">
-                ⭐⭐⭐⭐ 4 Stars
-            </option>
-
-            <option value="5">
-                ⭐⭐⭐⭐⭐ 5 Stars
-            </option>
-
-        </select>
-
-        <button
-        type="submit">
-
-            Submit Rating
-
-        </button>
-
+        <input type="hidden" name="spot_id" value="{{ $spot->id }}">
+        <span>Your rating</span>
+        @include('partials.star-input', ['inputId' => 'admin-spot-'.$spot->id, 'value' => $spot->ratings->where('user_id', Auth::id())->sortByDesc('id')->first()?->rating, 'label' => 'Rate this spot'])
+        <p class="rating-help">Select a star to submit your rating.</p>
     </form>
 
 </div>
@@ -344,7 +247,7 @@ href="{{ asset('css/style.css') }}">
 
     <h2>Comments & Reviews</h2>
 
-    <form method="POST" action="/spot/comment">
+    <form method="POST" action="/spot/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -358,6 +261,8 @@ href="{{ asset('css/style.css') }}">
         rows="4"
         placeholder="Write your review..."
         required></textarea>
+
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button type="submit">
             Submit Comment
@@ -401,7 +306,7 @@ href="{{ asset('css/style.css') }}">
                 class="menu-btn"
                 onclick="toggleMenu({{ $comment->id }})">
 
-                    ⋮
+
 
                 </button>
 
@@ -440,6 +345,7 @@ href="{{ asset('css/style.css') }}">
         <div class="comment-body">
 
             <p>{{ $comment->comment }}</p>
+            @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
 
             <small>
                 {{ $comment->created_at->diffForHumans() }}
@@ -450,14 +356,7 @@ href="{{ asset('css/style.css') }}">
         <!-- COMMENT RATING -->
 
         <div class="comment-rating">
-
-            ⭐ Comment Rating:
-
-            {{ number_format(
-                $comment->ratings->avg('rating') ?? 0,
-                1
-            ) }}
-
+            @include('partials.score-stars', ['score' => $comment->ratings->avg('rating') ?? 0])
         </div>
 
         <!-- LIKE / DISLIKE -->
@@ -466,7 +365,7 @@ href="{{ asset('css/style.css') }}">
 
             <a href="/comment/{{ $comment->id }}/like">
 
-                👍
+
 
                 {{ $comment->reactions
                     ->where('type','like')
@@ -476,7 +375,7 @@ href="{{ asset('css/style.css') }}">
 
             <a href="/comment/{{ $comment->id }}/dislike">
 
-                👎
+
 
                 {{ $comment->reactions
                     ->where('type','dislike')
@@ -499,21 +398,7 @@ href="{{ asset('css/style.css') }}">
             name="comment_id"
             value="{{ $comment->id }}">
 
-            <select name="rating">
-
-                <option value="1">⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="5">⭐⭐⭐⭐⭐</option>
-
-            </select>
-
-            <button type="submit">
-
-                Rate Comment
-
-            </button>
+            @include('partials.star-input', ['inputId' => 'admin-comment-'.$comment->id, 'small' => true, 'label' => 'Rate this review'])
 
         </form>
 
@@ -526,7 +411,7 @@ href="{{ asset('css/style.css') }}">
 
             <form
             method="POST"
-            action="/comment/reply">
+            action="/comment/reply" enctype="multipart/form-data">
 
                 @csrf
 
@@ -540,6 +425,8 @@ href="{{ asset('css/style.css') }}">
                 rows="2"
                 placeholder="Write a reply..."
                 required></textarea>
+
+                <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
                 <button type="submit">
 
@@ -581,7 +468,7 @@ href="{{ asset('css/style.css') }}">
                     class="menu-btn"
                     onclick="toggleReplyMenu({{ $reply->id }})">
 
-                        ⋮
+
 
                     </button>
 
@@ -618,6 +505,7 @@ href="{{ asset('css/style.css') }}">
             <div class="reply-content">
 
                 {{ $reply->reply }}
+                @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
 
             </div>
 
@@ -636,7 +524,7 @@ href="{{ asset('css/style.css') }}">
 
                 <form
                 method="POST"
-                action="/comment/reply">
+                action="/comment/reply" enctype="multipart/form-data">
 
                     @csrf
 
@@ -655,6 +543,8 @@ href="{{ asset('css/style.css') }}">
                     rows="2"
                     placeholder="Reply to {{ $reply->user->name }}"
                     required></textarea>
+
+                    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
                     <button type="submit">
 

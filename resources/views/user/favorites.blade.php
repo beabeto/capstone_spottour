@@ -10,28 +10,29 @@ content="width=device-width, initial-scale=1.0">
 
 <title>My Favorites</title>
 
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-pages.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body account-page">
 
-<div class="back-btn">
-
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
-
-</div>
+@include('user.partials.account-bar')
 
 <div class="dashboard-container">
 
-<h1>❤️ My Favorites</h1>
+<header class="account-hero">
+    <p class="account-kicker">Saved places</p>
+    <h1>My Favorites</h1>
+    <p>Spots, hotels, and restaurants you liked and want to open again.</p>
+</header>
 
 {{-- SPOT FAVORITES --}}
+
+@if($favorites->count())
+<h2 class="section-title">Tourist Spots</h2>
+@endif
 
 @forelse($favorites as $favorite)
 
@@ -45,7 +46,7 @@ href="{{ asset('css/style.css') }}">
 
         <h3>
 
-            📍 {{ $favorite->spot->name }}
+             {{ $favorite->spot->name }}
 
         </h3>
 
@@ -57,7 +58,7 @@ href="{{ asset('css/style.css') }}">
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $favorite->spot->ratings->avg('rating') ?? 0,
                 1
             ) }}
@@ -94,6 +95,10 @@ href="{{ asset('css/style.css') }}">
 
 {{-- HOTEL FAVORITES --}}
 
+@if($hotelFavorites->count())
+<h2 class="section-title">Hotels</h2>
+@endif
+
 @forelse($hotelFavorites as $favorite)
 
 <div class="favorite-card">
@@ -106,7 +111,7 @@ href="{{ asset('css/style.css') }}">
 
         <h3>
 
-            🏨 {{ $favorite->hotel->name }}
+             {{ $favorite->hotel->name }}
 
         </h3>
 
@@ -118,7 +123,7 @@ href="{{ asset('css/style.css') }}">
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $favorite->hotel->ratings->avg('rating') ?? 0,
                 1
             ) }}
@@ -153,24 +158,11 @@ href="{{ asset('css/style.css') }}">
 @endforelse
 
 
-@if(
-    $favorites->count() == 0 &&
-    $hotelFavorites->count() == 0
-)
-
-<div class="empty-card">
-
-    <h3>
-
-        No Favorites Yet
-
-    </h3>
-
-</div>
-
-@endif
-
 {{-- FOOD FAVORITES --}}
+
+@if($foodFavorites->count())
+<h2 class="section-title">Restaurants</h2>
+@endif
 
 @forelse($foodFavorites as $favorite)
 
@@ -184,7 +176,7 @@ href="{{ asset('css/style.css') }}">
 
         <h3>
 
-            🍽 {{ $favorite->food->name }}
+             {{ $favorite->food->name }}
 
         </h3>
 
@@ -196,7 +188,7 @@ href="{{ asset('css/style.css') }}">
 
         <div class="favorite-rating">
 
-            ⭐ {{ number_format(
+             ★ {{ number_format(
                 $favorite->food->ratings->avg('rating') ?? 0,
                 1
             ) }}
@@ -229,6 +221,13 @@ href="{{ asset('css/style.css') }}">
 
 @empty
 @endforelse
+
+@if($favorites->count() == 0 && $hotelFavorites->count() == 0 && $foodFavorites->count() == 0)
+<div class="empty-card">
+    <h3>No favorites yet</h3>
+    <p>Places you like will show up here.</p>
+</div>
+@endif
 
 </div>
 

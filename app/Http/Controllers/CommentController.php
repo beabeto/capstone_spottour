@@ -9,6 +9,7 @@ use App\Models\SpotComment;
 use App\Models\CommentReply;
 use App\Models\CommentRating;
 use App\Models\CommentReaction;
+use App\Models\CommentReplyRating;
 use App\Models\Notification;
 
 class CommentController extends Controller
@@ -62,7 +63,7 @@ class CommentController extends Controller
 
    return back()->with(
     'success',
-    '⭐ You rated this comment ' .
+    ' You rated this comment ' .
     $request->rating .
     ' star(s).'
 );
@@ -74,10 +75,13 @@ class CommentController extends Controller
 
         'comment_id' => 'required|exists:spot_comments,id',
 
-        'reply' => 'required|string|max:1000'
+        'reply' => 'required|string|max:1000',
+        'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120'
 
     ]);
 
+    $image = $request->hasFile('image') ? time().'_'.$request->file('image')->getClientOriginalName() : null;
+    if ($image) $request->file('image')->move(public_path('uploads/comments'), $image);
     $reply = CommentReply::create([
 
         'comment_id' => $request->comment_id,
@@ -86,7 +90,8 @@ class CommentController extends Controller
 
         'parent_reply_id' => $request->parent_reply_id,
 
-        'reply' => $request->reply
+        'reply' => $request->reply,
+        'image' => $image
 
     ]);
 
@@ -119,7 +124,7 @@ class CommentController extends Controller
 
     return back()->with(
         'success',
-        '↩️ Reply posted.'
+        ' Reply posted.'
     );
 }
 
@@ -162,7 +167,7 @@ public function like($id)
 
     return back()->with(
     'success',
-    '👍 Comment liked.'
+    ' Comment liked.'
 );
 }
 
@@ -205,7 +210,7 @@ public function like($id)
 
     return back()->with(
     'success',
-    '👎 Comment disliked.'
+    ' Comment disliked.'
 );
 }
 
@@ -248,7 +253,7 @@ public function update(
     '/spots/' . $comment->spot_id
 )->with(
     'success',
-    '✏️ Comment updated.'
+    ' Comment updated.'
 );
 }
 
@@ -265,7 +270,7 @@ public function delete($id)
 
     return back()->with(
     'success',
-    '🗑️ Comment deleted.'
+    ' Comment deleted.'
 );
 }
 
@@ -282,7 +287,7 @@ public function deleteReply($id)
 
     return back()->with(
     'success',
-    '🗑️ Reply deleted.'
+    ' Reply deleted.'
 );
 }
 
@@ -324,7 +329,17 @@ public function updateReply(
 
     return back()->with(
     'success',
-    '✏️ Reply updated.'
+    ' Reply updated.'
 );
+}
+
+public function rateReply(Request $request)
+{
+    $request->validate(['reply_id' => 'required|exists:comment_replies,id', 'rating' => 'required|integer|between:1,5']);
+    CommentReplyRating::updateOrCreate(
+        ['reply_id' => $request->reply_id, 'user_id' => Auth::id()],
+        ['rating' => $request->rating]
+    );
+    return back()->with('success', 'Reply rating saved.');
 }
 }

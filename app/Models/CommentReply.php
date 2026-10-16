@@ -14,7 +14,8 @@ class CommentReply extends Model
 
         'reply',
 
-        'parent_reply_id'
+        'parent_reply_id',
+        'image'
 
     ];
 
@@ -47,5 +48,10 @@ public function children()
         CommentReply::class,
         'parent_reply_id'
     );
+}
+
+public function ratings()
+{
+    return $this->hasMany(CommentReplyRating::class, 'reply_id');
 }
 }

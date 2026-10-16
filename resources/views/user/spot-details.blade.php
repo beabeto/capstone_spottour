@@ -12,10 +12,17 @@ content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body listing-detail">
+
+@php
+    $isFavorite = \App\Models\Favorite::where('user_id', Auth::id())->where('spot_id', $spot->id)->exists();
+    $isBookmarked = \App\Models\Bookmark::where('user_id', Auth::id())->where('spot_id', $spot->id)->exists();
+    $isChecklist = \App\Models\Checklist::where('user_id', Auth::id())->where('spot_id', $spot->id)->exists();
+@endphp
 
 @if(session('success'))
 
@@ -30,9 +37,7 @@ href="{{ asset('css/style.css') }}">
 <!-- BACK -->
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <div class="spot-details-container">
@@ -45,7 +50,7 @@ href="{{ asset('css/style.css') }}">
 
         <img
         src="{{ asset('uploads/spots/'.$spot->image) }}"
-        class="hero-image">
+        class="hero-image" onclick="this.classList.toggle('image-zoomed')" title="Click to enlarge">
 
     @endif
 
@@ -59,21 +64,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $spot->location }}
+             {{ $spot->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $spot->ratings()->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $spot->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -86,31 +82,35 @@ href="{{ asset('css/style.css') }}">
 
     <a
     href="/favorite/{{ $spot->id }}"
-    class="favorite-btn">
+    class="favorite-btn{{ $isFavorite ? ' is-saved' : '' }}">
 
-        ❤️ Favorite
+         {{ $isFavorite ? 'Remove Favorite' : 'Favorite' }}
 
     </a>
 
     <a
     href="/bookmark/{{ $spot->id }}"
-    class="bookmark-btn">
+    class="bookmark-btn{{ $isBookmarked ? ' is-saved' : '' }}">
 
-        🔖 Bookmark
+         {{ $isBookmarked ? 'Remove Bookmark' : 'Bookmark' }}
 
     </a>
 
     <a
     href="/checklist/{{ $spot->id }}"
-    class="checklist-btn">
+    class="checklist-btn{{ $isChecklist ? ' is-saved' : '' }}">
 
-        ✅ Checklist
+         {{ $isChecklist ? 'Remove Checklist' : 'Checklist' }}
 
     </a>
+
+    <a href="/booking/spot/{{ $spot->id }}" class="book-now-btn">Book now</a>
 
 </div>
 
 <!-- DETAILS -->
+
+@if(!empty($spot->gallery_images))<section class="listing-gallery" aria-label="Spot photos">@foreach($spot->gallery_images as $galleryImage)<img src="{{ asset('uploads/spots/'.$galleryImage) }}" alt="{{ $spot->name }} photo" onclick="this.classList.toggle('image-zoomed')">@endforeach</section>@endif
 
 <div class="spot-card">
 
@@ -134,7 +134,7 @@ href="{{ asset('css/style.css') }}">
 
     Entrance Fee:
 
-    ₱{{ number_format($spot->price,2) }}
+    PHP {{ number_format($spot->price,2) }}
 
 </p>
 
@@ -154,7 +154,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $spot->location }}
+         {{ $spot->location }}
 
     </p>
 
@@ -165,7 +165,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -174,9 +174,7 @@ href="{{ asset('css/style.css') }}">
 </div>
 
 
-@if($spot->booking_type == 'cottage')
-
-<div class="spot-card">
+<div class="spot-card" id="booking">
 
     <h2>Book This Spot</h2>
 
@@ -190,8 +188,13 @@ href="{{ asset('css/style.css') }}">
 
         <input type="date"
                name="booking_date"
+               class="availability-date"
+               data-listing-type="spot"
+               data-listing-id="{{ $spot->id }}"
                min="{{ date('Y-m-d') }}"
                required>
+
+        @if($spot->booking_type == 'cottage')
 
         <label>Number Of Cottages</label>
 
@@ -210,10 +213,29 @@ href="{{ asset('css/style.css') }}">
 
             <p>
                 Cottage Price:
-                ₱{{ number_format($spot->cottage_price,2) }}
+                PHP {{ number_format($spot->cottage_price,2) }}
             </p>
 
         </div>
+
+        <div class="booking-estimate" aria-live="polite">
+            Estimated total <strong id="spotBookingTotal" data-price="{{ $spot->cottage_price }}">PHP {{ number_format($spot->cottage_price, 2) }}</strong>
+        </div>
+
+        @else
+
+        <input type="hidden" name="quantity" value="1">
+
+        <div class="booking-info">
+            <p>Entrance Fee: PHP {{ number_format($spot->price, 2) }}</p>
+            <p>One guest reservation</p>
+        </div>
+
+        <div class="booking-estimate">
+            Amount to pay <strong>PHP {{ number_format($spot->price, 2) }}</strong>
+        </div>
+
+        @endif
 
         <button type="submit">
             Proceed To Booking
@@ -222,8 +244,6 @@ href="{{ asset('css/style.css') }}">
     </form>
 
 </div>
-
-@endif
 
 <!-- RATINGS -->
 
@@ -235,60 +255,14 @@ href="{{ asset('css/style.css') }}">
 
     </h2>
 
-    <div class="rating-big">
+    @include('partials.rating-board', ['ratings' => $spot->ratings])
 
-    ⭐ {{ number_format($spot->ratings->avg('rating') ?? 0, 1) }}
-
-</div>
-
-<p>
-
-    {{ $spot->ratings->count() }} Ratings
-
-</p>
-
-    <form
-    method="POST"
-    action="/spot/rate">
-
+    <form method="POST" action="/spot/rate" class="rating-compose">
         @csrf
-
-        <input
-        type="hidden"
-        name="spot_id"
-        value="{{ $spot->id }}">
-
-        <select
-        name="rating">
-
-            <option value="1">
-                ⭐ 1 Star
-            </option>
-
-            <option value="2">
-                ⭐⭐ 2 Stars
-            </option>
-
-            <option value="3">
-                ⭐⭐⭐ 3 Stars
-            </option>
-
-            <option value="4">
-                ⭐⭐⭐⭐ 4 Stars
-            </option>
-
-            <option value="5">
-                ⭐⭐⭐⭐⭐ 5 Stars
-            </option>
-
-        </select>
-
-        <button>
-
-            Submit Rating
-
-        </button>
-
+        <input type="hidden" name="spot_id" value="{{ $spot->id }}">
+        <span>Your rating</span>
+        @include('partials.star-input', ['inputId' => 'user-spot-'.$spot->id, 'value' => $spot->ratings->where('user_id', Auth::id())->sortByDesc('id')->first()?->rating, 'label' => 'Rate this spot'])
+        <p class="rating-help">Select a star to submit your rating.</p>
     </form>
 
 </div>
@@ -299,7 +273,7 @@ href="{{ asset('css/style.css') }}">
 
 <h2>Comments & Reviews</h2>
 
-<form method="POST" action="/spot/comment">
+<form method="POST" action="/spot/comment" enctype="multipart/form-data">
 
     @csrf
 
@@ -313,6 +287,8 @@ href="{{ asset('css/style.css') }}">
     rows="4"
     placeholder="Write your review..."
     required></textarea>
+
+    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
     <button type="submit">
         Submit Comment
@@ -357,7 +333,7 @@ class="comment-card">
             class="menu-btn"
             onclick="toggleMenu({{ $comment->id }})">
 
-                ⋮
+
 
             </button>
 
@@ -394,6 +370,8 @@ class="comment-card">
 
         <p>{{ $comment->comment }}</p>
 
+        @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
+
         <small>
             {{ $comment->created_at->diffForHumans() }}
         </small>
@@ -404,7 +382,7 @@ class="comment-card">
 
     <div class="comment-rating">
 
-        ⭐ Comment Rating:
+         Comment Rating:
 
         {{ number_format(
             $comment->ratings->avg('rating') ?? 0,
@@ -419,7 +397,7 @@ class="comment-card">
 
         <a href="/comment/{{ $comment->id }}/like">
 
-            👍
+
 
             {{ $comment->reactions
                 ->where('type','like')
@@ -429,7 +407,7 @@ class="comment-card">
 
         <a href="/comment/{{ $comment->id }}/dislike">
 
-            👎
+
 
             {{ $comment->reactions
                 ->where('type','dislike')
@@ -452,21 +430,11 @@ class="comment-card">
         name="comment_id"
         value="{{ $comment->id }}">
 
-        <select name="rating">
-
-            <option value="1">⭐</option>
-            <option value="2">⭐⭐</option>
-            <option value="3">⭐⭐⭐</option>
-            <option value="4">⭐⭐⭐⭐</option>
-            <option value="5">⭐⭐⭐⭐⭐</option>
-
-        </select>
-
-        <button type="submit">
-
-            Rate Comment
-
-        </button>
+        <div class="star-rating star-rating-small" role="radiogroup" aria-label="Rate this review">
+            @for($rating = 5; $rating >= 1; $rating--)
+                <input id="spot-comment-{{ $comment->id }}-{{ $rating }}" type="radio" name="rating" value="{{ $rating }}" onchange="this.form.submit()"><label for="spot-comment-{{ $comment->id }}-{{ $rating }}" title="{{ $rating }} star{{ $rating > 1 ? 's' : '' }}">&#9733;</label>
+            @endfor
+        </div>
 
     </form>
 
@@ -479,7 +447,7 @@ class="comment-card">
 
         <form
         method="POST"
-        action="/comment/reply">
+        action="/comment/reply" enctype="multipart/form-data">
 
             @csrf
 
@@ -493,6 +461,8 @@ class="comment-card">
             rows="2"
             placeholder="Write a reply..."
             required></textarea>
+
+            <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
             <button type="submit">
 
@@ -535,7 +505,7 @@ class="comment-card">
                 class="menu-btn"
                 onclick="toggleReplyMenu({{ $reply->id }})">
 
-                    ⋮
+
 
                 </button>
 
@@ -574,7 +544,14 @@ class="comment-card">
 
             {{ $reply->reply }}
 
+            @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
+
         </div>
+
+        <form method="POST" action="/reply/rate" class="reply-rating-form" aria-label="Rate this reply">
+            @csrf<input type="hidden" name="reply_id" value="{{ $reply->id }}"><span>Rate reply</span>
+            @include('partials.star-input', ['inputId' => 'spot-reply-'.$reply->id, 'value' => $reply->ratings->firstWhere('user_id', Auth::id())?->rating, 'small' => true, 'label' => 'Rate this reply'])
+        </form>
 
         <small class="reply-time">
 
@@ -591,7 +568,7 @@ class="comment-card">
 
             <form
             method="POST"
-            action="/comment/reply">
+            action="/comment/reply" enctype="multipart/form-data">
 
                 @csrf
 
@@ -605,6 +582,8 @@ class="comment-card">
                 rows="2"
                 placeholder="Reply to {{ $reply->user->name }}"
                 required></textarea>
+
+                <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
                 <button type="submit">
 
@@ -686,7 +665,23 @@ function toggleReplyToReply(id)
     }
 }
 
+const cottageQuantity = document.querySelector('input[name="quantity"]');
+const spotBookingTotal = document.getElementById('spotBookingTotal');
+
+if (cottageQuantity && spotBookingTotal)
+{
+    const refreshSpotTotal = () => {
+        const total = Math.max(1, Number(cottageQuantity.value || 1)) * Number(spotBookingTotal.dataset.price || 0);
+        spotBookingTotal.textContent = 'PHP ' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    cottageQuantity.addEventListener('input', refreshSpotTotal);
+    refreshSpotTotal();
+}
+
+
 </script>
 
+<script src="{{ asset('js/availability-calendar.js') }}"></script>
 </body>
 </html>

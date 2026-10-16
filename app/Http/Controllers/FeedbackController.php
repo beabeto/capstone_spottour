@@ -2,156 +2,155 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Feedback;
 use App\Models\Notification;
+use App\Models\User;
+use App\Support\SpotTourMail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class FeedbackController extends Controller
 {
-    // ================= USER =================
+    public function userIndex()
+    {
+        $feedbacks = Feedback::with('admin')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
 
-   public function userIndex()
-{
-    $feedbacks = Feedback::where(
-        'user_id',
-        Auth::id()
-    )
-    ->latest()
-    ->get();
-
-    return view(
-        'user.feedback',
-        compact('feedbacks')
-    );
-}
-
-    // ================= OWNER =================
+        return view('user.feedback', compact('feedbacks'));
+    }
 
     public function ownerIndex()
     {
-        $feedbacks = Feedback::where(
-            'user_id',
-            Auth::id()
-        )
-        ->latest()
-        ->get();
+        $feedbacks = Feedback::with('admin')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
 
-        return view(
-            'owner.feedback',
-            compact('feedbacks')
-        );
+        return view('owner.feedback', compact('feedbacks'));
     }
-
-    // ================= SEND FEEDBACK =================
 
     public function store(Request $request)
     {
         $request->validate([
-
             'subject' => 'required|max:255',
-
-            'message' => 'required'
-
+            'message' => 'required',
         ]);
 
-        Feedback::create([
-
+        $feedback = Feedback::create([
             'user_id' => Auth::id(),
-
             'subject' => $request->subject,
-
             'message' => $request->message,
-
-            'status' => 'pending'
-
+            'status' => 'pending',
         ]);
 
-        return back()->with(
-            'success',
-            'Feedback sent successfully.'
-        );
-    }
+        $preview = Str::limit($request->subject, 80);
+        foreach (User::where('role', 'admin')->get() as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'sender_id' => Auth::id(),
+                'message' => Auth::user()->name.' sent feedback: '.$preview,
+                'is_read' => 0,
+                'category' => 'feedback',
+            ]);
 
-    // ================= ADMIN =================
+            SpotTourMail::notify(
+                $admin,
+                'New SpotTour feedback',
+                "Hi {$admin->name},\n\n".Auth::user()->name." sent feedback:\n\nSubject: {$feedback->subject}\n\n{$feedback->message}\n\nOpen SpotTour → Feedback to reply.\n"
+            );
+        }
+
+        return back()->with('success', 'Feedback sent. The admin was notified on the web and by email.');
+    }
 
     public function adminIndex()
     {
-        $feedbacks = Feedback::with('user')
+        $feedbacks = Feedback::with(['user', 'admin'])
             ->latest()
             ->get();
 
-        return view(
-            'admin.feedback',
-            compact('feedbacks')
-        );
+        return view('admin.feedback', compact('feedbacks'));
     }
 
-    // ================= REPLY =================
-
     public function reply(Request $request, $id)
-{
-    $request->validate([
+    {
+        $this->ensureAdministrator();
 
-        'reply' => 'required'
+        $request->validate([
+            'reply' => 'required',
+        ]);
 
-    ]);
+        $feedback = Feedback::with('user')->findOrFail($id);
+        $admin = Auth::user();
 
-    $feedback = Feedback::findOrFail($id);
+        $feedback->update([
+            'reply' => $request->reply,
+            'replied_by' => $admin->id,
+            'replied_at' => now(),
+            'status' => 'replied',
+        ]);
 
-    $feedback->update([
+        $message = 'Admin '.$admin->name.' replied to your feedback "'.$feedback->subject.'".';
 
-        'reply' => $request->reply,
+        Notification::create([
+            'user_id' => $feedback->user_id,
+            'sender_id' => $admin->id,
+            'message' => $message,
+            'is_read' => 0,
+            'category' => 'feedback',
+        ]);
 
-        'status' => 'replied'
+        SpotTourMail::notify(
+            $feedback->user,
+            'Admin replied to your SpotTour feedback',
+            "Hi {$feedback->user?->name},\n\nAdmin {$admin->name} replied to your feedback \"{$feedback->subject}\":\n\n{$request->reply}\n\nYou can also read this reply in SpotTour → Feedback.\n"
+        );
 
-    ]);
-
-    Notification::create([
-
-        'user_id' => $feedback->user_id,
-
-        'sender_id' => Auth::id(),
-
-        'message' => '💬 Your feedback has been replied to by the administrator.',
-
-        'is_read' => 0
-
-    ]);
-
-    return back()->with(
-        'success',
-        'Reply sent successfully.'
-    );
-}
-
-    // ================= RESOLVE =================
+        return back()->with('success', 'Reply sent. The traveller was notified on the web and by email.');
+    }
 
     public function resolve($id)
     {
-        $feedback = Feedback::findOrFail($id);
+        $this->ensureAdministrator();
 
-        $feedback->update([
-
-            'status' => 'resolved'
-
+        Feedback::findOrFail($id)->update([
+            'status' => 'resolved',
         ]);
 
-        return back()->with(
-            'success',
-            'Feedback marked as resolved.'
-        );
+        return back()->with('success', 'Feedback marked as resolved.');
     }
 
-    // ================= DELETE =================
+    public function update(Request $request, $id)
+    {
+        $this->ensureAdministrator();
+
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        Feedback::findOrFail($id)->update([
+            'subject' => $request->subject,
+            'message' => $request->message,
+        ]);
+
+        return back()->with('success', 'Feedback record updated.');
+    }
 
     public function delete($id)
     {
+        $this->ensureAdministrator();
+
         Feedback::findOrFail($id)->delete();
 
-        return back()->with(
-            'success',
-            'Feedback deleted.'
-        );
+        return back()->with('success', 'Feedback deleted.');
+    }
+
+    private function ensureAdministrator(): void
+    {
+        abort_unless(Auth::check() && Auth::user()->role === 'admin', 403);
     }
 }

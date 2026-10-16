@@ -23,9 +23,7 @@ href="{{ asset('css/style.css') }}">
 <!-- BACK -->
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ← 
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <!-- HERO -->
@@ -50,55 +48,22 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $spot->location }}
+             {{ $spot->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $spot->ratings()->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $spot->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
 
 </div>
 
-<!-- FAVORITE BOOKMARK CHECKLIST -->
-
-<div class="spot-actions-top">
-
-    <a
-    href="/favorite/{{ $spot->id }}"
-    class="favorite-btn">
-
-        ❤️ Favorite
-
-    </a>
-
-    <a
-    href="/bookmark/{{ $spot->id }}"
-    class="bookmark-btn">
-
-        🔖 Bookmark
-
-    </a>
-
-    <a
-    href="/checklist/{{ $spot->id }}"
-    class="checklist-btn">
-
-        ✅ Checklist
-
-    </a>
-
+<div class="owner-listing-actions">
+    <a href="/owner/spots/edit/{{ $spot->id }}" class="edit-btn">Edit spot</a>
+    <a href="/owner/bookings" class="view-btn">View bookings</a>
+    <a href="/owner/spots/delete/{{ $spot->id }}" class="deletes-btn" onclick="return confirm('Delete this spot?')">Delete</a>
 </div>
 
 <!-- ABOUT -->
@@ -123,7 +88,7 @@ href="{{ asset('css/style.css') }}">
 
         Entrance Fee:
 
-        ₱{{ number_format(
+        PHP {{ number_format(
             $spot->price,
             2
         ) }}
@@ -146,7 +111,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $spot->location }}
+         {{ $spot->location }}
 
     </p>
 
@@ -157,7 +122,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -165,122 +130,12 @@ href="{{ asset('css/style.css') }}">
 
 </div>
 
-<!-- BOOKING -->
-
-@if($spot->booking_type == 'cottage')
-
-<div class="spot-card">
-
-    <h2>
-
-        Book Cottage
-
-    </h2>
-
-    <form
-    method="GET"
-    action="/booking/confirm">
-
-        <input
-        type="hidden"
-        name="spot_id"
-        value="{{ $spot->id }}">
-
-        <label>
-
-            Booking Date
-
-        </label>
-
-        <input
-        type="date"
-        name="booking_date"
-        min="{{ date('Y-m-d') }}"
-        required>
-
-        <label>
-
-            Number Of Cottages
-
-        </label>
-
-        <input
-        type="number"
-        name="quantity"
-        min="1"
-        max="{{ $spot->available_cottages }}"
-        value="1">
-
-        <p>
-
-            Available:
-            {{ $spot->available_cottages }}
-
-        </p>
-
-        <p>
-
-            Cottage Price:
-            ₱{{ number_format(
-                $spot->cottage_price,
-                2
-            ) }}
-
-        </p>
-
-        <button
-        type="submit">
-
-            Proceed To Booking
-
-        </button>
-
-    </form>
-
-</div>
-
-@endif
-
 <!-- SPOT RATING -->
 
 <div class="spot-card">
 
-    <h2>
-
-        Rate This Spot
-
-    </h2>
-
-    <form
-    method="POST"
-    action="/spot/rate">
-
-        @csrf
-
-        <input
-        type="hidden"
-        name="spot_id"
-        value="{{ $spot->id }}">
-
-        <select
-        name="rating">
-
-            <option value="1">⭐ 1 Star</option>
-            <option value="2">⭐⭐ 2 Stars</option>
-            <option value="3">⭐⭐⭐ 3 Stars</option>
-            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
-
-        </select>
-
-        <button
-        type="submit">
-
-            Submit Rating
-
-        </button>
-
-    </form>
+    <h2>Guest ratings</h2>
+    @include('partials.rating-board', ['ratings' => $spot->ratings])
 
 </div>
 
@@ -296,7 +151,7 @@ href="{{ asset('css/style.css') }}">
 
     <form
     method="POST"
-    action="/spot/comment">
+    action="/spot/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -310,6 +165,8 @@ href="{{ asset('css/style.css') }}">
         rows="4"
         placeholder="Write your review..."
         required></textarea>
+
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button
         type="submit">
@@ -358,7 +215,7 @@ href="{{ asset('css/style.css') }}">
 class="menu-btn"
 onclick="toggleMenu({{ $comment->id }})">
 
-⋮
+
 
 </button>
 
@@ -395,6 +252,8 @@ class="comment-dropdown">
 
         </p>
 
+        @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
+
         <small>
 
             {{ $comment->created_at->diffForHumans() }}
@@ -402,14 +261,7 @@ class="comment-dropdown">
         </small>
 
         <div class="comment-rating">
-
-            ⭐
-
-            {{ number_format(
-                $comment->ratings->avg('rating') ?? 0,
-                1
-            ) }}
-
+            @include('partials.score-stars', ['score' => $comment->ratings->avg('rating') ?? 0])
         </div>
 
         <div class="comment-actions">
@@ -417,7 +269,7 @@ class="comment-dropdown">
             <a
             href="/comment/{{ $comment->id }}/like">
 
-                👍
+
 
                 {{ $comment->reactions
                 ->where('type','like')
@@ -428,7 +280,7 @@ class="comment-dropdown">
             <a
             href="/comment/{{ $comment->id }}/dislike">
 
-                👎
+
 
                 {{ $comment->reactions
                 ->where('type','dislike')
@@ -437,38 +289,6 @@ class="comment-dropdown">
             </a>
 
         </div>
-
-        <!-- RATE COMMENT -->
-
-        <form
-        method="POST"
-        action="/comment/rate">
-
-            @csrf
-
-            <input
-            type="hidden"
-            name="comment_id"
-            value="{{ $comment->id }}">
-
-            <select
-            name="rating">
-
-                <option value="1">⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="5">⭐⭐⭐⭐⭐</option>
-
-            </select>
-
-            <button>
-
-                Rate Comment
-
-            </button>
-
-        </form>
 
         <!-- REPLY -->
 
@@ -479,7 +299,7 @@ style="display:none;">
 
 <form
 method="POST"
-action="/comment/reply">
+action="/comment/reply" enctype="multipart/form-data">
 
     @csrf
 
@@ -494,6 +314,8 @@ action="/comment/reply">
     placeholder="Write a reply..."
     required></textarea>
 
+    <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+
     <button type="submit">
 
         Reply
@@ -503,7 +325,7 @@ action="/comment/reply">
 </form>
 
 </div>
-    
+
 @foreach($comment->replies as $reply)
 
 <div class="reply-card">
@@ -532,7 +354,7 @@ action="/comment/reply">
             class="menu-btn"
             onclick="toggleReplyMenu({{ $reply->id }})">
 
-                ⋮
+
 
             </button>
 
@@ -561,13 +383,15 @@ action="/comment/reply">
 
         </div>
 
-        
+
 
     </div>
 
     <div class="reply-content">
 
         {{ $reply->reply }}
+
+        @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
 
     </div>
 
@@ -584,7 +408,7 @@ action="/comment/reply">
 
         <form
         method="POST"
-        action="/comment/reply">
+        action="/comment/reply" enctype="multipart/form-data">
 
             @csrf
 
@@ -603,6 +427,8 @@ action="/comment/reply">
             rows="2"
             placeholder="Reply to {{ $reply->user->name }}"
             required></textarea>
+
+            <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
             <button type="submit">
 

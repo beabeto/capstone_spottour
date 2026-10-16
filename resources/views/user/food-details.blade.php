@@ -12,24 +12,27 @@ content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet"
 href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/listing-details.css') }}">
 
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body listing-detail">
+
+@php
+    $isFavorite = \App\Models\FoodFavorite::where('user_id', Auth::id())->where('food_id', $food->id)->exists();
+    $isBookmarked = \App\Models\FoodBookmark::where('user_id', Auth::id())->where('food_id', $food->id)->exists();
+    $isChecklist = \App\Models\FoodChecklist::where('user_id', Auth::id())->where('food_id', $food->id)->exists();
+@endphp
 
 <div class="back-btn">
 
-    <button onclick="history.back()">
-
-        ←
-
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 
 </div>
 
 @if(session('success'))
 
-<div class="success">
+<div id="toast" class="toast-success">
 
     {{ session('success') }}
 
@@ -48,7 +51,7 @@ href="{{ asset('css/style.css') }}">
     <img
     src="{{ asset('uploads/foods/'.$food->image) }}"
     alt="{{ $food->name }}"
-    class="hero-image">
+    class="hero-image" onclick="this.classList.toggle('image-zoomed')" title="Click to enlarge">
 
     @endif
 
@@ -62,21 +65,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $food->location }}
+             {{ $food->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            ⭐
-
-            {{ number_format(
-                $food->ratings->avg('rating') ?? 0,
-                1
-            ) }}
-
-            / 5.0
-
+            @include('partials.score-stars', ['score' => $food->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -89,31 +83,35 @@ href="{{ asset('css/style.css') }}">
 
     <a
     href="/food/favorite/{{ $food->id }}"
-    class="favorite-btn">
+    class="favorite-btn{{ $isFavorite ? ' is-saved' : '' }}">
 
-        ❤️ Favorite
+         {{ $isFavorite ? 'Remove Favorite' : 'Favorite' }}
 
     </a>
 
     <a
     href="/food/bookmark/{{ $food->id }}"
-    class="bookmark-btn">
+    class="bookmark-btn{{ $isBookmarked ? ' is-saved' : '' }}">
 
-        🔖 Bookmark
+         {{ $isBookmarked ? 'Remove Bookmark' : 'Bookmark' }}
 
     </a>
 
     <a
     href="/food/checklist/{{ $food->id }}"
-    class="checklist-btn">
+    class="checklist-btn{{ $isChecklist ? ' is-saved' : '' }}">
 
-        ✅ Checklist
+         {{ $isChecklist ? 'Remove Checklist' : 'Checklist' }}
 
     </a>
+
+    <a href="/booking/food/{{ $food->id }}" class="book-now-btn">Book now</a>
 
 </div>
 
 <!-- ABOUT -->
+
+@if(!empty($food->gallery_images))<section class="listing-gallery" aria-label="Restaurant photos">@foreach($food->gallery_images as $galleryImage)<img src="{{ asset('uploads/foods/'.$galleryImage) }}" alt="{{ $food->name }} photo" onclick="this.classList.toggle('image-zoomed')">@endforeach</section>@endif
 
 <div class="spot-card">
 
@@ -143,7 +141,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🍽 Available Tables:
+         Available Tables:
 
         {{ $food->available_tables }}
 
@@ -151,7 +149,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🎉 Venue Capacity:
+         Venue Capacity:
 
         {{ $food->venue_capacity }}
 
@@ -171,7 +169,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $food->location }}
+         {{ $food->location }}
 
     </p>
 
@@ -182,7 +180,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -204,13 +202,13 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        🍴 Food Menu
+         Food Menu
 
     </h2>
 
     @forelse($food->menus as $menu)
 
-    <div class="comment-card">
+    <div class="comment-card menu-card">
 
         <div class="comment-header">
 
@@ -250,7 +248,7 @@ href="{{ asset('css/style.css') }}">
 
             <h3>
 
-                ₱{{ number_format(
+                PHP {{ number_format(
                     $menu->price,
                     2
                 ) }}
@@ -273,7 +271,7 @@ href="{{ asset('css/style.css') }}">
 
 </div>
 
-<div class="spot-card">
+<div class="spot-card" id="booking">
 
 <h2>
 
@@ -299,6 +297,10 @@ Reservation Date
 <input
 type="date"
 name="reservation_date"
+class="availability-date"
+data-listing-type="food"
+data-listing-id="{{ $food->id }}"
+min="{{ date('Y-m-d') }}"
 required>
 
 <label>
@@ -345,77 +347,14 @@ Proceed To Reservation
 
     </h2>
 
-    <div class="rating-big">
+    @include('partials.rating-board', ['ratings' => $food->ratings])
 
-        ⭐
-
-        {{ number_format(
-            $food->ratings->avg('rating') ?? 0,
-            1
-        ) }}
-
-    </div>
-
-    <p>
-
-        Based on
-
-        {{ $food->ratings->count() }}
-
-        ratings
-
-    </p>
-
-    <hr><br>
-
-    <form
-    method="POST"
-    action="/food/rate">
-
+    <form method="POST" action="/food/rate" class="rating-compose">
         @csrf
-
-        <input
-        type="hidden"
-        name="food_id"
-        value="{{ $food->id }}">
-
-        <label>
-
-            Rate This Restaurant
-
-        </label>
-
-        <select
-        name="rating">
-
-            <option value="1">
-                ⭐ 1 Star
-            </option>
-
-            <option value="2">
-                ⭐⭐ 2 Stars
-            </option>
-
-            <option value="3">
-                ⭐⭐⭐ 3 Stars
-            </option>
-
-            <option value="4">
-                ⭐⭐⭐⭐ 4 Stars
-            </option>
-
-            <option value="5">
-                ⭐⭐⭐⭐⭐ 5 Stars
-            </option>
-
-        </select>
-
-        <button
-        type="submit">
-
-            Submit Rating
-
-        </button>
+        <input type="hidden" name="food_id" value="{{ $food->id }}">
+        <span>Your rating</span>
+        @include('partials.star-input', ['inputId' => 'user-food-'.$food->id, 'value' => $food->ratings->where('user_id', Auth::id())->sortByDesc('id')->first()?->rating, 'label' => 'Rate this restaurant'])
+        <p class="rating-help">Select a star to submit your rating.</p>
 
     </form>
 
@@ -435,7 +374,7 @@ Proceed To Reservation
 
     <form
     method="POST"
-    action="/food/comment">
+    action="/food/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -449,6 +388,8 @@ Proceed To Reservation
         rows="4"
         placeholder="Write your review..."
         required></textarea>
+
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button type="submit">
 
@@ -498,7 +439,7 @@ Proceed To Reservation
                 class="menu-btn"
                 onclick="toggleMenu({{ $comment->id }})">
 
-                    ⋮
+
 
                 </button>
 
@@ -542,7 +483,9 @@ Proceed To Reservation
 
             <p>
 
-                {{ $comment->comment }}
+            {{ $comment->comment }}
+
+            @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
 
             </p>
 
@@ -560,7 +503,7 @@ Proceed To Reservation
 
             <a href="/food/comment/{{ $comment->id }}/like">
 
-                👍
+
 
                 {{ $comment->reactions->where('type','like')->count() }}
 
@@ -568,7 +511,7 @@ Proceed To Reservation
 
             <a href="/food/comment/{{ $comment->id }}/dislike">
 
-                👎
+
 
                 {{ $comment->reactions->where('type','dislike')->count() }}
 
@@ -580,7 +523,7 @@ Proceed To Reservation
 
         <div class="comment-rating">
 
-            ⭐
+
 
             {{ number_format(
                 $comment->ratings->avg('rating') ?? 0,
@@ -602,21 +545,11 @@ Proceed To Reservation
             name="comment_id"
             value="{{ $comment->id }}">
 
-            <select name="rating">
-
-                <option value="1">⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="5">⭐⭐⭐⭐⭐</option>
-
-            </select>
-
-            <button type="submit">
-
-                Rate Comment
-
-            </button>
+            <div class="star-rating star-rating-small" role="radiogroup" aria-label="Rate this review">
+                @for($rating = 5; $rating >= 1; $rating--)
+                    <input id="food-comment-{{ $comment->id }}-{{ $rating }}" type="radio" name="rating" value="{{ $rating }}" onchange="this.form.submit()"><label for="food-comment-{{ $comment->id }}-{{ $rating }}" title="{{ $rating }} star{{ $rating > 1 ? 's' : '' }}">&#9733;</label>
+                @endfor
+            </div>
 
         </form>
 
@@ -629,7 +562,7 @@ Proceed To Reservation
 
             <form
             method="POST"
-            action="/food/comment/reply">
+            action="/food/comment/reply" enctype="multipart/form-data">
 
                 @csrf
 
@@ -643,6 +576,8 @@ Proceed To Reservation
                 rows="2"
                 placeholder="Write your reply..."
                 required></textarea>
+
+                <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
                 <button type="submit">
 
@@ -684,7 +619,14 @@ Proceed To Reservation
 
                 {{ $reply->reply }}
 
+                @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
+
             </div>
+
+            <form method="POST" action="/food/reply/rate" class="reply-rating-form" aria-label="Rate this reply">
+                @csrf<input type="hidden" name="reply_id" value="{{ $reply->id }}"><span>Rate reply</span>
+                @include('partials.star-input', ['inputId' => 'food-reply-'.$reply->id, 'value' => $reply->ratings->firstWhere('user_id', Auth::id())?->rating, 'small' => true, 'label' => 'Rate this reply'])
+            </form>
 
             <small class="reply-time">
 
@@ -734,6 +676,7 @@ function toggleReplyBox(id)
         ? 'block'
         : 'none';
 }
+
 
 </script>
 

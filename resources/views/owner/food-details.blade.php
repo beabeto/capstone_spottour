@@ -23,9 +23,7 @@ href="{{ asset('css/style.css') }}">
 <!-- BACK -->
 
 <div class="back-btn">
-    <button onclick="history.back()">
-        ←
-    </button>
+    <button type="button" onclick="window.history.back(); return false;">Back</button>
 </div>
 
 <!-- HERO -->
@@ -50,15 +48,12 @@ href="{{ asset('css/style.css') }}">
 
         <p>
 
-            📍 {{ $food->location }}
+             {{ $food->location }}
 
         </p>
 
         <div class="hero-rating">
-
-            🍽 Food Establishment •
-            {{ ucfirst($food->status) }}
-
+            @include('partials.score-stars', ['score' => $food->ratings->avg('rating') ?? 0])
         </div>
 
     </div>
@@ -73,7 +68,7 @@ href="{{ asset('css/style.css') }}">
     href="/owner/foods/edit/{{ $food->id }}"
     class="bookmark-btn">
 
-        ✏️ Edit
+         Edit
 
     </a>
 
@@ -81,7 +76,7 @@ href="{{ asset('css/style.css') }}">
     href="/owner/foods/{{ $food->id }}/menus/create"
     class="favorite-btn">
 
-        🍽 Add Menu
+         Add Menu
 
     </a>
 
@@ -89,7 +84,7 @@ href="{{ asset('css/style.css') }}">
     href="/owner/foods/{{ $food->id }}/menus"
     class="favorite-btn">
 
-        📋 Manage Menus
+         Manage Menus
 
     </a>
 
@@ -98,10 +93,15 @@ href="{{ asset('css/style.css') }}">
     class="checklist-btn"
     onclick="return confirm('Delete this establishment?')">
 
-        🗑 Delete
+         Delete
 
     </a>
 
+</div>
+
+<div class="spot-card">
+    <h2>Guest ratings</h2>
+    @include('partials.rating-board', ['ratings' => $food->ratings])
 </div>
 
 <!-- ABOUT -->
@@ -134,34 +134,42 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        🍽 Available Tables:
+         Available Tables:
         {{ $food->available_tables }}
 
     </p>
 
     <p>
 
-        🎉 Venue Capacity:
+         Venue Capacity:
         {{ $food->venue_capacity }}
 
     </p>
 
+    <form method="POST" action="/owner/foods/{{ $food->id }}/daily-limit" class="arrival-checkin">
+        @csrf
+        <label>Bookings accepted per day
+            <input type="number" name="daily_booking_limit" min="1" value="{{ $food->daily_booking_limit }}" placeholder="No daily limit">
+        </label>
+        <button type="submit">Save</button>
+    </form>
+
     <p>
 
-        🍴 Menu Items:
+         Menu Items:
         {{ $food->menus->count() }}
 
     </p>
 
     <p>
 
-        📌 Status:
+         Status:
         {{ ucfirst($food->status) }}
 
     </p>
 
 
-    
+
 </div>
 
 <!-- LOCATION -->
@@ -176,7 +184,7 @@ href="{{ asset('css/style.css') }}">
 
     <p>
 
-        📍 {{ $food->location }}
+         {{ $food->location }}
 
     </p>
 
@@ -187,7 +195,7 @@ href="{{ asset('css/style.css') }}">
     target="_blank"
     class="map-btn">
 
-        📍 Open In Google Maps
+         Open In Google Maps
 
     </a>
 
@@ -201,7 +209,7 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        🍴 Food Menus
+         Food Menus
 
     </h2>
 
@@ -245,7 +253,7 @@ href="{{ asset('css/style.css') }}">
 
         <h3>
 
-            ₱{{ number_format(
+            PHP {{ number_format(
                 $menu->price,
                 2
             ) }}
@@ -257,7 +265,7 @@ href="{{ asset('css/style.css') }}">
             <a
             href="/owner/menus/edit/{{ $menu->id }}">
 
-                ✏️ Edit
+                 Edit
 
             </a>
 
@@ -265,7 +273,7 @@ href="{{ asset('css/style.css') }}">
             href="/owner/menus/delete/{{ $menu->id }}"
             onclick="return confirm('Delete this menu item?')">
 
-                🗑 Delete
+                 Delete
 
             </a>
 
@@ -290,7 +298,7 @@ href="{{ asset('css/style.css') }}">
 
     <h2>
 
-        💬 Customer Comments
+         Customer Comments
 
     </h2>
 
@@ -306,7 +314,7 @@ href="{{ asset('css/style.css') }}">
 
     <form
     method="POST"
-    action="/food/comment">
+    action="/food/comment" enctype="multipart/form-data">
 
         @csrf
 
@@ -320,6 +328,8 @@ href="{{ asset('css/style.css') }}">
         rows="4"
         placeholder="Write your comment..."
         required></textarea>
+
+        <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 
         <button
         type="submit"
@@ -370,6 +380,36 @@ href="{{ asset('css/style.css') }}">
                 {{ $comment->comment }}
 
             </p>
+
+            @if($comment->image)<img src="{{ asset('uploads/comments/'.$comment->image) }}" class="review-image" alt="Review photo">@endif
+
+            @foreach($comment->replies as $reply)
+            <div class="reply-card">
+                <div class="reply-header">
+                    <img src="{{ $reply->user && $reply->user->profile_image ? asset('uploads/profile/'.$reply->user->profile_image) : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" class="reply-avatar" alt="">
+                    <div>
+                        <strong>{{ $reply->user->name ?? 'Guest' }}</strong>
+                        <small>{{ $reply->created_at->diffForHumans() }}</small>
+                    </div>
+                </div>
+                <div class="reply-content">
+                    {{ $reply->reply }}
+                    @if($reply->image)<img src="{{ asset('uploads/comments/'.$reply->image) }}" class="review-image" alt="Reply photo">@endif
+                </div>
+            </div>
+            @endforeach
+
+            <form method="POST" action="/food/comment/reply" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="comment_id" value="{{ $comment->id }}">
+                <textarea name="reply" rows="2" placeholder="Write a reply..." required></textarea>
+                <label class="comment-image-field">Add photo (optional)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
+                <button type="submit">Reply</button>
+            </form>
+
+            <div class="comment-rating">
+                @include('partials.score-stars', ['score' => $comment->ratings->avg('rating') ?? 0])
+            </div>
 
         </div>
 

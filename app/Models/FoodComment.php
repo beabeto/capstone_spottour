@@ -9,7 +9,8 @@ class FoodComment extends Model
     protected $fillable = [
         'food_id',
         'user_id',
-        'comment'
+        'comment',
+        'image'
     ];
 
     public function user()

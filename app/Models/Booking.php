@@ -16,9 +16,25 @@ class Booking extends Model
     'receipt',
     'payer_name',
     'payer_number',
+    'contact_email',
+    'payment_method',
+    'payment_reference',
+    'needs_guide',
+    'package_id',
+    'package_name',
+    'arrival_code',
+    'arrived_at',
     'status'
 
 ];
+
+    protected function casts(): array
+    {
+        return [
+            'arrived_at' => 'datetime',
+            'needs_guide' => 'boolean',
+        ];
+    }
 
     public function user()
     {
@@ -31,7 +47,7 @@ class Booking extends Model
     {
         return $this->belongsTo(
             Spot::class
-        );
+        )->withTrashed();
     }
 
     public function payment()
