@@ -478,7 +478,7 @@ $totalNotifications =
     }
 
     public function activities()
-    {
+{
         $activities = $this->recentActivities(24);
 
         return view('admin.activities', compact('activities'));
@@ -610,5 +610,5 @@ $totalNotifications =
         $value = (string) $request->query('month', now()->format('Y-m'));
 
         return Carbon::createFromFormat('Y-m', preg_match('/^\d{4}-\d{2}$/', $value) ? $value : now()->format('Y-m'))->startOfMonth();
-    }
+}
 }

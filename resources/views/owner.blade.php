@@ -260,51 +260,35 @@ Calendar
 
         <div class="owner-cards">
 
-            <div class="owner-card">
+            <a class="owner-card" href="/owner/listings">
                 <h3>Total Listings</h3>
                 <p>{{ $listings }}</p>
-            </div>
+                <small>Spots, hotels, and restaurants you currently manage.</small>
+            </a>
 
-            <div class="owner-card">
+            <a class="owner-card" href="/owner/details/bookings">
                 <h3>Total Bookings</h3>
                 <p>{{ $totalBookings }}</p>
-            </div>
+                <small>All reservation requests made for your listings.</small>
+            </a>
 
-            <div class="owner-card">
+            <a class="owner-card" href="/owner/details/pending">
                 <h3>Pending Requests</h3>
                 <p>{{ $pendingBookings }}</p>
-            </div>
+                <small>Bookings that still need your approval.</small>
+            </a>
 
-            <div class="owner-card">
+            <a class="owner-card" href="/owner/details/ratings">
                 <h3>Ratings</h3>
                 <p>{{ $totalReviews }}</p>
-            </div>
+                <small>Reviews travellers left on your listings.</small>
+            </a>
 
-            <div class="owner-card revenue-card">
-
-    <div>
-
-        <small>
-
-            Total Revenue
-
-        </small>
-
-        <h2>
-
-            PHP {{ number_format($totalRevenue,2) }}
-
-        </h2>
-
-        <span class="growth-text">
-
-            Approved bookings only
-
-        </span>
-
-    </div>
-
-</div>
+            <a class="owner-card revenue-card" href="/owner/details/revenue">
+                <h3>Total Revenue</h3>
+                <p>PHP {{ number_format($totalRevenue, 2) }}</p>
+                <small>Earnings from approved bookings only.</small>
+            </a>
 
         </div>
 

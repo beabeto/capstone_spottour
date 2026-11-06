@@ -49,6 +49,8 @@ Route::get(
 
 Route::get('/owner/revenue-period', [OwnerController::class, 'revenuePeriod']);
 Route::get('/owner/booking-period', [OwnerController::class, 'bookingPeriod']);
+Route::get('/owner/listings', [OwnerController::class, 'listings']);
+Route::get('/owner/details/{card}', [OwnerController::class, 'cardDetails']);
 Route::get('/booking/availability', [BookingController::class, 'availability']);
 Route::get('/admin/calendar', [BookingController::class, 'calendar'])->middleware('auth');
 

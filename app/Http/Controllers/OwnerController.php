@@ -752,6 +752,214 @@ $unreadCount = Notification::where('user_id', $ownerId)->where('is_read', false)
 );
 }
 
+    public function listings()
+    {
+        $ownerId = Auth::id();
+
+        $listings = collect()
+            ->concat(Spot::where('user_id', $ownerId)->get()->map(fn ($spot) => (object) [
+                'kind' => 'spot',
+                'type' => 'Tourist spot',
+                'name' => $spot->name,
+                'location' => $spot->location,
+                'image' => $spot->image ? asset('uploads/spots/'.$spot->image) : 'https://via.placeholder.com/160x110?text=Spot',
+                'metric_label' => 'Entry fee',
+                'metric_value' => 'PHP '.number_format((float) $spot->price, 2),
+                'status' => $spot->status ?: 'pending',
+                'url' => '/owner/spots/'.$spot->id,
+                'manage_url' => '/owner/spots',
+            ]))
+            ->concat(Hotel::where('owner_id', $ownerId)->get()->map(fn ($hotel) => (object) [
+                'kind' => 'hotel',
+                'type' => 'Hotel',
+                'name' => $hotel->name,
+                'location' => $hotel->location,
+                'image' => $hotel->image ? asset('uploads/hotels/'.$hotel->image) : 'https://via.placeholder.com/160x110?text=Hotel',
+                'metric_label' => 'Rate / night',
+                'metric_value' => 'PHP '.number_format((float) $hotel->price_per_night, 2),
+                'status' => $hotel->status ?: 'pending',
+                'url' => '/owner/hotels/'.$hotel->id,
+                'manage_url' => '/owner/hotels',
+            ]))
+            ->concat(Food::where('owner_id', $ownerId)->get()->map(fn ($food) => (object) [
+                'kind' => 'food',
+                'type' => 'Restaurant',
+                'name' => $food->name,
+                'location' => $food->location,
+                'image' => $food->image ? asset('uploads/foods/'.$food->image) : 'https://via.placeholder.com/160x110?text=Restaurant',
+                'metric_label' => 'Tables',
+                'metric_value' => (string) ($food->available_tables ?? 0),
+                'status' => $food->status ?: 'pending',
+                'url' => '/owner/foods/'.$food->id,
+                'manage_url' => '/owner/foods',
+            ]))
+            ->sortBy('name')
+            ->values();
+
+        return view('owner.listings', compact('listings'));
+    }
+
+    public function cardDetails(string $card)
+    {
+        $pages = [
+            'bookings' => [
+                'kicker' => 'Owner bookings',
+                'title' => 'Total Bookings',
+                'intro' => 'All reservation requests made for your spots, hotels, and restaurants.',
+                'empty' => 'No bookings found.',
+            ],
+            'pending' => [
+                'kicker' => 'Pending requests',
+                'title' => 'Pending Requests',
+                'intro' => 'Bookings that still need your approval.',
+                'empty' => 'No pending requests right now.',
+            ],
+            'ratings' => [
+                'kicker' => 'Guest ratings',
+                'title' => 'Ratings',
+                'intro' => 'All reviews travellers left on your listings.',
+                'empty' => 'No ratings yet.',
+            ],
+            'revenue' => [
+                'kicker' => 'Owner revenue',
+                'title' => 'Total Revenue',
+                'intro' => 'Approved bookings that make up your total earnings.',
+                'empty' => 'No approved bookings yet.',
+            ],
+        ];
+
+        abort_unless(isset($pages[$card]), 404);
+
+        $page = (object) $pages[$card];
+        $items = match ($card) {
+            'bookings' => $this->ownerCardBookings(),
+            'pending' => $this->ownerCardBookings('pending'),
+            'revenue' => $this->ownerCardBookings('approved'),
+            default => $this->ownerCardRatings(),
+        };
+
+        return view('owner.card-details', compact('page', 'items'));
+    }
+
+    private function ownerCardBookings(?string $status = null)
+    {
+        $ownerId = Auth::id();
+
+        $spots = Booking::with(['user', 'spot'])
+            ->whereHas('spot', fn ($query) => $query->where('user_id', $ownerId))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->get()
+            ->map(fn ($booking) => (object) [
+                'type' => 'Tourist spot',
+                'title' => $booking->spot?->name ?? 'Removed tourist spot',
+                'subtitle' => $booking->user?->name ?? 'Traveller',
+                'detail' => $booking->booking_date ?: optional($booking->created_at)->format('M d, Y'),
+                'amount' => 'PHP '.number_format((float) $booking->total_price, 2),
+                'status' => $booking->status ?: 'pending',
+                'image' => $booking->spot?->image
+                    ? asset('uploads/spots/'.$booking->spot->image)
+                    : 'https://via.placeholder.com/160x110?text=Spot',
+                'url' => $booking->spot_id ? '/owner/spots/'.$booking->spot_id : '/owner/bookings',
+            ]);
+
+        $hotels = HotelBooking::with(['user', 'hotel'])
+            ->whereHas('hotel', fn ($query) => $query->where('owner_id', $ownerId))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->get()
+            ->map(fn ($booking) => (object) [
+                'type' => 'Hotel',
+                'title' => $booking->hotel?->name ?? 'Removed hotel',
+                'subtitle' => $booking->user?->name ?? 'Traveller',
+                'detail' => trim(($booking->check_in ?? '').($booking->check_out ? ' – '.$booking->check_out : '')),
+                'amount' => 'PHP '.number_format((float) $booking->total_price, 2),
+                'status' => $booking->status ?: 'pending',
+                'image' => $booking->hotel?->image
+                    ? asset('uploads/hotels/'.$booking->hotel->image)
+                    : 'https://via.placeholder.com/160x110?text=Hotel',
+                'url' => $booking->hotel_id ? '/owner/hotels/'.$booking->hotel_id : '/owner/bookings',
+            ]);
+
+        $foods = FoodBooking::with(['user', 'food'])
+            ->whereHas('food', fn ($query) => $query->where('owner_id', $ownerId))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->get()
+            ->map(fn ($booking) => (object) [
+                'type' => 'Restaurant',
+                'title' => $booking->food?->name ?? 'Removed restaurant',
+                'subtitle' => $booking->user?->name ?? 'Traveller',
+                'detail' => trim(($booking->reservation_date ?? '').' '.($booking->reservation_time ?? '')),
+                'amount' => 'PHP '.number_format((float) $booking->total_price, 2),
+                'status' => $booking->status ?: 'pending',
+                'image' => $booking->food?->image
+                    ? asset('uploads/foods/'.$booking->food->image)
+                    : 'https://via.placeholder.com/160x110?text=Restaurant',
+                'url' => $booking->food_id ? '/owner/foods/'.$booking->food_id : '/owner/bookings',
+            ]);
+
+        return $spots->concat($hotels)->concat($foods)->values();
+    }
+
+    private function ownerCardRatings()
+    {
+        $ownerId = Auth::id();
+
+        $spots = SpotComment::with(['user', 'spot'])
+            ->whereHas('spot', fn ($query) => $query->where('user_id', $ownerId))
+            ->latest()
+            ->get()
+            ->map(fn ($comment) => (object) [
+                'type' => 'Tourist spot',
+                'title' => $comment->spot?->name ?? 'Removed tourist spot',
+                'subtitle' => $comment->user?->name ?? 'Traveller',
+                'detail' => $comment->comment ?: 'No comment written.',
+                'amount' => optional($comment->created_at)->format('M d, Y'),
+                'status' => 'review',
+                'image' => $comment->spot?->image
+                    ? asset('uploads/spots/'.$comment->spot->image)
+                    : 'https://via.placeholder.com/160x110?text=Spot',
+                'url' => $comment->spot_id ? '/owner/spots/'.$comment->spot_id : '/owner/reviews',
+            ]);
+
+        $hotels = HotelComment::with(['user', 'hotel'])
+            ->whereHas('hotel', fn ($query) => $query->where('owner_id', $ownerId))
+            ->latest()
+            ->get()
+            ->map(fn ($comment) => (object) [
+                'type' => 'Hotel',
+                'title' => $comment->hotel?->name ?? 'Removed hotel',
+                'subtitle' => $comment->user?->name ?? 'Traveller',
+                'detail' => $comment->comment ?: 'No comment written.',
+                'amount' => optional($comment->created_at)->format('M d, Y'),
+                'status' => 'review',
+                'image' => $comment->hotel?->image
+                    ? asset('uploads/hotels/'.$comment->hotel->image)
+                    : 'https://via.placeholder.com/160x110?text=Hotel',
+                'url' => $comment->hotel_id ? '/owner/hotels/'.$comment->hotel_id : '/owner/reviews',
+            ]);
+
+        $foods = FoodComment::with(['user', 'food'])
+            ->whereHas('food', fn ($query) => $query->where('owner_id', $ownerId))
+            ->latest()
+            ->get()
+            ->map(fn ($comment) => (object) [
+                'type' => 'Restaurant',
+                'title' => $comment->food?->name ?? 'Removed restaurant',
+                'subtitle' => $comment->user?->name ?? 'Traveller',
+                'detail' => $comment->comment ?: 'No comment written.',
+                'amount' => optional($comment->created_at)->format('M d, Y'),
+                'status' => 'review',
+                'image' => $comment->food?->image
+                    ? asset('uploads/foods/'.$comment->food->image)
+                    : 'https://via.placeholder.com/160x110?text=Restaurant',
+                'url' => $comment->food_id ? '/owner/foods/'.$comment->food_id : '/owner/reviews',
+            ]);
+
+        return $spots->concat($hotels)->concat($foods)->values();
+    }
+
     public function reviews()
 {
     $ownerId = Auth::id();

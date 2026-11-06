@@ -4336,23 +4336,24 @@ body.dashboard-body,body.admin-body,body.owner-body{min-width:320px;background:v
 
 .notification-page .notification-type{position:static;width:auto;height:auto;margin:0 0 4px;padding:0;border-radius:0;background:transparent;color:#167b69;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
 
-body.catalog-page{min-width:320px;background:#f3f7f6;color:#203531}
-.catalog-shell{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:86px 0 56px}
+body.catalog-page{min-width:0;max-width:100vw;overflow-x:hidden;background:#f3f7f6;color:#203531}
+.catalog-shell{box-sizing:border-box;width:min(1180px,100%);max-width:100%;margin:0 auto;padding:86px 20px 56px}
 .catalog-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 22px;padding:26px 28px;border:1px solid #d7e8e3;border-radius:18px;background:linear-gradient(135deg,#e7f5f0,#fff)}
+.catalog-heading>*{min-width:0}
 .catalog-heading span{display:block;margin-bottom:4px;color:#167b69;font-size:11px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
 .catalog-heading h1{margin:0 0 6px;color:#17473f;font-size:clamp(28px,4vw,36px);letter-spacing:-.04em}
 .catalog-heading p{margin:0;max-width:540px;color:#607772}
 .catalog-count{flex:none;padding:8px 12px;border:1px solid #cfe5de;border-radius:999px;background:#fff;color:#17473f;font-size:13px}
-.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.catalog-card{display:flex;flex-direction:column;min-height:100%;overflow:hidden;border:1px solid #d7e8e3;border-radius:16px;background:#fff;color:inherit;text-decoration:none;box-shadow:0 6px 18px rgba(23,71,63,.05);transition:transform .18s ease,box-shadow .18s ease}
+.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:16px;width:100%;max-width:100%}
+.catalog-card{display:flex;flex-direction:column;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:100%;overflow:hidden;border:1px solid #d7e8e3;border-radius:16px;background:#fff;color:inherit;text-decoration:none;box-shadow:0 6px 18px rgba(23,71,63,.05);transition:transform .18s ease,box-shadow .18s ease}
 .catalog-card:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(23,71,63,.1)}
 .catalog-media{position:relative;height:190px;background:#e7f3ee}
-.catalog-media img,.catalog-fallback{width:100%;height:100%;object-fit:cover}
+.catalog-media img,.catalog-fallback{display:block;width:100%;height:100%;object-fit:cover}
 .catalog-fallback{display:grid;place-items:center;color:#7b918b;font-size:13px;font-weight:800}
-.catalog-chip{position:absolute;left:12px;top:12px;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.94);color:#17473f;font-size:11px;font-weight:800}
-.catalog-body{display:flex;flex:1;flex-direction:column;gap:8px;padding:16px}
-.catalog-body h2{margin:0;color:#17473f;font-size:18px;line-height:1.3}
-.catalog-location,.catalog-summary{margin:0;color:#607772;font-size:13px;line-height:1.45}
+.catalog-chip{position:absolute;left:12px;top:12px;z-index:1;max-width:calc(100% - 24px);padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.94);color:#17473f;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalog-body{display:flex;flex:1;flex-direction:column;gap:8px;padding:16px;min-width:0}
+.catalog-body h2{margin:0;color:#17473f;font-size:18px;line-height:1.3;overflow-wrap:anywhere}
+.catalog-location,.catalog-summary{margin:0;color:#607772;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
 .catalog-meta{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:auto;padding-top:8px}
 .catalog-rating{color:#b77912;font-size:13px;font-weight:800}
 .catalog-price{color:#167b69;font-size:14px;font-weight:850;text-align:right}
@@ -4362,7 +4363,21 @@ body.catalog-page{min-width:320px;background:#f3f7f6;color:#203531}
 .catalog-empty{padding:40px 24px;border:1px dashed #cfe5de;border-radius:16px;background:#fff;text-align:center}
 .catalog-empty h2{margin:0 0 6px;color:#17473f}
 .catalog-empty p{margin:0;color:#607772}
-@media(max-width:640px){.catalog-shell{width:min(100% - 24px,1180px);padding-top:72px}.catalog-heading{align-items:flex-start;flex-direction:column;padding:20px}.catalog-grid{grid-template-columns:1fr}}
+@media(max-width:640px){
+.catalog-shell{width:100%;max-width:100%;padding:72px 12px 40px}
+.catalog-heading{align-items:flex-start;flex-direction:column;padding:16px}
+.catalog-heading h1{font-size:clamp(24px,7vw,30px)}
+.catalog-grid{grid-template-columns:1fr;gap:12px}
+.catalog-media{height:170px}
+.catalog-body{padding:14px}
+.catalog-body h2{font-size:17px}
+.catalog-action{min-height:42px}
+}
+@media(max-width:420px){
+.catalog-shell{padding:68px 10px 32px}
+.catalog-heading{padding:14px}
+.catalog-media{height:150px}
+}
 .notification-page .notification-card .delete-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;position:absolute!important;top:50%!important;right:12px!important;width:34px!important;height:34px!important;margin:0!important;padding:0!important;border:1px solid #f0c8c3!important;border-radius:8px!important;background:#fff!important;color:#b9372f!important;transform:translateY(-50%)!important;box-shadow:none!important}
 .notification-page .notification-card .delete-btn:hover{background:#fff4f2!important;transform:translateY(-50%)!important}
 .notification-page .notification-card .delete-btn svg{display:block;width:16px;height:16px}
@@ -4704,9 +4719,12 @@ body.admin-body .admin-main .dashboard-section,
 body.admin-body .admin-main .approval-section,
 body.admin-body .admin-main .dashboard-graphs,
 body.admin-body .admin-main .top-performers{margin-bottom:22px!important}
-body.admin-body .admin-main .dashboard-cards a.stat-card{display:block;color:inherit;text-decoration:none}
-body.admin-body .admin-main .dashboard-cards a.stat-card:hover{background:#f4fbf8!important}
-body.admin-body .admin-main .dashboard-cards .stat-card small{display:block;margin-top:8px;color:#607772;font-size:12px;font-weight:700;line-height:1.4;text-align:left}
+body.admin-body .admin-main .dashboard-cards a.stat-card,
+body.owner-body .owner-main .owner-cards a.owner-card{display:flex;color:inherit;text-decoration:none;cursor:pointer}
+body.admin-body .admin-main .dashboard-cards a.stat-card:hover,
+body.owner-body .owner-main .owner-cards a.owner-card:hover{background:#f4fbf8!important}
+body.admin-body .admin-main .dashboard-cards .stat-card small,
+body.owner-body .owner-main .owner-cards .owner-card small{display:block;margin-top:auto!important;padding-top:10px;color:#607772;font-size:12px;font-weight:700;line-height:1.4;text-align:left}
 .management-heading h1{display:block!important}
 .management-heading h1::before{content:none!important}
 .management-heading .add-btn{display:inline-flex;align-items:center;justify-content:center;width:auto;min-height:36px;margin-top:14px;padding:0 14px;border-radius:8px;background:#167b69;color:#fff;font-size:13px;font-weight:800;text-decoration:none}
@@ -4804,4 +4822,44 @@ body.admin-body .admin-main .schedule-content small{margin-top:4px!important}
 .room-page-head,.activity-card{align-items:flex-start!important;flex-direction:column}
 .activity-card{grid-template-columns:44px minmax(0,1fr)!important}
 .activity-meta{grid-column:2;justify-items:start}
+}
+
+.listing-status-cell,
+.listing-status{
+white-space:nowrap!important;
+text-align:center;
+vertical-align:middle
+}
+.listing-status-cell .status-approved,
+.listing-status-cell .status-pending,
+.listing-status-cell .status-rejected,
+.listing-status .status-approved,
+.listing-status .status-pending,
+.listing-status .status-rejected,
+.owner-listing-page .status-approved,
+.owner-listing-page .status-pending,
+.owner-listing-page .status-rejected,
+.admin-listing-page .status-approved,
+.admin-listing-page .status-pending,
+.admin-listing-page .status-rejected,
+.listing-status .status-review,
+.owner-listing-page .status-review,
+.admin-listing-page .status-review{
+display:inline-flex!important;
+align-items:center!important;
+justify-content:center!important;
+min-width:98px!important;
+min-height:28px!important;
+padding:5px 14px!important;
+border-radius:999px!important;
+font-size:12px!important;
+font-weight:800!important;
+line-height:1!important;
+white-space:nowrap!important
+}
+.listing-status .status-review,
+.owner-listing-page .status-review,
+.admin-listing-page .status-review{
+background:#e8f4ff!important;
+color:#246d9a!important
 }

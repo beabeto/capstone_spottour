@@ -104,22 +104,14 @@ No Image
 
 </td>
 
-<td>
-
-<span class="
+<td class="listing-status-cell">
 @if($food->status == 'approved')
-status-approved
+<span class="status-approved">Approved</span>
 @elseif($food->status == 'rejected')
-status-rejected
+<span class="status-rejected">Rejected</span>
 @else
-status-pending
+<span class="status-pending">Pending</span>
 @endif
-">
-
-{{ ucfirst($food->status) }}
-
-</span>
-
 </td>
 
 <td>

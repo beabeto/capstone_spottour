@@ -325,6 +325,14 @@
         });
     }
 
+    var params = new URLSearchParams(window.location.search);
+    var requestedStatus = params.get('status');
+    if (requestedStatus && Array.prototype.some.call(statusFilter.options, function (option) {
+        return option.value === requestedStatus;
+    })) {
+        statusFilter.value = requestedStatus;
+    }
+
     [typeFilter, statusFilter].forEach(function (el) {
         el.addEventListener('change', applyFilters);
     });

@@ -144,12 +144,26 @@ body.listing-detail>.page-container textarea,body.listing-detail>.spot-card text
 body.listing-detail>.page-container button,body.listing-detail>.spot-card button{width:100%!important;min-height:44px!important;border:0!important;border-radius:10px!important;background:#167b69!important;color:#fff!important;font-weight:800!important}
 
 @media(max-width:760px){
-    body.listing-detail .spot-details-container,body.booking-form-page .booking-form-shell,body.dashboard-body .booking-confirm-container,body.payment-page .checkout-shell,body.listing-detail .dashboard-container{width:min(100% - 24px,980px)!important}
+    body.listing-detail .spot-details-container,body.booking-form-page .booking-form-shell,body.dashboard-body .booking-confirm-container,body.payment-page .checkout-shell,body.listing-detail .dashboard-container{width:min(100% - 20px,980px)!important}
     body.listing-detail .spot-hero{height:auto!important}
-    body.listing-detail .hero-image{height:240px!important}
+    body.listing-detail .hero-image{height:220px!important}
+    body.listing-detail .hero-overlay{padding:16px!important}
+    body.listing-detail .hero-overlay h1{font-size:clamp(22px,6.5vw,30px)!important}
+    body.listing-detail .hero-overlay p,body.listing-detail .hero-rating{font-size:14px!important;line-height:1.5!important}
+    body.listing-detail .spot-card{padding:16px!important}
+    body.listing-detail .spot-card h2{font-size:clamp(18px,5vw,20px)!important}
+    body.listing-detail .spot-card>p,body.listing-detail .comment-card,body.listing-detail .booking-info{font-size:15px!important;line-height:1.55!important}
     body.listing-detail .spot-actions-top{grid-template-columns:1fr 1fr!important}
+    body.listing-detail .spot-actions-top a{font-size:14px!important;min-height:44px!important}
     body.listing-detail .menu-card{grid-template-columns:72px minmax(0,1fr)}
+    body.booking-form-page .booking-form-heading{padding:16px!important}
+    body.booking-form-page .booking-form-heading h1{font-size:clamp(22px,6vw,28px)!important}
+    body.booking-form-page .booking-form-heading p,body.booking-form-page label{font-size:14px!important}
+    body.booking-form-page input,body.booking-form-page select,body.booking-form-page textarea,body.booking-form-page button{font-size:16px!important;min-height:44px}
     body.payment-page .pay-methods,body.payment-page .pay-proof .form-grid{grid-template-columns:1fr}
     body.payment-page .checkout-shell{padding-top:70px!important}
     body.payment-page .checkout-toolbar{top:12px!important;left:12px!important}
+    body.payment-page .checkout-heading{padding:16px!important}
+    body.payment-page .checkout-heading h1{font-size:clamp(22px,6vw,28px)!important}
+    body.payment-page .checkout-heading p,body.payment-page .summary-list,body.payment-page .pay-option{font-size:14px!important;line-height:1.5!important}
 }

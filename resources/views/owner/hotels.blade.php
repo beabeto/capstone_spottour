@@ -113,34 +113,14 @@ PHP {{ number_format(
 
 </td>
 
-<td>
-
+<td class="listing-status-cell">
 @if($hotel->status == 'approved')
-
-<span class="status-approved">
-
-    Approved
-
-</span>
-
+<span class="status-approved">Approved</span>
 @elseif($hotel->status == 'pending')
-
-<span class="status-pending">
-
-    Pending
-
-</span>
-
+<span class="status-pending">Pending</span>
 @else
-
-<span class="status-rejected">
-
-    Rejected
-
-</span>
-
+<span class="status-rejected">Rejected</span>
 @endif
-
 </td>
 
 <td>
