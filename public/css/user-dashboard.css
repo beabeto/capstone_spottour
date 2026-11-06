@@ -1459,10 +1459,10 @@ body.dashboard-body{font-size:15px!important;line-height:1.45!important}
 .dashboard-body .trip-note{margin-top:4px!important;color:#48635c!important}
 .dashboard-body .trip-action{display:inline-flex;align-items:center;justify-content:center;min-width:68px;min-height:34px;padding:0 12px;border-radius:9px;background:#167b69;color:#fff!important;font-size:12px;font-weight:800;text-decoration:none}
 .dashboard-body .trip-action:hover{background:#12685a;color:#fff!important}
-.dashboard-body .trip-empty{padding:18px 12px 16px;text-align:center}
-.dashboard-body .trip-empty h3{margin:0 0 6px;color:#17473f;font-size:16px}
-.dashboard-body .trip-empty p{margin:0 0 12px;color:#607772;font-size:13px}
-.dashboard-body .trip-empty .explore-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:9px;background:#167b69;color:#fff;font-size:13px;font-weight:800;text-decoration:none}
+.dashboard-body .trip-empty{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:10px;margin:4px 0 8px;padding:22px 16px;border:1px dashed #cfe5de;border-radius:12px;background:#f7fcfa;text-align:center!important}
+.dashboard-body .trip-empty h3,.dashboard-body .trip-empty p{display:block;width:100%;max-width:420px;margin:0!important;text-align:center!important}
+.dashboard-body .trip-empty p{color:#607772!important;font-size:13px!important;line-height:1.5!important}
+.dashboard-body .trip-empty .trip-action{width:auto!important;min-width:140px}
 
 @media(max-width:700px){
 .dashboard-body .booking-preview-card{grid-template-columns:1fr!important}

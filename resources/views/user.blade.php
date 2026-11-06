@@ -551,16 +551,24 @@ $unreadCount = \App\Models\Notification::where(
         UPCOMING TRIPS
 ====================================== -->
 
+@php
+    $travellerUpcoming = collect($upcomingBookings ?? [])->filter()->values();
+    if ($travellerUpcoming->isEmpty() && !empty($nextBooking)) {
+        $travellerUpcoming = collect([$nextBooking]);
+    }
+@endphp
 <section class="dashboard-panel">
     <div class="section-header panel-header">
         <div>
             <h2>Upcoming bookings</h2>
             <p>Your next spot, hotel, and restaurant reservations.</p>
         </div>
-        <a href="/user/bookings" class="view-all-link">View all</a>
+        @if($travellerUpcoming->isNotEmpty())
+            <a href="/user/bookings" class="view-all-link">View all</a>
+        @endif
     </div>
 
-    @forelse(($upcomingBookings ?? collect($nextBooking ? [$nextBooking] : [])) as $booking)
+    @forelse($travellerUpcoming as $booking)
         @php
             $image = match ($booking->type) {
                 'spot' => $booking->spot?->image ? asset('uploads/spots/'.$booking->spot->image) : null,
@@ -591,9 +599,8 @@ $unreadCount = \App\Models\Notification::where(
         </article>
     @empty
         <div class="trip-empty">
-            <h3>No upcoming booking</h3>
-            <p>Book a tourist spot, hotel, or restaurant to start your trip.</p>
-            <a href="/spots" class="explore-btn">Explore places</a>
+            <p>No upcoming bookings yet. Reserve a spot, hotel, or restaurant to start your trip.</p>
+            <a href="/spots" class="trip-action">Explore places</a>
         </div>
     @endforelse
 
