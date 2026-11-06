@@ -8,20 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-
-            $table->string('booking_type')
-                  ->default('spot');
-
-        });
+        if (! Schema::hasColumn('bookings', 'booking_type')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->string('booking_type')->default('spot');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-
-            $table->dropColumn('booking_type');
-
-        });
+        if (Schema::hasColumn('bookings', 'booking_type')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->dropColumn('booking_type');
+            });
+        }
     }
 };

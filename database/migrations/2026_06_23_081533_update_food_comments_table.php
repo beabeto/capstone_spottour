@@ -8,27 +8,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('food_comments', function (Blueprint $table) {
+        if (! Schema::hasTable('food_comments')) {
+            return;
+        }
 
-            $table->unsignedBigInteger('food_id');
+        if (! Schema::hasColumn('food_comments', 'food_id')) {
+            Schema::table('food_comments', function (Blueprint $table) {
+                $table->unsignedBigInteger('food_id');
+            });
+        }
 
-            $table->unsignedBigInteger('user_id');
+        if (! Schema::hasColumn('food_comments', 'user_id')) {
+            Schema::table('food_comments', function (Blueprint $table) {
+                $table->unsignedBigInteger('user_id');
+            });
+        }
 
-            $table->text('comment');
-
-        });
+        if (! Schema::hasColumn('food_comments', 'comment')) {
+            Schema::table('food_comments', function (Blueprint $table) {
+                $table->text('comment');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('food_comments', function (Blueprint $table) {
-
-            $table->dropColumn([
-                'food_id',
-                'user_id',
-                'comment'
-            ]);
-
-        });
+        //
     }
 };

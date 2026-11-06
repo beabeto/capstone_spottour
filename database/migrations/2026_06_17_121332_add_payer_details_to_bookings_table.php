@@ -6,29 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::table('bookings', function ($table) {
+    {
+        if (! Schema::hasColumn('bookings', 'payer_name')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->string('payer_name')->nullable();
+            });
+        }
 
-        $table->string('payer_name')
-              ->nullable();
+        if (! Schema::hasColumn('bookings', 'payer_number')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->string('payer_number')->nullable();
+            });
+        }
+    }
 
-        $table->string('payer_number')
-              ->nullable();
-
-    });
-}
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

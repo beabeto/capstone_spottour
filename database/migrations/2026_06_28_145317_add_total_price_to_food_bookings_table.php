@@ -6,26 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-{
-    Schema::table('food_bookings', function (Blueprint $table) {
+    public function up(): void
+    {
+        if (! Schema::hasColumn('food_bookings', 'total_price')) {
+            Schema::table('food_bookings', function (Blueprint $table) {
+                $table->decimal('total_price', 10, 2)->default(0)->after('guests');
+            });
+        }
+    }
 
-        $table->decimal('total_price',10,2)
-              ->default(0)
-              ->after('guests');
-
-    });
-}
-
-public function down()
-{
-    Schema::table('food_bookings', function (Blueprint $table) {
-
-        $table->dropColumn('total_price');
-
-    });
-}
+    public function down(): void
+    {
+        if (Schema::hasColumn('food_bookings', 'total_price')) {
+            Schema::table('food_bookings', function (Blueprint $table) {
+                $table->dropColumn('total_price');
+            });
+        }
+    }
 };
