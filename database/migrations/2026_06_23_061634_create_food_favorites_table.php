@@ -6,31 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasTable('food_favorites')) {
+            return;
+        }
+
         Schema::create('food_favorites', function (Blueprint $table) {
-
-    $table->id();
-
-    $table->foreignId('user_id')
-          ->constrained()
-          ->cascadeOnDelete();
-
-    $table->foreignId('food_id')
-          ->constrained()
-          ->cascadeOnDelete();
-
-    $table->timestamps();
-
-});
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('food_id')->constrained()->cascadeOnDelete();
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('food_favorites');
