@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('food_checklists', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('food_id');
             $table->timestamps();
         });
     }

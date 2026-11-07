@@ -114,16 +114,56 @@
         });
     }
 
+    function enablePullToRefresh() {
+        var startX = 0;
+        var startY = 0;
+        var tracking = false;
+        var reloading = false;
+        var threshold = 96;
+
+        document.addEventListener('touchstart', function (event) {
+            tracking = false;
+            if (event.touches.length !== 1 || window.scrollY > 0) return;
+
+            var target = event.target;
+            if (target && target.closest && target.closest('input, textarea, select, button, a, [contenteditable="true"], .notification-menu, #traveller-chat')) return;
+
+            startX = event.touches[0].clientX;
+            startY = event.touches[0].clientY;
+            tracking = true;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function (event) {
+            if (!tracking || reloading || !event.changedTouches.length) return;
+
+            var touch = event.changedTouches[0];
+            var deltaY = touch.clientY - startY;
+            var deltaX = Math.abs(touch.clientX - startX);
+            tracking = false;
+
+            if (window.scrollY <= 0 && deltaY >= threshold && deltaY > deltaX * 1.25) {
+                reloading = true;
+                window.location.reload();
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchcancel', function () {
+            tracking = false;
+        }, { passive: true });
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () {
             start();
             keepReportOnOnePage();
             watchWorkspaceMenus();
+            enablePullToRefresh();
         });
     } else {
         start();
         keepReportOnOnePage();
         watchWorkspaceMenus();
+        enablePullToRefresh();
     }
 
     window.spottourToggleTheme = function () {

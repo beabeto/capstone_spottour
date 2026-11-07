@@ -193,6 +193,28 @@ class EnsureLiveSchema
             self::column('users', 'birth_date', fn (Blueprint $table) => $table->date('birth_date')->nullable());
             self::column('users', 'profile_image', fn (Blueprint $table) => $table->string('profile_image')->nullable());
             self::column('users', 'is_online', fn (Blueprint $table) => $table->boolean('is_online')->default(false));
+
+            foreach ([
+                'bookmarks' => 'spot_id',
+                'checklists' => 'spot_id',
+                'hotel_bookmarks' => 'hotel_id',
+                'hotel_checklists' => 'hotel_id',
+                'food_bookmarks' => 'food_id',
+                'food_checklists' => 'food_id',
+            ] as $tableName => $listingColumn) {
+                if (! Schema::hasTable($tableName)) {
+                    Schema::create($tableName, function (Blueprint $table) use ($listingColumn) {
+                        $table->id();
+                        $table->unsignedBigInteger('user_id')->nullable();
+                        $table->unsignedBigInteger($listingColumn)->nullable();
+                        $table->timestamps();
+                    });
+                }
+
+                self::column($tableName, 'user_id', fn (Blueprint $table) => $table->unsignedBigInteger('user_id')->nullable());
+                self::column($tableName, $listingColumn, fn (Blueprint $table) => $table->unsignedBigInteger($listingColumn)->nullable());
+            }
+
             self::$ran = true;
         } catch (\Throwable $e) {
             report($e);

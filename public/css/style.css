@@ -4937,6 +4937,7 @@ color:#246d9a!important
 
 /* Outlined listing actions for owner and admin spot, hotel, and restaurant pages. */
 .owner-listing-page .listing-table-scroll table td:last-child a,
+.owner-listing-page .listing-delete-form button,
 .admin-listing-page .listing-actions a{box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;min-height:36px!important;margin:0!important;padding:0 12px!important;border:1px solid currentColor!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;font-size:12px!important;font-weight:800!important;line-height:1.2;text-align:center;text-decoration:none!important;white-space:nowrap}
 .owner-listing-page .listing-table-scroll table td:last-child .view-btn,
 .admin-listing-page .listing-actions .view-btn{color:#167b69!important}
@@ -4947,8 +4948,8 @@ color:#246d9a!important
 .owner-listing-page .listing-table-scroll table td:last-child .deletes-btn,
 .owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button,
 .admin-listing-page .listing-actions .deletes-btn{color:#b42318!important}
-.owner-listing-page .listing-delete-form{display:inline;margin:0}
-.owner-listing-page .listing-delete-form button{box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;min-height:36px!important;margin:0!important;padding:0 12px!important;border:1px solid currentColor!important;border-radius:8px!important;background:transparent!important;color:#b42318!important;font:inherit!important;font-size:12px!important;font-weight:800!important;line-height:1.2;white-space:nowrap;cursor:pointer}
+.owner-listing-page .listing-delete-form{display:contents!important}
+.owner-listing-page .listing-delete-form button{appearance:none!important;font-family:inherit!important;color:#b42318!important;cursor:pointer}
 .admin-listing-page .listing-actions .approve-btn{border-color:#167b69!important;background:transparent!important;color:#167b69!important}
 .admin-listing-page .listing-actions .reject-btn{border-color:#b42318!important;background:transparent!important;color:#b42318!important}
 .owner-listing-page .listing-table-scroll table td:last-child a:hover,

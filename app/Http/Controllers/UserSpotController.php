@@ -208,6 +208,8 @@ class UserSpotController extends Controller
 
     public function bookmark($spotId)
     {
+        \App\Support\EnsureLiveSchema::run();
+
         $bookmark = Bookmark::where(
             'user_id',
             Auth::id()
@@ -239,6 +241,8 @@ class UserSpotController extends Controller
 
     public function checklist($spotId)
     {
+        \App\Support\EnsureLiveSchema::run();
+
         $checklist = Checklist::where(
             'user_id',
             Auth::id()
@@ -432,6 +436,8 @@ public function foodFavorite($foodId)
 
 public function foodBookmark($foodId)
 {
+    \App\Support\EnsureLiveSchema::run();
+
     $bookmark = FoodBookmark::where(
         'user_id',
         Auth::id()
@@ -466,6 +472,8 @@ public function foodBookmark($foodId)
 
 public function foodChecklist($foodId)
 {
+    \App\Support\EnsureLiveSchema::run();
+
     $checklist = FoodChecklist::where(
         'user_id',
         Auth::id()
@@ -534,6 +542,8 @@ public function hotelFavorite($hotelId)
 
 public function hotelBookmark($hotelId)
 {
+    \App\Support\EnsureLiveSchema::run();
+
     $bookmark = HotelBookmark::where(
         'user_id',
         Auth::id()
@@ -568,6 +578,8 @@ public function hotelBookmark($hotelId)
 
 public function hotelChecklist($hotelId)
 {
+    \App\Support\EnsureLiveSchema::run();
+
     $checklist = HotelChecklist::where(
         'user_id',
         Auth::id()

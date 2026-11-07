@@ -296,7 +296,7 @@ Route::get(
 Route::get(
     '/bookmark/{spot}',
     [UserSpotController::class,'bookmark']
-);
+)->middleware('auth');
 
 //
 // CHECKLIST
@@ -305,7 +305,7 @@ Route::get(
 Route::get(
     '/checklist/{spot}',
     [UserSpotController::class,'checklist']
-);
+)->middleware('auth');
 
 ///////////////////////////////////////////////////////////////
 // OWNER SPOTS
@@ -491,7 +491,7 @@ Route::get(
 Route::get(
     '/hotel/bookmark/{hotel}',
     [UserSpotController::class,'hotelBookmark']
-);
+)->middleware('auth');
 
 //
 // HOTEL CHECKLIST
@@ -500,7 +500,7 @@ Route::get(
 Route::get(
     '/hotel/checklist/{hotel}',
     [UserSpotController::class,'hotelChecklist']
-);
+)->middleware('auth');
 
 ///////////////////////////////////////////////////////////////
 // OWNER HOTELS
@@ -685,7 +685,7 @@ Route::get(
 Route::get(
     '/food/bookmark/{food}',
     [UserSpotController::class,'foodBookmark']
-);
+)->middleware('auth');
 
 //
 // FOOD CHECKLIST
@@ -694,7 +694,7 @@ Route::get(
 Route::get(
     '/food/checklist/{food}',
     [UserSpotController::class,'foodChecklist']
-);
+)->middleware('auth');
 
 ///////////////////////////////////////////////////////////////
 // OWNER RESTAURANTS
