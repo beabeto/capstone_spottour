@@ -552,3 +552,28 @@ html[data-theme="dark"] .notification-menu-item small,html[data-theme="dark"] .n
 html[data-theme="dark"] .notification-menu-dot{background:#48645b!important}
 html[data-theme="dark"] .notification-menu-dot.is-unread{background:#f3bb52!important}
 html[data-theme="dark"] .unread-notification{background:#1b302a!important}
+
+/* Keep owner/admin listing editors and room actions readable in dark mode. */
+html[data-theme="dark"] body.owner-listing-page .page-container>form,
+html[data-theme="dark"] body.dashboard-body .page-container>form{background:#1c2e29!important;color:#e7f3ef!important;border-color:#3d5c54!important}
+html[data-theme="dark"] body.owner-listing-page .page-container>form label,
+html[data-theme="dark"] body.dashboard-body .page-container>form label{color:#d4e8e1!important}
+html[data-theme="dark"] body.owner-listing-page .page-container>form input,
+html[data-theme="dark"] body.owner-listing-page .page-container>form select,
+html[data-theme="dark"] body.owner-listing-page .page-container>form textarea,
+html[data-theme="dark"] body.dashboard-body .page-container>form input,
+html[data-theme="dark"] body.dashboard-body .page-container>form select,
+html[data-theme="dark"] body.dashboard-body .page-container>form textarea{background:#101816!important;color:#e7f3ef!important;border-color:#3d5c54!important;color-scheme:dark}
+html[data-theme="dark"] body.owner-listing-page .page-container>form input::placeholder,
+html[data-theme="dark"] body.owner-listing-page .page-container>form textarea::placeholder{color:#91aca3!important}
+html[data-theme="dark"] body.owner-listing-page .page-container>form .add-btn:hover,
+html[data-theme="dark"] body.dashboard-body .page-container>form button[type=submit]:hover{background:#20a68c!important;box-shadow:0 0 0 3px rgba(32,166,140,.18)!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>a{background:#3a2422!important;color:#ffd4ce!important;border-color:#a54b43!important;transition:background-color .16s ease,border-color .16s ease,color .16s ease}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>a:hover{background:#5a2b27!important;color:#fff!important;border-color:#e47769!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details>summary{background:#1e4638!important;color:#b7e7d4!important;border-color:#3d806b!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details>summary:hover{background:#285b49!important;color:#e4fff4!important;border-color:#56b79a!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form{background:#14221e!important;border-color:#3d5c54!important;color:#e7f3ef!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form label{color:#d4e8e1!important}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form input,
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form select{background:#101816!important;color:#e7f3ef!important;border-color:#3d5c54!important;color-scheme:dark}
+html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form button:hover{background:#20a68c!important}

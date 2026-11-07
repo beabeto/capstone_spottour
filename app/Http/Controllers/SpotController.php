@@ -253,7 +253,12 @@ public function ownerShow($id)
 public function edit($id)
 {
     $spot = Spot::findOrFail($id);
-    abort_unless((int) $spot->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    abort_unless(
+        (int) $spot->owner_id === (int) Auth::id()
+            || (int) $spot->user_id === (int) Auth::id()
+            || Auth::user()?->role === 'admin',
+        403
+    );
 
     return view(
         'owner.edit-spot',
@@ -267,7 +272,12 @@ public function update(
 )
 {
     $spot = Spot::findOrFail($id);
-    abort_unless((int) $spot->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    abort_unless(
+        (int) $spot->owner_id === (int) Auth::id()
+            || (int) $spot->user_id === (int) Auth::id()
+            || Auth::user()?->role === 'admin',
+        403
+    );
 
     $imageName = $spot->image;
 
