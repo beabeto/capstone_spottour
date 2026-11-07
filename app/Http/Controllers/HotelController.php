@@ -48,7 +48,9 @@ class HotelController extends Controller
 
     public function store(Request $request)
     {
+        try {
         \App\Support\EnsureLiveSchema::run();
+        abort_unless(Auth::check(), 403);
         $request->validate([
             'name' => 'required',
             'location' => 'required',
@@ -138,6 +140,13 @@ class HotelController extends Controller
             'success',
             'Hotel saved with its room types.'
         );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save this hotel: '.$e->getMessage());
+        }
     }
 
     public function ownerShow($id)
@@ -247,14 +256,14 @@ private function storeRoomType(Hotel $hotel, Request $request, string $index, ar
         $gallery[] = $name;
     }
 
-    HotelRoom::create([
+    HotelRoom::create(\App\Support\SchemaSafe::only('hotel_rooms', [
         'hotel_id' => $hotel->id,
         'name' => $room['type'],
         'price_per_night' => $room['price'],
         'available_rooms' => $room['available'],
         'cover_image' => $cover,
         'gallery_images' => $gallery,
-    ]);
+    ]));
 }
 
 private function refreshHotelRooms(Hotel $hotel): void

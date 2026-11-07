@@ -11,6 +11,9 @@
 <div class="spot-form-container">
 <div class="spot-form-card">
 <h1>Add Hotel</h1>
+@if(session('error'))
+<div class="form-error-box">{{ session('error') }}</div>
+@endif
 @if($errors->any())
 <div class="form-error-box"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
 @endif

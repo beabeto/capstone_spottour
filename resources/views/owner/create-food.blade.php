@@ -10,6 +10,9 @@
 <div class="back-btn"><button type="button" onclick="window.history.back(); return false;">Back</button></div>
 <div class="spot-form-container"><div class="spot-form-card">
 <h1>Add Food Establishment</h1>
+@if(session('error'))
+<div class="form-error-box">{{ session('error') }}</div>
+@endif
 @if($errors->any())
 <div class="form-error-box"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
 @endif

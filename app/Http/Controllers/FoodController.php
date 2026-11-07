@@ -60,7 +60,9 @@ class FoodController extends Controller
 
     public function store(Request $request)
     {
+        try {
         \App\Support\EnsureLiveSchema::run();
+        abort_unless(Auth::check(), 403);
         $request->validate([
 
             'name' => 'required',
@@ -168,14 +170,14 @@ class FoodController extends Controller
                 $menuImage->move($directory, $imageName);
             }
 
-            FoodMenu::create([
+            FoodMenu::create(\App\Support\SchemaSafe::only('food_menus', [
                 'food_id' => $food->id,
                 'name' => $menu['name'],
                 'description' => $menu['description'] ?? null,
                 'price' => $menu['price'],
                 'category' => $menu['category'],
                 'image' => $imageName,
-            ]);
+            ]));
         }
 
         if (!$isAdmin) {
@@ -191,6 +193,13 @@ class FoodController extends Controller
             'success',
             'Restaurant saved with its menu.'
         );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save this restaurant: '.$e->getMessage());
+        }
     }
 
     public function edit($id)

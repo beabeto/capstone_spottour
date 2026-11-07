@@ -73,91 +73,97 @@ class SpotController extends Controller
 
     public function store(Request $request)
     {
-        \App\Support\EnsureLiveSchema::run();
-        $isAdmin = Auth::user()->role === 'admin';
+        try {
+            \App\Support\EnsureLiveSchema::run();
+            abort_unless(Auth::check(), 403);
+            $isAdmin = Auth::user()?->role === 'admin';
 
-        $request->validate([
-            'name' => 'required',
-            'location' => 'required',
-            'description' => 'required',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
-            'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
-        ]);
+            $request->validate([
+                'name' => 'required',
+                'location' => 'required',
+                'description' => 'required',
+                'price' => 'nullable|numeric|min:0',
+                'cottage_price' => 'nullable|numeric|min:0',
+                'available_cottages' => 'nullable|integer|min:0',
+                'daily_booking_limit' => 'nullable|integer|min:1',
+                'booking_type' => 'nullable|in:none,cottage',
+                'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+                'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
+            ]);
 
-        $imageName = null;
+            $ownerId = $isAdmin ? $request->integer('owner_id') : Auth::id();
+            $uploadDir = public_path('uploads/spots');
+            if (! is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
 
-        if ($request->hasFile('image'))
-        {
-            $imageName =
-                time() . '.' .
-                $request->image->extension();
+            $imageName = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $imageName = time().'.'.$file->getClientOriginalExtension();
+                $file->move($uploadDir, $imageName);
+            }
 
-            $request->image->move(
-                public_path('uploads/spots'),
-                $imageName
+            $gallery = [];
+            $galleryFiles = $request->file('gallery_images', []);
+            if (! is_array($galleryFiles)) {
+                $galleryFiles = $galleryFiles ? [$galleryFiles] : [];
+            }
+            foreach ($galleryFiles as $file) {
+                if (! $file) {
+                    continue;
+                }
+                $name = time().'_'.uniqid().'_'.preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
+                $file->move($uploadDir, $name);
+                $gallery[] = $name;
+            }
+
+            $coords = \App\Support\PlaceMap::locate(
+                $request->latitude,
+                $request->longitude,
+                $request->map_link,
+                (string) $request->name,
+                (string) $request->location
             );
+
+            $spot = Spot::create(\App\Support\SchemaSafe::only('spots', [
+                'user_id' => $ownerId,
+                'owner_id' => $ownerId,
+                'name' => $request->name,
+                'location' => $request->location,
+                'description' => $request->description,
+                'price' => $request->filled('price') ? $request->input('price') : null,
+                'daily_booking_limit' => $request->filled('daily_booking_limit') ? max(1, $request->integer('daily_booking_limit')) : null,
+                'image' => $imageName,
+                'gallery_images' => $gallery,
+                'status' => $isAdmin ? 'approved' : 'pending',
+                'booking_type' => $request->input('booking_type') ?: 'none',
+                'available_cottages' => $request->filled('available_cottages') ? $request->integer('available_cottages') : null,
+                'cottage_price' => $request->filled('cottage_price') ? $request->input('cottage_price') : null,
+                'map_link' => $request->map_link,
+                'latitude' => $coords['latitude'],
+                'longitude' => $coords['longitude'],
+            ]));
+
+            if (! $isAdmin) {
+                BookingNotice::admins(
+                    Auth::user()->name.' submitted the tourist spot "'.$spot->name.'" for review.',
+                    ['spot_id' => $spot->id],
+                    [],
+                    'listing'
+                );
+            }
+
+            return redirect($isAdmin ? '/admin/spots' : '/owner/spots')
+                ->with('success', 'Spot added successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save this spot: '.$e->getMessage());
         }
-
-        $gallery = [];
-        foreach ($request->file('gallery_images', []) as $file) {
-            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/spots'), $name);
-            $gallery[] = $name;
-        }
-
-        $coords = \App\Support\PlaceMap::locate(
-            $request->latitude,
-            $request->longitude,
-            $request->map_link,
-            (string) $request->name,
-            (string) $request->location
-        );
-
-        $spot = Spot::create(\App\Support\SchemaSafe::only('spots', [
-
-            'user_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
-
-            'name' => $request->name,
-
-            'location' => $request->location,
-
-            'description' => $request->description,
-
-            'price' => $request->price,
-
-            'daily_booking_limit' => $request->filled('daily_booking_limit') ? max(1, $request->integer('daily_booking_limit')) : null,
-
-            'image' => $imageName,
-            'gallery_images' => $gallery,
-
-            'status' => $isAdmin ? 'approved' : 'pending',
-
-            'booking_type' => $request->booking_type,
-
-            'available_cottages' => $request->available_cottages,
-
-            'cottage_price' => $request->cottage_price,
-
-            'map_link' => $request->map_link,
-            'latitude' => $coords['latitude'],
-            'longitude' => $coords['longitude'],
-
-        ]));
-
-        if (!$isAdmin) {
-            BookingNotice::admins(
-                Auth::user()->name.' submitted the tourist spot "'.$spot->name.'" for review.',
-                ['spot_id' => $spot->id],
-                [],
-                'listing'
-            );
-        }
-
-        return redirect($isAdmin ? '/admin/spots' : '/owner/spots')
-            ->with(
-                'success',
-                'Spot added successfully!'
-            );
     }
 
 public function show($id)

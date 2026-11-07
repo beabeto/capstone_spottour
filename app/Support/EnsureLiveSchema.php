@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class EnsureLiveSchema
@@ -19,6 +20,8 @@ class EnsureLiveSchema
                 self::column($listing, 'daily_booking_limit', fn (Blueprint $table) => $table->unsignedInteger('daily_booking_limit')->nullable());
                 self::column($listing, 'image', fn (Blueprint $table) => $table->string('image')->nullable());
                 self::column($listing, 'status', fn (Blueprint $table) => $table->string('status')->default('pending'));
+                self::widenCoordinate($listing, 'latitude');
+                self::widenCoordinate($listing, 'longitude');
             }
 
             self::column('spots', 'price', fn (Blueprint $table) => $table->decimal('price', 10, 2)->nullable());
@@ -176,5 +179,30 @@ class EnsureLiveSchema
         }
 
         Schema::table($table, $define);
+    }
+
+    private static function widenCoordinate(string $table, string $column): void
+    {
+        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
+            return;
+        }
+
+        try {
+            $info = DB::selectOne("SHOW COLUMNS FROM `{$table}` LIKE ?", [$column]);
+            $type = strtolower((string) ($info->Type ?? $info->type ?? ''));
+            if ($type === '' || str_contains($type, 'double') || str_contains($type, 'float')) {
+                return;
+            }
+            if (preg_match('/decimal\((\d+),(\d+)\)/', $type, $match) && (int) $match[1] >= 11) {
+                return;
+            }
+            if ($column === 'latitude' && preg_match('/decimal\((\d+),/', $type, $match) && (int) $match[1] >= 10) {
+                return;
+            }
+
+            DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` DOUBLE NULL");
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 }

@@ -12,10 +12,16 @@ class SchemaSafe
             return [];
         }
 
-        return array_filter(
-            $data,
-            fn ($key) => Schema::hasColumn($table, $key),
-            ARRAY_FILTER_USE_KEY
-        );
+        $filtered = [];
+
+        foreach ($data as $key => $value) {
+            if (! Schema::hasColumn($table, $key)) {
+                continue;
+            }
+
+            $filtered[$key] = $value === '' ? null : $value;
+        }
+
+        return $filtered;
     }
 }

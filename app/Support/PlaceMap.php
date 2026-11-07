@@ -193,7 +193,7 @@ class PlaceMap
         $curl = curl_init($url);
         curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 6,
+            CURLOPT_TIMEOUT => 2,
             CURLOPT_HTTPHEADER => [
                 'User-Agent: SpotTour/1.0 (Surigao City listings)',
                 'Accept: application/json',
