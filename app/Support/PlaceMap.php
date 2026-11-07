@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Cache;
 use App\Models\Food;
 use App\Models\Hotel;
 use App\Models\Spot;
@@ -96,6 +97,13 @@ class PlaceMap
         foreach ($rows as $row) {
             $coords = self::coordinates($row[4], $row[5], $row[6])
                 ?? ($shared[self::locationKey($row[3])] ?? null);
+
+            if (! $coords) {
+                $query = trim(($row[2] ?? '').' '.($row[3] ?? ''));
+                if ($query !== '') {
+                    $coords = Cache::remember('place-map:'.sha1($query), now()->addDays(30), fn () => self::geocode($query));
+                }
+            }
 
             $pins[] = self::pin($row[0], $row[1], $row[2], $row[3], $coords[0] ?? null, $coords[1] ?? null, $row[6], $row[7]);
         }

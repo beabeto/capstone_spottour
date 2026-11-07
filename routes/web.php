@@ -127,17 +127,17 @@ Route::get(
 Route::get(
     '/user/notifications',
     [NotificationController::class,'index']
-);
+)->middleware('auth');
 
 Route::get(
     '/notification/{id}',
     [NotificationController::class,'open']
-);
+)->middleware('auth');
 
 Route::get(
     '/notification/delete/{id}',
     [NotificationController::class,'delete']
-);
+)->middleware('auth');
 
 ///////////////////////////////////////////////////////////////
 // FEEDBACK

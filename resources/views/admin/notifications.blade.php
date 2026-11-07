@@ -21,7 +21,7 @@
         <div class="notification-card {{ !$notification->is_read ? 'unread' : '' }}">
             <a href="/notification/{{ $notification->id }}" class="notification-link">
                 <div class="notification-content">
-                    <div class="notification-type">{{ $notification->category === 'listing' ? 'Listing' : ($notification->category === 'chat' ? 'Chat' : 'Booking') }}</div>
+                    <div class="notification-type">{{ match($notification->category) { 'listing' => 'Listing', 'chat' => 'Chat', 'feedback' => 'Feedback', 'booking' => 'Booking', default => 'Update' } }}</div>
                     <p class="notification-message">{{ $notification->message }}</p>
                     <small class="notification-time">{{ $notification->created_at->diffForHumans() }}</small>
                 </div>

@@ -593,9 +593,11 @@ body.admin-detail-page .workspace-standalone-sidebar.collapsed+.workspace-standa
 .workspace-standalone-menu-toggle span::after{position:absolute;top:5px}
 @media(max-width:900px){
  .workspace-standalone-main{width:100%;margin-left:0;padding-top:0}
- .workspace-standalone-main .back-btn{left:10px!important}
- body.admin-detail-page .workspace-standalone-main .back-btn{left:10px!important}
- .workspace-standalone-menu-toggle{display:inline-flex}
+ .workspace-standalone-main{padding-top:62px!important}
+ .workspace-standalone-main .back-btn,
+ body.admin-detail-page .workspace-standalone-main .back-btn{position:fixed!important;top:12px!important;left:12px!important;z-index:1210!important;margin:0!important}
+ .workspace-standalone-menu-toggle{display:inline-flex;top:12px;right:12px}
+ .workspace-standalone-sidebar .workspace-sidebar-toggle{display:inline-flex!important}
 }
 html[data-theme="dark"] .workspace-standalone-menu-toggle{background:#182420;color:#8ee0cf;border-color:#3d6b62}
 

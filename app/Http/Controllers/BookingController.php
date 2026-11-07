@@ -670,12 +670,18 @@ public function paymentPage(Request $request)
         return redirect('/user')->with('error', 'Your booking details expired. Please start the reservation again.');
     }
 
+    $quantity = max(1, (int) $request->input('quantity', old('quantity', 1)));
+    $bookingDate = $request->input('booking_date', old('booking_date'));
+    if (! $bookingDate || ! strtotime((string) $bookingDate)) {
+        return redirect('/booking/spot/'.$spotId)->with('error', 'Choose a booking date before continuing to payment.');
+    }
+
     $spot = Spot::with('owner')->findOrFail($spotId);
 
     return view('user.payment', [
         'spot' => $spot,
-        'booking_date' => $request->input('booking_date', old('booking_date')),
-        'quantity' => $request->input('quantity', old('quantity')),
+        'booking_date' => $bookingDate,
+        'quantity' => $quantity,
     ]);
 }
 
@@ -838,13 +844,20 @@ public function hotelPaymentPage(Request $request)
         return redirect('/hotels')->with('error', 'Your hotel booking details expired. Please reserve again.');
     }
 
+    $checkIn = $request->input('check_in', old('check_in'));
+    $checkOut = $request->input('check_out', old('check_out'));
+    $rooms = max(1, (int) $request->input('rooms', old('rooms', 1)));
+    if (! $checkIn || ! $checkOut || ! strtotime((string) $checkIn) || ! strtotime((string) $checkOut) || $checkOut <= $checkIn) {
+        return redirect('/booking/hotel/'.$hotelId)->with('error', 'Choose valid check-in and check-out dates before continuing to payment.');
+    }
+
     $hotel = Hotel::with(['rooms', 'packages', 'owner'])->findOrFail($hotelId);
 
     return view('user.hotel-payment', [
         'hotel' => $hotel,
-        'check_in' => $request->input('check_in', old('check_in')),
-        'check_out' => $request->input('check_out', old('check_out')),
-        'rooms' => $request->input('rooms', old('rooms')),
+        'check_in' => $checkIn,
+        'check_out' => $checkOut,
+        'rooms' => $rooms,
     ]);
 }
 
@@ -1017,6 +1030,12 @@ public function foodPaymentPage(Request $request)
         return redirect('/foods')->with('error', 'Your restaurant booking details expired. Please reserve again.');
     }
 
+    $reservationDate = $request->input('reservation_date', old('reservation_date'));
+    $reservationTime = $request->input('reservation_time', old('reservation_time'));
+    if (! $reservationDate || ! strtotime((string) $reservationDate) || ! $reservationTime) {
+        return redirect('/booking/food/'.$foodId)->with('error', 'Choose a reservation date and time before continuing to payment.');
+    }
+
     $food = Food::with('owner')->findOrFail($foodId);
     $guests = (int) $request->input('guests', old('guests', 1));
     $package = BookingExtras::package($request, 'food_id', $food->id);
@@ -1026,8 +1045,8 @@ public function foodPaymentPage(Request $request)
 
     return view('user.food-payment', [
         'food' => $food,
-        'reservation_date' => $request->input('reservation_date', old('reservation_date')),
-        'reservation_time' => $request->input('reservation_time', old('reservation_time')),
+        'reservation_date' => $reservationDate,
+        'reservation_time' => $reservationTime,
         'guests' => $guests,
         'special_request' => $request->input('special_request', old('special_request')),
         'menus' => $menus,

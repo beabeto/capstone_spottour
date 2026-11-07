@@ -90,6 +90,14 @@ public function open($id)
         return redirect('/user/bookings');
     }
 
+    if ($notification->category === 'feedback') {
+        return match (Auth::user()->role) {
+            'admin' => redirect('/admin/feedback'),
+            'owner' => redirect('/owner/feedback'),
+            default => redirect('/user/feedback'),
+        };
+    }
+
     if($notification->food_id)
     {
         return redirect('/foods/' . $notification->food_id . ($notification->comment_id ? '#comment'.$notification->comment_id : ''));
@@ -105,7 +113,11 @@ public function open($id)
         return redirect('/spots/' . $notification->spot_id . ($notification->comment_id ? '#comment'.$notification->comment_id : ''));
     }
 
-    return redirect('/user');
+    return match (Auth::user()->role) {
+        'admin' => redirect('/admin/notifications'),
+        'owner' => redirect('/owner/notifications'),
+        default => redirect('/user/notifications'),
+    };
 }
 
     public function adminIndex()

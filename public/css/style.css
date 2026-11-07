@@ -4973,3 +4973,20 @@ color:#246d9a!important
 body.admin-body .notification-menu,body.owner-body .notification-menu,.admin-bell-float .notification-menu{position:fixed!important;top:50%!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(440px,calc(100vw - 32px))!important;max-height:min(620px,calc(100dvh - 32px))!important;overflow:auto;overscroll-behavior:contain;z-index:6000!important}
 body.admin-body .notification-menu.show-notification-menu,body.owner-body .notification-menu.show-notification-menu,.admin-bell-float .notification-menu.show-notification-menu{display:block!important}
 @media(max-width:600px){body.admin-body .notification-menu,body.owner-body .notification-menu,.admin-bell-float .notification-menu{width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;border-radius:15px!important}}
+/* Admin notifications stay centered and readable on phones. */
+@media(max-width:640px){
+ body.admin-body .notification-menu{box-sizing:border-box!important;left:12px!important;right:12px!important;top:50dvh!important;width:auto!important;max-height:calc(100dvh - 24px)!important;transform:translateY(-50%)!important}
+ body.admin-body .notification-menu-header{position:sticky;top:0;z-index:1;min-height:52px;box-sizing:border-box;background:#fff}
+ body.admin-body .notification-menu-pending a,body.admin-body .notification-menu-item{min-height:44px;box-sizing:border-box}
+ body.admin-body .notification-page{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:560px;margin:0 auto!important;padding:64px 0 28px!important}
+ body.admin-body .notification-page .notification-page-header{display:flex;align-items:center!important;flex-direction:column;gap:14px;margin:0 0 16px;padding:17px 14px;text-align:center!important}
+ body.admin-body .notification-page .notification-page-header>div{width:100%;margin:0 auto}
+ body.admin-body .notification-page .notification-page-header h1{font-size:25px;line-height:1.2}
+ body.admin-body .notification-page .notification-page-header p{max-width:34ch;margin:0 auto;font-size:13px;line-height:1.45}
+ body.admin-body .notification-page .notification-dashboard-btn{width:100%;box-sizing:border-box;text-align:center}
+ body.admin-body .notification-page .notification-card{box-sizing:border-box;width:100%;margin-top:10px}
+ body.admin-body .notification-page .notification-link{box-sizing:border-box;width:100%;padding:14px 52px 14px 13px!important}
+ body.admin-body .notification-page .notification-content{min-width:0;overflow-wrap:anywhere}
+ body.admin-body .notification-page .delete-btn{right:9px!important;width:34px!important;height:34px!important}
+}
+@media(max-width:380px){body.admin-body .notification-menu{left:8px!important;right:8px!important}.admin-body .notification-page .notification-link{padding-right:48px!important}}

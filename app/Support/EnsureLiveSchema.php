@@ -223,7 +223,7 @@ class EnsureLiveSchema
 
     private static function column(string $table, string $column, callable $define): void
     {
-        if (! Schema::hasTable($table) || Schema::hasColumn($table, $column)) {
+        if (! Schema::hasTable($table) || in_array($column, Schema::getColumnListing($table), true)) {
             return;
         }
 
