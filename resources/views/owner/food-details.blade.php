@@ -12,7 +12,7 @@ content="width=device-width, initial-scale=1.0">
 <title>{{ $food->name }}</title>
 
 <link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 
 </head>
 

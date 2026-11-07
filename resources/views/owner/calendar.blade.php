@@ -9,7 +9,7 @@
 href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
 
 <link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 
 </head>
 

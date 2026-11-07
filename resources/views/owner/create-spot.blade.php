@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Add Tourist Spot</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
 <body class="dashboard-body">
 <div class="spot-form-container">

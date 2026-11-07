@@ -5,7 +5,7 @@
 <title>Add Menu Item</title>
 
 <link rel="stylesheet"
-href="{{ asset('css/style.css') }}">
+href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 
 </head>
 

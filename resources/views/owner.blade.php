@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 <title>Owner Dashboard</title>
 
-<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 
 </head>
 <body class="owner-body">

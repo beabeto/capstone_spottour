@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest day plans | SpotTour</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
     <style>
         .owner-day-plans-page{padding-bottom:48px;background:#f3f7f6}
         .owner-day-plans-page .page-shell{width:min(980px,calc(100% - 40px));margin:0 auto;padding:78px 0 56px}
