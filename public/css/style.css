@@ -4888,12 +4888,14 @@ color:#246d9a!important
 .room-types-grid article>.room-card-actions{display:flex!important;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,205,190,.18)}
 .room-types-grid article>.room-card-actions>a{display:inline-flex!important;align-items:center;justify-content:center;position:relative;z-index:1;min-height:34px;padding:0 12px;border:1px solid #f2aaa2;border-radius:8px;background:#fff0ee!important;color:#b42318!important;font-size:13px;font-weight:800;text-decoration:none!important;visibility:visible!important;opacity:1!important}
 .room-types-grid article>.room-card-actions>a:hover{background:#ffe4e0!important}
-.room-types-grid article>.room-card-actions{grid-column:1/-1;display:flex!important;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,205,190,.28)}
+.room-types-grid article>.room-card-actions{grid-column:1/-1;display:flex!important;flex-wrap:wrap!important;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,205,190,.28)}
 .room-types-grid article>.room-card-actions>a,.room-types-grid article>.room-card-actions>.room-edit-details>summary{display:inline-flex!important;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid #f2aaa2;border-radius:8px;background:#fff0ee!important;color:#b42318!important;font-size:13px;font-weight:800;text-decoration:none!important;cursor:pointer;list-style:none}
 .room-types-grid article>.room-card-actions>.room-edit-details>summary{border-color:#b7ddd2;background:#e7f5f0!important;color:#167b69!important}
 .room-types-grid article>.room-card-actions>.room-edit-details>summary::-webkit-details-marker{display:none}
-.room-types-grid article>.room-card-actions>.room-edit-details[open]{flex:1 0 100%}
-.room-types-grid article>.room-card-actions>.room-edit-details form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;width:100%;margin-top:10px;padding:12px;border:1px solid rgba(160,205,190,.28);border-radius:9px;background:rgba(7,20,17,.22)}
+.room-types-grid article>.room-card-actions>.room-edit-details[open]{display:contents!important}
+.room-types-grid article>.room-card-actions>.room-edit-details>summary{order:1}
+.room-types-grid article>.room-card-actions>a{order:2}
+.room-types-grid article>.room-card-actions>.room-edit-details form{display:grid;order:3;flex:1 0 100%;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;width:100%;min-width:0;margin-top:10px;padding:12px;border:1px solid rgba(160,205,190,.28);border-radius:9px;background:rgba(7,20,17,.22)}
 .room-types-grid article>.room-card-actions>.room-edit-details form label{display:grid;gap:5px;color:inherit;font-size:12px;font-weight:700}
 .room-types-grid article>.room-card-actions>.room-edit-details form input,.room-types-grid article>.room-card-actions>.room-edit-details form select{box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #b7cfc7;border-radius:6px;background:#fff;color:#203531;font:inherit}
 .room-types-grid article>.room-card-actions>.room-edit-details form button{justify-self:start;min-height:34px;padding:0 12px;border:0;border-radius:7px;background:#167b69;color:#fff;font-weight:800;cursor:pointer}
