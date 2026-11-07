@@ -14,6 +14,7 @@
     <div class="sidebar-logo">
         <div class="logo-header">
             <h2>Spot<span>Tour</span></h2>
+            <button type="button" class="menu-toggle workspace-sidebar-toggle" aria-label="Close navigation" aria-expanded="true" onclick="toggleStandaloneWorkspaceSidebar()"><span></span></button>
         </div>
     </div>
 

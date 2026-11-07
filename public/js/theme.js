@@ -73,14 +73,27 @@
         return Array.prototype.slice.call(document.querySelectorAll('.sidebar, .owner-sidebar'));
     }
 
-    window.toggleStandaloneWorkspaceSidebar = function () {
+    window.toggleStandaloneWorkspaceSidebar = function (forceOpen) {
         var sidebar = document.getElementById('workspaceStandaloneSidebar');
-        var trigger = document.querySelector('.workspace-standalone-menu-toggle');
         if (!sidebar) return;
-        var open = !sidebar.classList.contains('show');
-        sidebar.classList.toggle('show', open);
-        if (trigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-        syncWorkspaceScrim();
+        var mobile = window.matchMedia('(max-width: 900px)').matches;
+        if (mobile) {
+            var open = typeof forceOpen === 'boolean' ? forceOpen : !sidebar.classList.contains('show');
+            sidebar.classList.toggle('show', open);
+            document.querySelectorAll('.workspace-standalone-menu-toggle, .workspace-sidebar-toggle').forEach(function (trigger) {
+                trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                trigger.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+            });
+            syncWorkspaceScrim();
+            return;
+        }
+
+        sidebar.classList.toggle('collapsed');
+        var expanded = !sidebar.classList.contains('collapsed');
+        document.querySelectorAll('.workspace-sidebar-toggle').forEach(function (trigger) {
+            trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            trigger.setAttribute('aria-label', expanded ? 'Collapse navigation' : 'Expand navigation');
+        });
     };
 
     function syncWorkspaceScrim() {
@@ -115,7 +128,15 @@
         });
         syncWorkspaceScrim();
         window.addEventListener('resize', function () {
-            if (!window.matchMedia('(max-width: 900px)').matches) {
+            if (window.matchMedia('(max-width: 900px)').matches) {
+                var standalone = document.getElementById('workspaceStandaloneSidebar');
+                if (standalone) standalone.classList.remove('collapsed');
+                var standaloneOpen = !!standalone && standalone.classList.contains('show');
+                document.querySelectorAll('.workspace-standalone-menu-toggle, .workspace-sidebar-toggle').forEach(function (trigger) {
+                    trigger.setAttribute('aria-expanded', standaloneOpen ? 'true' : 'false');
+                    trigger.setAttribute('aria-label', standaloneOpen ? 'Close navigation' : 'Open navigation');
+                });
+            } else {
                 workspaceSidebars().forEach(function (sidebar) {
                     sidebar.classList.remove('show');
                 });
