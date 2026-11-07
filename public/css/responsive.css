@@ -604,6 +604,7 @@ html[data-theme="dark"] .workspace-standalone-menu-toggle{background:#182420;col
 .owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button,
 .admin-listing-page .listing-actions a{box-sizing:border-box!important;width:84px!important;min-width:84px!important;height:38px!important;min-height:38px!important;flex:0 0 84px!important;padding:0 6px!important;line-height:1!important}
 .owner-listing-page .listing-table-scroll table td:last-child{min-width:276px!important;flex-wrap:nowrap!important;gap:8px!important}
+.owner-listing-page .listing-table-scroll table td:last-child>.listing-delete-form{margin-top:7px!important;align-self:flex-start!important}
 @media(max-width:640px){
  .owner-listing-page .listing-table-scroll table td:last-child a,
  .owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button{height:40px!important;min-height:40px!important}
