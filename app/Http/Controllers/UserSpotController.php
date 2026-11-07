@@ -39,97 +39,71 @@ class UserSpotController extends Controller
 
     public function dashboard()
 {
-    $spots = Spot::with('ratings')
-        ->where('status', 'approved')
-        ->latest()
-        ->take(6)
-        ->get();
+    \App\Support\EnsureLiveSchema::run();
 
-    $hotels = Hotel::with('ratings')
-        ->where('status', 'approved')
-        ->latest()
-        ->take(6)
-        ->get();
+    try {
+        $spots = Spot::with('ratings')->where('status', 'approved')->latest()->take(6)->get();
+        $hotels = Hotel::with('ratings')->where('status', 'approved')->latest()->take(6)->get();
+        $foods = Food::with('ratings')->where('status', 'approved')->latest()->take(6)->get();
+    } catch (\Throwable $e) {
+        report($e);
+        $spots = $hotels = $foods = collect();
+    }
 
-    $foods = Food::with('ratings')
-        ->where('status', 'approved')
-        ->latest()
-        ->take(6)
-        ->get();
+    try {
+        $bookings = Booking::where('user_id', Auth::id())->count()
+            + HotelBooking::where('user_id', Auth::id())->count()
+            + FoodBooking::where('user_id', Auth::id())->count();
+        $favorites = Favorite::where('user_id', Auth::id())->count()
+            + HotelFavorite::where('user_id', Auth::id())->count()
+            + FoodFavorite::where('user_id', Auth::id())->count();
+        $bookmarks = Bookmark::where('user_id', Auth::id())->count()
+            + HotelBookmark::where('user_id', Auth::id())->count()
+            + FoodBookmark::where('user_id', Auth::id())->count();
+        $checklists = Checklist::where('user_id', Auth::id())->count()
+            + HotelChecklist::where('user_id', Auth::id())->count()
+            + FoodChecklist::where('user_id', Auth::id())->count();
+        $reviews = SpotComment::where('user_id', Auth::id())->count()
+            + HotelComment::where('user_id', Auth::id())->count()
+            + FoodComment::where('user_id', Auth::id())->count();
+        $favoritePreview = Favorite::with('spot')->where('user_id', Auth::id())->latest()->take(3)->get();
+        $bookmarkPreview = Bookmark::with('spot')->where('user_id', Auth::id())->latest()->take(3)->get();
+        $checklistPreview = Checklist::with('spot')->where('user_id', Auth::id())->latest()->take(3)->get();
+        $recentReviews = SpotComment::with('user')->latest()->take(5)->get();
+        $notifications = Notification::where('user_id', Auth::id())->latest()->take(5)->get();
+        $recentNotifications = Notification::where('user_id', Auth::id())->latest()->take(3)->get();
+    } catch (\Throwable $e) {
+        report($e);
+        $bookings = $favorites = $bookmarks = $checklists = $reviews = 0;
+        $favoritePreview = $bookmarkPreview = $checklistPreview = $recentReviews = $notifications = $recentNotifications = collect();
+    }
 
-    $bookings =
-        Booking::where('user_id', Auth::id())->count()
-        + HotelBooking::where('user_id', Auth::id())->count()
-        + FoodBooking::where('user_id', Auth::id())->count();
+    try {
+        $nextBooking = UpcomingReservations::forUser((int) Auth::id());
+        $upcomingBookings = UpcomingReservations::forUserList((int) Auth::id(), 3);
+    } catch (\Throwable $e) {
+        report($e);
+        $nextBooking = null;
+        $upcomingBookings = collect();
+    }
 
-    $favorites =
-        Favorite::where('user_id', Auth::id())->count()
-        + HotelFavorite::where('user_id', Auth::id())->count()
-        + FoodFavorite::where('user_id', Auth::id())->count();
+    try {
+        $nextPlan = DayPlan::with(['spot', 'hotel', 'food'])
+            ->where('user_id', Auth::id())
+            ->whereDate('plan_date', '>=', now()->toDateString())
+            ->orderBy('plan_date')
+            ->first();
+    } catch (\Throwable $e) {
+        report($e);
+        $nextPlan = null;
+    }
 
-    $bookmarks =
-        Bookmark::where('user_id', Auth::id())->count()
-        + HotelBookmark::where('user_id', Auth::id())->count()
-        + FoodBookmark::where('user_id', Auth::id())->count();
-
-    $checklists =
-        Checklist::where('user_id', Auth::id())->count()
-        + HotelChecklist::where('user_id', Auth::id())->count()
-        + FoodChecklist::where('user_id', Auth::id())->count();
-
-    $reviews =
-        SpotComment::where('user_id', Auth::id())->count()
-        + HotelComment::where('user_id', Auth::id())->count()
-        + FoodComment::where('user_id', Auth::id())->count();
-
-    $favoritePreview = Favorite::with('spot')
-        ->where('user_id', Auth::id())
-        ->latest()
-        ->take(3)
-        ->get();
-
-    $bookmarkPreview = Bookmark::with('spot')
-        ->where('user_id', Auth::id())
-        ->latest()
-        ->take(3)
-        ->get();
-
-    $checklistPreview = Checklist::with('spot')
-        ->where('user_id', Auth::id())
-        ->latest()
-        ->take(3)
-        ->get();
-
-    $recentReviews = SpotComment::with('user')
-        ->latest()
-        ->take(5)
-        ->get();
-
-    $notifications = Notification::where(
-            'user_id',
-            Auth::id()
-        )
-        ->latest()
-        ->take(5)
-        ->get();
-
-    $nextBooking = UpcomingReservations::forUser((int) Auth::id());
-    $upcomingBookings = UpcomingReservations::forUserList((int) Auth::id(), 3);
-    $nextPlan = DayPlan::with(['spot', 'hotel', 'food'])
-        ->where('user_id', Auth::id())
-        ->whereDate('plan_date', '>=', now()->toDateString())
-        ->orderBy('plan_date')
-        ->first();
-
-    $recentNotifications = Notification::where(
-    'user_id',
-    Auth::id()
-)
-->latest()
-->take(3)
-->get();    
-
-    $mapPlaces = PlaceMap::pins();
+    try {
+        $mapPlaces = PlaceMap::pins();
+    } catch (\Throwable $e) {
+        report($e);
+        $mapPlaces = [];
+    }
 
     return view(
         'user',

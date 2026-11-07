@@ -11,7 +11,7 @@
     <title>SpotTour Dashboard</title>
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}?v={{ filemtime(public_path('css/user-dashboard.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/user-dashboard.css') }}?v={{ @filemtime(public_path('css/user-dashboard.css')) }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 </head>
@@ -20,13 +20,11 @@
 
 @php
 
-$unreadCount = \App\Models\Notification::where(
-    'user_id',
-    Auth::id()
-)->where(
-    'is_read',
-    0
-)->count();
+try {
+    $unreadCount = \App\Models\Notification::where('user_id', Auth::id())->where('is_read', 0)->count();
+} catch (\Throwable $e) {
+    $unreadCount = 0;
+}
 
 @endphp
 
