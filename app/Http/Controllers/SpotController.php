@@ -32,7 +32,7 @@ class SpotController extends Controller
 
     public function ownerIndex()
     {
-        $spots = Spot::where(
+        $spots = Spot::withoutGlobalScopes()->where(
             'user_id',
             Auth::id()
         )->get();
@@ -73,9 +73,11 @@ class SpotController extends Controller
 
     public function store(Request $request)
     {
+        if (! Auth::check()) {
+            return redirect('/')->with('error', 'Please sign in as an owner first.');
+        }
+
         try {
-            \App\Support\EnsureLiveSchema::run();
-            abort_unless(Auth::check(), 403);
             $isAdmin = Auth::user()?->role === 'admin';
 
             $request->validate([
@@ -89,7 +91,7 @@ class SpotController extends Controller
                 'booking_type' => 'nullable|in:none,cottage',
                 'image' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
                 'gallery_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
-                'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
+                'owner_id' => $isAdmin ? 'required|exists:users,id' : 'nullable',
             ]);
 
             $ownerId = $isAdmin ? $request->integer('owner_id') : Auth::id();
@@ -119,15 +121,9 @@ class SpotController extends Controller
                 $gallery[] = $name;
             }
 
-            $coords = \App\Support\PlaceMap::locate(
-                $request->latitude,
-                $request->longitude,
-                $request->map_link,
-                (string) $request->name,
-                (string) $request->location
-            );
+            $pin = \App\Support\PlaceMap::coordinates($request->latitude, $request->longitude, $request->map_link);
 
-            $spot = Spot::create(\App\Support\SchemaSafe::only('spots', [
+            $id = \App\Support\ListingPersist::create('spots', [
                 'user_id' => $ownerId,
                 'owner_id' => $ownerId,
                 'name' => $request->name,
@@ -142,14 +138,14 @@ class SpotController extends Controller
                 'available_cottages' => $request->filled('available_cottages') ? $request->integer('available_cottages') : null,
                 'cottage_price' => $request->filled('cottage_price') ? $request->input('cottage_price') : null,
                 'map_link' => $request->map_link,
-                'latitude' => $coords['latitude'],
-                'longitude' => $coords['longitude'],
-            ]));
+                'latitude' => $pin[0] ?? null,
+                'longitude' => $pin[1] ?? null,
+            ]);
 
             if (! $isAdmin) {
                 BookingNotice::admins(
-                    Auth::user()->name.' submitted the tourist spot "'.$spot->name.'" for review.',
-                    ['spot_id' => $spot->id],
+                    Auth::user()->name.' submitted the tourist spot "'.$request->name.'" for review.',
+                    ['spot_id' => $id],
                     [],
                     'listing'
                 );
@@ -162,7 +158,7 @@ class SpotController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Could not save this spot: '.$e->getMessage());
+            return back()->withInput()->with('error', \App\Support\ListingPersist::error($e, 'spot'));
         }
     }
 

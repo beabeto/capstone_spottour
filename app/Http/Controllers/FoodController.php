@@ -60,9 +60,11 @@ class FoodController extends Controller
 
     public function store(Request $request)
     {
+        if (! Auth::check()) {
+            return redirect('/')->with('error', 'Please sign in as an owner first.');
+        }
+
         try {
-        \App\Support\EnsureLiveSchema::run();
-        abort_unless(Auth::check(), 403);
         $request->validate([
 
             'name' => 'required',
@@ -128,7 +130,7 @@ class FoodController extends Controller
             (string) $request->location
         );
 
-        $food = Food::create(\App\Support\SchemaSafe::only('foods', [
+        $foodId = \App\Support\ListingPersist::create('foods', [
 
             'owner_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
             'status' => $isAdmin ? 'approved' : 'pending',
@@ -155,7 +157,8 @@ class FoodController extends Controller
             'image' => $image,
             'gallery_images' => $gallery,
 
-        ]));
+        ]);
+        $food = Food::withoutGlobalScopes()->findOrFail($foodId);
 
         $directory = public_path('uploads/menus');
         if (!is_dir($directory)) {
@@ -198,7 +201,7 @@ class FoodController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Could not save this restaurant: '.$e->getMessage());
+            return back()->withInput()->with('error', \App\Support\ListingPersist::error($e, 'restaurant'));
         }
     }
 

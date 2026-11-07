@@ -319,12 +319,12 @@ Route::get(
 Route::get(
     '/owner/spots/create',
     [SpotController::class,'create']
-);
+)->middleware('auth');
 
 Route::post(
     '/owner/spots/store',
     [SpotController::class,'store']
-);
+)->middleware('auth');
 
 Route::get(
     '/owner/spots/{id}',
@@ -517,7 +517,7 @@ Route::get(
 Route::post(
     '/owner/hotels/store',
     [HotelController::class,'store']
-);
+)->middleware('auth');
 
 Route::get('/owner/hotels/{id}/rooms', [HotelController::class, 'rooms']);
 Route::post('/owner/hotels/{id}/rooms', [HotelController::class, 'storeRoom']);
@@ -705,7 +705,7 @@ Route::get(
 Route::post(
     '/owner/foods/store',
     [FoodController::class,'store']
-);
+)->middleware('auth');
 
 Route::post(
     '/owner/foods/{id}/daily-limit',

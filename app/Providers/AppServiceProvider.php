@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
 
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
+            config(['session.secure' => true]);
         }
 
         EnsureLiveSchema::run();

@@ -4,10 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class Food extends Model
 {
     use SoftDeletes;
+
+    public static function bootSoftDeletes(): void
+    {
+        if (! Schema::hasTable('foods') || ! Schema::hasColumn('foods', 'deleted_at')) {
+            return;
+        }
+
+        static::addGlobalScope(new \Illuminate\Database\Eloquent\SoftDeletingScope);
+    }
     protected $table = 'foods';
 
     protected $fillable = [

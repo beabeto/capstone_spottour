@@ -3,14 +3,42 @@
 namespace App\Support;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class EnsureLiveSchema
 {
+    private static bool $ran = false;
+
     public static function run(): void
     {
+        if (self::$ran) {
+            return;
+        }
+
         try {
+            if (! Schema::hasTable('spots')) {
+                Schema::create('spots', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('user_id')->nullable();
+                    $table->string('name');
+                    $table->string('location')->nullable();
+                    $table->text('description')->nullable();
+                    $table->decimal('price', 10, 2)->nullable();
+                    $table->string('image')->nullable();
+                    $table->text('gallery_images')->nullable();
+                    $table->string('status')->default('pending');
+                    $table->string('booking_type')->default('none');
+                    $table->integer('available_cottages')->nullable();
+                    $table->decimal('cottage_price', 10, 2)->nullable();
+                    $table->unsignedInteger('daily_booking_limit')->nullable();
+                    $table->text('map_link')->nullable();
+                    $table->double('latitude')->nullable();
+                    $table->double('longitude')->nullable();
+                    $table->timestamp('deleted_at')->nullable();
+                    $table->timestamps();
+                });
+            }
+
             foreach (['spots', 'hotels', 'foods'] as $listing) {
                 self::column($listing, 'deleted_at', fn (Blueprint $table) => $table->timestamp('deleted_at')->nullable());
                 self::column($listing, 'latitude', fn (Blueprint $table) => $table->decimal('latitude', 10, 8)->nullable());
@@ -20,8 +48,6 @@ class EnsureLiveSchema
                 self::column($listing, 'daily_booking_limit', fn (Blueprint $table) => $table->unsignedInteger('daily_booking_limit')->nullable());
                 self::column($listing, 'image', fn (Blueprint $table) => $table->string('image')->nullable());
                 self::column($listing, 'status', fn (Blueprint $table) => $table->string('status')->default('pending'));
-                self::widenCoordinate($listing, 'latitude');
-                self::widenCoordinate($listing, 'longitude');
             }
 
             self::column('spots', 'price', fn (Blueprint $table) => $table->decimal('price', 10, 2)->nullable());
@@ -167,6 +193,7 @@ class EnsureLiveSchema
             self::column('users', 'birth_date', fn (Blueprint $table) => $table->date('birth_date')->nullable());
             self::column('users', 'profile_image', fn (Blueprint $table) => $table->string('profile_image')->nullable());
             self::column('users', 'is_online', fn (Blueprint $table) => $table->boolean('is_online')->default(false));
+            self::$ran = true;
         } catch (\Throwable $e) {
             report($e);
         }
@@ -179,30 +206,5 @@ class EnsureLiveSchema
         }
 
         Schema::table($table, $define);
-    }
-
-    private static function widenCoordinate(string $table, string $column): void
-    {
-        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
-            return;
-        }
-
-        try {
-            $info = DB::selectOne("SHOW COLUMNS FROM `{$table}` LIKE ?", [$column]);
-            $type = strtolower((string) ($info->Type ?? $info->type ?? ''));
-            if ($type === '' || str_contains($type, 'double') || str_contains($type, 'float')) {
-                return;
-            }
-            if (preg_match('/decimal\((\d+),(\d+)\)/', $type, $match) && (int) $match[1] >= 11) {
-                return;
-            }
-            if ($column === 'latitude' && preg_match('/decimal\((\d+),/', $type, $match) && (int) $match[1] >= 10) {
-                return;
-            }
-
-            DB::statement("ALTER TABLE `{$table}` MODIFY `{$column}` DOUBLE NULL");
-        } catch (\Throwable $e) {
-            report($e);
-        }
     }
 }

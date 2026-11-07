@@ -4,10 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class Hotel extends Model
 {
     use SoftDeletes;
+
+    public static function bootSoftDeletes(): void
+    {
+        if (! Schema::hasTable('hotels') || ! Schema::hasColumn('hotels', 'deleted_at')) {
+            return;
+        }
+
+        static::addGlobalScope(new \Illuminate\Database\Eloquent\SoftDeletingScope);
+    }
     protected $fillable = [
 
         'owner_id',

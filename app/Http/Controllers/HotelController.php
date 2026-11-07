@@ -48,9 +48,11 @@ class HotelController extends Controller
 
     public function store(Request $request)
     {
+        if (! Auth::check()) {
+            return redirect('/')->with('error', 'Please sign in as an owner first.');
+        }
+
         try {
-        \App\Support\EnsureLiveSchema::run();
-        abort_unless(Auth::check(), 403);
         $request->validate([
             'name' => 'required',
             'location' => 'required',
@@ -93,7 +95,7 @@ class HotelController extends Controller
             (string) $request->location
         );
 
-        $hotel = Hotel::create(\App\Support\SchemaSafe::only('hotels', [
+        $hotelId = \App\Support\ListingPersist::create('hotels', [
 
             'owner_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
 
@@ -121,7 +123,8 @@ class HotelController extends Controller
 
             'image' => $image
 
-        ]));
+        ]);
+        $hotel = Hotel::withoutGlobalScopes()->findOrFail($hotelId);
 
         foreach ($request->input('rooms') as $index => $room) {
             $this->storeRoomType($hotel, $request, (string) $index, $room);
@@ -145,7 +148,7 @@ class HotelController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Could not save this hotel: '.$e->getMessage());
+            return back()->withInput()->with('error', \App\Support\ListingPersist::error($e, 'hotel'));
         }
     }
 

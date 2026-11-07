@@ -49,10 +49,10 @@ use Illuminate\Support\Str;
             </li>
 
             @if(
-                Auth::user()->business_type == 'spot_cottage' ||
-                Auth::user()->business_type == 'spot_hotel' ||
-                Auth::user()->business_type == 'spot_food' ||
-                Auth::user()->business_type == 'spot_hotel_food'
+                Auth::user()?->business_type == 'spot_cottage' ||
+                Auth::user()?->business_type == 'spot_hotel' ||
+                Auth::user()?->business_type == 'spot_food' ||
+                Auth::user()?->business_type == 'spot_hotel_food'
             )
 
             <li>
@@ -65,10 +65,10 @@ use Illuminate\Support\Str;
             @endif
 
             @if(
-                Auth::user()->business_type == 'hotel_inn_lounge' ||
-                Auth::user()->business_type == 'spot_hotel' ||
-                Auth::user()->business_type == 'hotel_food' ||
-                Auth::user()->business_type == 'spot_hotel_food'
+                Auth::user()?->business_type == 'hotel_inn_lounge' ||
+                Auth::user()?->business_type == 'spot_hotel' ||
+                Auth::user()?->business_type == 'hotel_food' ||
+                Auth::user()?->business_type == 'spot_hotel_food'
             )
 
             <li>
@@ -90,10 +90,10 @@ Hotels
             @endif
 
             @if(
-    Auth::user()->business_type == 'food_establishment' ||
-    Auth::user()->business_type == 'spot_food' ||
-    Auth::user()->business_type == 'hotel_food' ||
-    Auth::user()->business_type == 'spot_hotel_food'
+    Auth::user()?->business_type == 'food_establishment' ||
+    Auth::user()?->business_type == 'spot_food' ||
+    Auth::user()?->business_type == 'hotel_food' ||
+    Auth::user()?->business_type == 'spot_hotel_food'
 )
 
 <li>
@@ -151,13 +151,13 @@ Calendar
 </li>
 
             @if(
-    Auth::user()->business_type == 'spot_cottage' ||
-    Auth::user()->business_type == 'spot_hotel' ||
-    Auth::user()->business_type == 'spot_food' ||
-    Auth::user()->business_type == 'spot_hotel_food' ||
+    Auth::user()?->business_type == 'spot_cottage' ||
+    Auth::user()?->business_type == 'spot_hotel' ||
+    Auth::user()?->business_type == 'spot_food' ||
+    Auth::user()?->business_type == 'spot_hotel_food' ||
 
-    Auth::user()->business_type == 'hotel_inn_lounge' ||
-    Auth::user()->business_type == 'hotel_food'
+    Auth::user()?->business_type == 'hotel_inn_lounge' ||
+    Auth::user()?->business_type == 'hotel_food'
 )
 
 <li>
@@ -215,17 +215,17 @@ Calendar
             <button type="button" class="header-menu" onclick="toggleOwnerSidebar()" aria-label="Open menu"></button>
             <div class="workspace-title">
                 <h1>Owner Dashboard</h1>
-                <p class="store-indicator"><span>Your business</span>{{ ucfirst(str_replace('_', ' ', Auth::user()->business_type)) }}</p>
+                <p class="store-indicator"><span>Your business</span>{{ ucfirst(str_replace('_', ' ', Auth::user()?->business_type)) }}</p>
             </div>
 
             <div class="topbar-actions">
             @include('partials.notification-menu', ['notifications' => $notifications, 'unreadCount' => $unreadCount, 'allUrl' => '/owner/notifications'])
             <div class="admin-user account-chip is-owner" role="link" tabindex="0" onclick="window.location='/owner/profile'" onkeydown="if(event.key==='Enter')window.location='/owner/profile'">
 
-    @if(Auth::user()->profile_image)
+    @if(Auth::user()?->profile_image)
 
         <img
-            src="{{ asset('uploads/profile/' . Auth::user()->profile_image) }}"
+            src="{{ asset('uploads/profile/' . Auth::user()?->profile_image) }}"
             alt="Profile">
 
     @else
@@ -239,7 +239,7 @@ Calendar
     <div>
 
         <span class="admin-name">
-            {{ Auth::user()->name }}
+            {{ Auth::user()?->name }}
         </span>
 
         <small class="admin-role">Owner</small>
@@ -253,7 +253,7 @@ Calendar
 
         <section class="owner-welcome owner-welcome-top" id="ownerWelcome">
             <button type="button" class="welcome-close" aria-label="Close welcome message" onclick="closeOwnerWelcome()">&times;</button>
-            <h2>Welcome back, {{ Auth::user()->name }}!</h2>
+            <h2>Welcome back, {{ Auth::user()?->name }}!</h2>
             <p>Manage your business, track revenue, and respond to booking requests from one place.</p>
         </section>
 

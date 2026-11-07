@@ -4,12 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class Spot extends Model
 {
     use SoftDeletes;
+
+    public static function bootSoftDeletes(): void
+    {
+        if (! Schema::hasTable('spots') || ! Schema::hasColumn('spots', 'deleted_at')) {
+            return;
+        }
+
+        static::addGlobalScope(new \Illuminate\Database\Eloquent\SoftDeletingScope);
+    }
     protected $fillable = [
         'user_id',
+        'owner_id',
         'name',
         'location',
         'description',
