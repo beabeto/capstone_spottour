@@ -574,9 +574,11 @@ html[data-theme="dark"] .admin-accounts-page .accounts-table-card td::before{col
 /* Add the matching role sidebar to standalone admin and owner pages. */
 .workspace-standalone-shell{min-height:100vh;width:100%;box-sizing:border-box}
 .workspace-standalone-main{box-sizing:border-box;min-height:100vh;width:calc(100% - 264px);margin-left:264px;overflow-x:clip;transition:width .24s ease,margin-left .24s ease}
+.workspace-standalone-main .back-btn{left:282px!important}
 .workspace-standalone-sidebar{z-index:1250!important}
 .workspace-standalone-sidebar.collapsed{width:78px!important}
 .workspace-standalone-sidebar.collapsed+.workspace-standalone-shell .workspace-standalone-main{width:calc(100% - 78px);margin-left:78px}
+.workspace-standalone-sidebar.collapsed+.workspace-standalone-shell .back-btn{left:96px!important}
 .workspace-standalone-sidebar.collapsed .sidebar-logo h2 span,
 .workspace-standalone-sidebar.collapsed .sidebar-logo h2{display:none!important}
 .workspace-standalone-sidebar.collapsed .workspace-nav{grid-template-columns:1fr!important;justify-items:center;padding:0!important}
@@ -589,6 +591,7 @@ html[data-theme="dark"] .admin-accounts-page .accounts-table-card td::before{col
 .workspace-standalone-menu-toggle span::after{position:absolute;top:5px}
 @media(max-width:900px){
  .workspace-standalone-main{width:100%;margin-left:0;padding-top:0}
+ .workspace-standalone-main .back-btn{left:10px!important}
  .workspace-standalone-menu-toggle{display:inline-flex}
 }
 html[data-theme="dark"] .workspace-standalone-menu-toggle{background:#182420;color:#8ee0cf;border-color:#3d6b62}
