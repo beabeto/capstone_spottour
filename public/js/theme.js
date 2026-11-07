@@ -73,6 +73,16 @@
         return Array.prototype.slice.call(document.querySelectorAll('.sidebar, .owner-sidebar'));
     }
 
+    window.toggleStandaloneWorkspaceSidebar = function () {
+        var sidebar = document.getElementById('workspaceStandaloneSidebar');
+        var trigger = document.querySelector('.workspace-standalone-menu-toggle');
+        if (!sidebar) return;
+        var open = !sidebar.classList.contains('show');
+        sidebar.classList.toggle('show', open);
+        if (trigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        syncWorkspaceScrim();
+    };
+
     function syncWorkspaceScrim() {
         var open = workspaceSidebars().some(function (sidebar) {
             return sidebar.classList.contains('show');

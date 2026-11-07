@@ -65,6 +65,28 @@ class InjectTheme
             }
         }
 
+        $role = Auth::user()?->role;
+        $isAdminPage = $role === 'admin' && $request->is('admin', 'admin/*');
+        $isOwnerPage = $role === 'owner' && $request->is('owner', 'owner/*');
+        $alreadyHasWorkspaceSidebar = str_contains($html, 'id="sidebar"')
+            || str_contains($html, 'id="ownerSidebar"');
+
+        if (($isAdminPage || $isOwnerPage) && ! $isAuthSurface && ! $alreadyHasWorkspaceSidebar) {
+            try {
+                $sidebar = view('partials.workspace-sidebar', ['role' => $role])->render();
+                $menuButton = '<button type="button" class="workspace-standalone-menu-toggle" aria-label="Open navigation" aria-expanded="false" onclick="toggleStandaloneWorkspaceSidebar()"><span></span></button>';
+                $html = preg_replace_callback(
+                    '/<body\b[^>]*>/i',
+                    fn (array $match) => $match[0].$sidebar.'<div class="workspace-standalone-shell"><main class="workspace-standalone-main">'.$menuButton,
+                    $html,
+                    1
+                ) ?? $html;
+                $html = str_replace('</body>', '</main></div></body>', $html);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $response->setContent($html);
 
         return $response;
