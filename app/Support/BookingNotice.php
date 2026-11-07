@@ -14,14 +14,18 @@ class BookingNotice
             return;
         }
 
-        Notification::create(array_merge([
-            'user_id' => $userId,
-            'sender_id' => Auth::id(),
-            'message' => $message,
-            'is_read' => 0,
-        ], $links, [
-            'category' => $category,
-        ]));
+        try {
+            Notification::create(\App\Support\SchemaSafe::only('notifications', array_merge([
+                'user_id' => $userId,
+                'sender_id' => Auth::id(),
+                'message' => $message,
+                'is_read' => 0,
+            ], $links, [
+                'category' => $category,
+            ])));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     public static function admins(string $message, array $links = [], array $except = [], string $category = 'booking'): void

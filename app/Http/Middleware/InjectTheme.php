@@ -25,12 +25,12 @@ class InjectTheme
         }
 
         if (! str_contains($html, '/js/theme.js')) {
-            $assets = '<link rel="stylesheet" href="'.asset('css/theme.css').'?v='.filemtime(public_path('css/theme.css')).'">'
-                .'<link rel="stylesheet" href="'.asset('css/responsive.css').'?v='.filemtime(public_path('css/responsive.css')).'">'
-                .'<script src="'.asset('js/theme.js').'?v='.filemtime(public_path('js/theme.js')).'"></script>';
+            $assets = '<link rel="stylesheet" href="'.asset('css/theme.css').'?v='.@filemtime(public_path('css/theme.css')).'">'
+                .'<link rel="stylesheet" href="'.asset('css/responsive.css').'?v='.@filemtime(public_path('css/responsive.css')).'">'
+                .'<script src="'.asset('js/theme.js').'?v='.@filemtime(public_path('js/theme.js')).'"></script>';
             $html = str_replace('</head>', $assets.'</head>', $html);
         } elseif (! str_contains($html, '/css/responsive.css')) {
-            $responsive = '<link rel="stylesheet" href="'.asset('css/responsive.css').'?v='.filemtime(public_path('css/responsive.css')).'">';
+            $responsive = '<link rel="stylesheet" href="'.asset('css/responsive.css').'?v='.@filemtime(public_path('css/responsive.css')).'">';
             $html = str_replace('</head>', $responsive.'</head>', $html);
         }
 
@@ -53,12 +53,16 @@ class InjectTheme
         }
 
         if (Auth::user()?->role === 'admin' && ! str_contains($html, 'notification-icon')) {
-            $bell = view('partials.notification-menu', [
-                'notifications' => Notification::where('user_id', Auth::id())->latest()->take(6)->get(),
-                'unreadCount' => Notification::where('user_id', Auth::id())->where('is_read', 0)->count(),
-                'allUrl' => '/admin/notifications',
-            ])->render();
-            $html = str_replace('</body>', '<div class="admin-bell-float">'.$bell.'</div></body>', $html);
+            try {
+                $bell = view('partials.notification-menu', [
+                    'notifications' => Notification::where('user_id', Auth::id())->latest()->take(6)->get(),
+                    'unreadCount' => Notification::where('user_id', Auth::id())->where('is_read', 0)->count(),
+                    'allUrl' => '/admin/notifications',
+                ])->render();
+                $html = str_replace('</body>', '<div class="admin-bell-float">'.$bell.'</div></body>', $html);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $response->setContent($html);

@@ -17,6 +17,85 @@ class EnsureLiveSchema
                 self::column($listing, 'map_link', fn (Blueprint $table) => $table->text('map_link')->nullable());
                 self::column($listing, 'gallery_images', fn (Blueprint $table) => $table->text('gallery_images')->nullable());
                 self::column($listing, 'daily_booking_limit', fn (Blueprint $table) => $table->unsignedInteger('daily_booking_limit')->nullable());
+                self::column($listing, 'image', fn (Blueprint $table) => $table->string('image')->nullable());
+                self::column($listing, 'status', fn (Blueprint $table) => $table->string('status')->default('pending'));
+            }
+
+            self::column('spots', 'price', fn (Blueprint $table) => $table->decimal('price', 10, 2)->nullable());
+            self::column('spots', 'booking_type', fn (Blueprint $table) => $table->string('booking_type')->default('none'));
+            self::column('spots', 'available_cottages', fn (Blueprint $table) => $table->integer('available_cottages')->nullable());
+            self::column('spots', 'cottage_price', fn (Blueprint $table) => $table->decimal('cottage_price', 10, 2)->nullable());
+            self::column('hotels', 'price_per_night', fn (Blueprint $table) => $table->decimal('price_per_night', 10, 2)->nullable());
+            self::column('hotels', 'available_rooms', fn (Blueprint $table) => $table->integer('available_rooms')->default(0));
+            self::column('hotels', 'amenities', fn (Blueprint $table) => $table->text('amenities')->nullable());
+            self::column('hotels', 'room_types', fn (Blueprint $table) => $table->text('room_types')->nullable());
+            self::column('foods', 'available_tables', fn (Blueprint $table) => $table->integer('available_tables')->default(0));
+            self::column('foods', 'venue_capacity', fn (Blueprint $table) => $table->integer('venue_capacity')->default(0));
+            self::column('foods', 'price_per_guest', fn (Blueprint $table) => $table->decimal('price_per_guest', 10, 2)->nullable());
+
+            if (! Schema::hasTable('packages')) {
+                Schema::create('packages', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('spot_id')->nullable();
+                    $table->unsignedBigInteger('hotel_id')->nullable();
+                    $table->unsignedBigInteger('food_id')->nullable();
+                    $table->string('name');
+                    $table->string('kind', 20)->nullable();
+                    $table->text('description')->nullable();
+                    $table->decimal('price', 10, 2)->nullable();
+                    $table->timestamps();
+                });
+            }
+
+            if (! Schema::hasTable('hotel_rooms')) {
+                Schema::create('hotel_rooms', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('hotel_id');
+                    $table->string('name');
+                    $table->decimal('price_per_night', 10, 2)->default(0);
+                    $table->unsignedInteger('available_rooms')->default(0);
+                    $table->string('cover_image')->nullable();
+                    $table->text('gallery_images')->nullable();
+                    $table->timestamps();
+                });
+            }
+
+            if (! Schema::hasTable('food_menus')) {
+                Schema::create('food_menus', function (Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('food_id');
+                    $table->string('name');
+                    $table->text('description')->nullable();
+                    $table->decimal('price', 10, 2)->default(0);
+                    $table->string('category')->default('meal');
+                    $table->string('image')->nullable();
+                    $table->timestamps();
+                });
+            }
+
+            foreach (['bookings', 'hotel_bookings', 'food_bookings'] as $booking) {
+                self::column($booking, 'package_id', fn (Blueprint $table) => $table->unsignedBigInteger('package_id')->nullable());
+                self::column($booking, 'package_name', fn (Blueprint $table) => $table->string('package_name')->nullable());
+            }
+            self::column('bookings', 'needs_guide', fn (Blueprint $table) => $table->boolean('needs_guide')->default(false));
+            self::column('hotel_bookings', 'hotel_room_id', fn (Blueprint $table) => $table->unsignedBigInteger('hotel_room_id')->nullable());
+            self::column('hotel_bookings', 'room_name', fn (Blueprint $table) => $table->string('room_name')->nullable());
+
+            foreach ([
+                'uploads/spots',
+                'uploads/hotels',
+                'uploads/hotel-rooms',
+                'uploads/foods',
+                'uploads/menus',
+                'uploads/profile',
+                'uploads/comments',
+                'uploads/receipts',
+                'uploads/gcash-qr',
+            ] as $dir) {
+                $path = public_path($dir);
+                if (! is_dir($path)) {
+                    mkdir($path, 0775, true);
+                }
             }
 
             foreach (['bookings', 'hotel_bookings', 'food_bookings'] as $booking) {

@@ -60,8 +60,9 @@ class SpotController extends Controller
 
     public function create()
     {
-        abort_if(request()->is('admin/*') && Auth::user()->role !== 'admin', 403);
-        $owners = Auth::user()->role === 'admin'
+        \App\Support\EnsureLiveSchema::run();
+        abort_if(request()->is('admin/*') && Auth::user()?->role !== 'admin', 403);
+        $owners = Auth::user()?->role === 'admin'
             ? User::where('role', 'owner')->orderBy('name')->get()
             : collect();
 
@@ -72,6 +73,7 @@ class SpotController extends Controller
 
     public function store(Request $request)
     {
+        \App\Support\EnsureLiveSchema::run();
         $isAdmin = Auth::user()->role === 'admin';
 
         $request->validate([
@@ -111,15 +113,13 @@ class SpotController extends Controller
             (string) $request->location
         );
 
-        $spot = Spot::create([
+        $spot = Spot::create(\App\Support\SchemaSafe::only('spots', [
 
             'user_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
 
             'name' => $request->name,
 
             'location' => $request->location,
-
-            
 
             'description' => $request->description,
 
@@ -132,20 +132,17 @@ class SpotController extends Controller
 
             'status' => $isAdmin ? 'approved' : 'pending',
 
-            'booking_type' =>
-    $request->booking_type,
+            'booking_type' => $request->booking_type,
 
-'available_cottages' =>
-    $request->available_cottages,
+            'available_cottages' => $request->available_cottages,
 
-'cottage_price' =>
-    $request->cottage_price,
+            'cottage_price' => $request->cottage_price,
 
-    'map_link' => $request->map_link,
+            'map_link' => $request->map_link,
             'latitude' => $coords['latitude'],
             'longitude' => $coords['longitude'],
 
-        ]);
+        ]));
 
         if (!$isAdmin) {
             BookingNotice::admins(

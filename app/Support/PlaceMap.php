@@ -50,8 +50,13 @@ class PlaceMap
 
     public static function locate(mixed $latitude, mixed $longitude, ?string $mapLink, string $name = '', string $location = ''): array
     {
-        $coords = self::coordinates($latitude, $longitude, $mapLink)
-            ?? self::geocode(trim($name.' '.$location));
+        try {
+            $coords = self::coordinates($latitude, $longitude, $mapLink)
+                ?? self::geocode(trim($name.' '.$location));
+        } catch (\Throwable $e) {
+            report($e);
+            $coords = self::coordinates($latitude, $longitude, $mapLink);
+        }
 
         return [
             'latitude' => $coords[0] ?? null,

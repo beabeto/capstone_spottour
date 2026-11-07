@@ -49,7 +49,8 @@ class FoodController extends Controller
 
     public function create()
     {
-        abort_if(request()->is('admin/*') && Auth::user()->role !== 'admin', 403);
+        \App\Support\EnsureLiveSchema::run();
+        abort_if(request()->is('admin/*') && Auth::user()?->role !== 'admin', 403);
         $owners = Auth::user()->role === 'admin'
             ? User::where('role', 'owner')->orderBy('name')->get()
             : collect();
@@ -59,6 +60,7 @@ class FoodController extends Controller
 
     public function store(Request $request)
     {
+        \App\Support\EnsureLiveSchema::run();
         $request->validate([
 
             'name' => 'required',
@@ -124,7 +126,7 @@ class FoodController extends Controller
             (string) $request->location
         );
 
-        $food = Food::create([
+        $food = Food::create(\App\Support\SchemaSafe::only('foods', [
 
             'owner_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
             'status' => $isAdmin ? 'approved' : 'pending',
@@ -135,18 +137,15 @@ class FoodController extends Controller
 
             'description' => $request->description,
 
-            'available_tables' =>
-                $request->available_tables,
+            'available_tables' => $request->available_tables,
 
-            'venue_capacity' =>
-                $request->integer('venue_capacity'),
+            'venue_capacity' => $request->integer('venue_capacity'),
 
             'price_per_guest' => $request->filled('price_per_guest') ? $request->input('price_per_guest') : 0,
 
             'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
 
-            'map_link' =>
-                $request->map_link,
+            'map_link' => $request->map_link,
 
             'latitude' => $coords['latitude'],
             'longitude' => $coords['longitude'],
@@ -154,7 +153,7 @@ class FoodController extends Controller
             'image' => $image,
             'gallery_images' => $gallery,
 
-        ]);
+        ]));
 
         $directory = public_path('uploads/menus');
         if (!is_dir($directory)) {

@@ -23,12 +23,12 @@
 
         <form
             method="POST"
-            action="{{ Auth::user()->role === 'admin' ? '/admin/spots/store' : '/owner/spots/store' }}"
+            action="{{ Auth::user()?->role === 'admin' ? '/admin/spots/store' : '/owner/spots/store' }}"
             enctype="multipart/form-data">
 
             @csrf
 
-            @if(Auth::user()->role === 'admin')
+            @if(Auth::user()?->role === 'admin')
             <div class="form-group">
                 <label>Assign to owner</label>
                 <select name="owner_id" required>

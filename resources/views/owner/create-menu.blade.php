@@ -10,7 +10,7 @@ href="{{ asset('css/style.css') }}">
 </head>
 
 <body class="owner-listing-page">
-@php $workspace = Auth::user()->role === 'admin' ? 'admin' : 'owner'; @endphp
+@php $workspace = Auth::user()?->role === 'admin' ? 'admin' : 'owner'; @endphp
 
 <div class="page-container">
 

@@ -37,7 +37,8 @@ class HotelController extends Controller
 
     public function create()
     {
-        abort_if(request()->is('admin/*') && Auth::user()->role !== 'admin', 403);
+        \App\Support\EnsureLiveSchema::run();
+        abort_if(request()->is('admin/*') && Auth::user()?->role !== 'admin', 403);
         $owners = Auth::user()->role === 'admin'
             ? User::where('role', 'owner')->orderBy('name')->get()
             : collect();
@@ -47,6 +48,7 @@ class HotelController extends Controller
 
     public function store(Request $request)
     {
+        \App\Support\EnsureLiveSchema::run();
         $request->validate([
             'name' => 'required',
             'location' => 'required',
@@ -89,7 +91,7 @@ class HotelController extends Controller
             (string) $request->location
         );
 
-        $hotel = Hotel::create([
+        $hotel = Hotel::create(\App\Support\SchemaSafe::only('hotels', [
 
             'owner_id' => $isAdmin ? $request->integer('owner_id') : Auth::id(),
 
@@ -107,11 +109,9 @@ class HotelController extends Controller
 
             'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
 
-            'amenities' =>
-                $request->amenities,
+            'amenities' => $request->amenities,
 
-            'map_link' =>
-                $request->map_link,
+            'map_link' => $request->map_link,
 
             'latitude' => $coords['latitude'],
 
@@ -119,7 +119,7 @@ class HotelController extends Controller
 
             'image' => $image
 
-        ]);
+        ]));
 
         foreach ($request->input('rooms') as $index => $room) {
             $this->storeRoomType($hotel, $request, (string) $index, $room);

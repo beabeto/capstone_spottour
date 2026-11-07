@@ -14,12 +14,12 @@
 @if($errors->any())
 <div class="form-error-box"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
 @endif
-<form method="POST" action="{{ Auth::user()->role === 'admin' ? '/admin/hotels/store' : '/owner/hotels/store' }}" enctype="multipart/form-data" class="composed-form">
+<form method="POST" action="{{ Auth::user()?->role === 'admin' ? '/admin/hotels/store' : '/owner/hotels/store' }}" enctype="multipart/form-data" class="composed-form">
 @csrf
 <section class="form-block">
 <h2>Hotel details</h2>
 <p>Name, location, and photos for the property.</p>
-@if(Auth::user()->role === 'admin')
+@if(Auth::user()?->role === 'admin')
 <label>Assign to owner
 <select name="owner_id" required>
 @foreach($owners ?? [] as $owner)
