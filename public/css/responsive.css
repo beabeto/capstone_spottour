@@ -579,6 +579,8 @@ html[data-theme="dark"] .admin-accounts-page .accounts-table-card td::before{col
 .workspace-standalone-sidebar.collapsed{width:78px!important}
 .workspace-standalone-sidebar.collapsed+.workspace-standalone-shell .workspace-standalone-main{width:calc(100% - 78px);margin-left:78px}
 .workspace-standalone-sidebar.collapsed+.workspace-standalone-shell .back-btn{left:96px!important}
+body.admin-detail-page .workspace-standalone-main .back-btn{left:282px!important}
+body.admin-detail-page .workspace-standalone-sidebar.collapsed+.workspace-standalone-shell .back-btn{left:96px!important}
 .workspace-standalone-sidebar.collapsed .sidebar-logo h2 span,
 .workspace-standalone-sidebar.collapsed .sidebar-logo h2{display:none!important}
 .workspace-standalone-sidebar.collapsed .workspace-nav{grid-template-columns:1fr!important;justify-items:center;padding:0!important}
@@ -592,6 +594,18 @@ html[data-theme="dark"] .admin-accounts-page .accounts-table-card td::before{col
 @media(max-width:900px){
  .workspace-standalone-main{width:100%;margin-left:0;padding-top:0}
  .workspace-standalone-main .back-btn{left:10px!important}
+ body.admin-detail-page .workspace-standalone-main .back-btn{left:10px!important}
  .workspace-standalone-menu-toggle{display:inline-flex}
 }
 html[data-theme="dark"] .workspace-standalone-menu-toggle{background:#182420;color:#8ee0cf;border-color:#3d6b62}
+
+/* Match listing action button dimensions across admin and owner pages. */
+.owner-listing-page .listing-table-scroll table td:last-child a,
+.owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button,
+.admin-listing-page .listing-actions a{box-sizing:border-box!important;width:84px!important;min-width:84px!important;height:38px!important;min-height:38px!important;flex:0 0 84px!important;padding:0 6px!important;line-height:1!important}
+.owner-listing-page .listing-table-scroll table td:last-child{min-width:276px!important;flex-wrap:nowrap!important;gap:8px!important}
+@media(max-width:640px){
+ .owner-listing-page .listing-table-scroll table td:last-child a,
+ .owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button{height:40px!important;min-height:40px!important}
+ .admin-listing-page .admin-listing-card .listing-action-row a{width:100%!important;min-width:0!important;height:40px!important;min-height:40px!important;flex:1 1 auto!important}
+}
