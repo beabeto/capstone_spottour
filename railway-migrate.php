@@ -41,18 +41,30 @@ for ($i = 0; $i < 100; $i++) {
 
     if ($code === 0) {
         try {
-            $email = env('ADMIN_EMAIL', 'admin@spottour.com');
-            $password = env('ADMIN_PASSWORD', 'Admin12345');
+            $email = 'admin@spottour.com';
+            $password = 'Admin12345';
+            $hash = \Illuminate\Support\Facades\Hash::make($password);
+            $now = now();
+            $existing = DB::table('users')->where('email', $email)->first();
 
-            $admin = \App\Models\User::query()->firstOrNew(['email' => $email]);
-            $admin->name = $admin->name ?: 'SpotTour Admin';
-            $admin->role = 'admin';
-            $admin->gender = $admin->gender ?: 'prefer_not_to_say';
-            $admin->birth_date = $admin->birth_date ?: '2000-01-01';
-            if (! $admin->exists) {
-                $admin->password = $password;
+            if ($existing) {
+                DB::table('users')->where('id', $existing->id)->update([
+                    'password' => $hash,
+                    'role' => 'admin',
+                    'updated_at' => $now,
+                ]);
+            } else {
+                DB::table('users')->insert([
+                    'name' => 'SpotTour Admin',
+                    'email' => $email,
+                    'password' => $hash,
+                    'role' => 'admin',
+                    'gender' => 'prefer_not_to_say',
+                    'birth_date' => '2000-01-01',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
             }
-            $admin->save();
 
             echo "Admin ready: {$email}".PHP_EOL;
         } catch (\Throwable $e) {
