@@ -4948,8 +4948,8 @@ color:#246d9a!important
 .owner-listing-page .listing-table-scroll table td:last-child .deletes-btn,
 .owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button,
 .admin-listing-page .listing-actions .deletes-btn{color:#b42318!important}
-.owner-listing-page .listing-delete-form{display:contents!important}
-.owner-listing-page .listing-delete-form button{appearance:none!important;font-family:inherit!important;color:#b42318!important;cursor:pointer}
+.owner-listing-page .listing-delete-form{display:inline-flex!important;flex:0 0 auto!important;align-items:center;width:auto!important;max-width:max-content!important;margin:0!important;padding:0!important}
+.owner-listing-page .listing-delete-form button{appearance:none!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;font-family:inherit!important;color:#b42318!important;cursor:pointer}
 .admin-listing-page .listing-actions .approve-btn{border-color:#167b69!important;background:transparent!important;color:#167b69!important}
 .admin-listing-page .listing-actions .reject-btn{border-color:#b42318!important;background:transparent!important;color:#b42318!important}
 .owner-listing-page .listing-table-scroll table td:last-child a:hover,
