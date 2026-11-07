@@ -41,7 +41,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
     @if($spot->image)
 
         <img
-        src="{{ asset('uploads/spots/'.$spot->image) }}"
+        src="{{ \App\Support\ListingImage::url($spot->image, 'spots') }}"
         alt="{{ $spot->name }}"
         class="hero-image">
 

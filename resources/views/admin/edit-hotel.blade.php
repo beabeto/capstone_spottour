@@ -119,7 +119,7 @@ value="{{ $hotel->map_link }}">
 <br><br>
 
 <img
-src="{{ asset('uploads/hotels/'.$hotel->image) }}"
+src="{{ \App\Support\ListingImage::url($hotel->image, 'hotels') }}"
 style="
 width:200px;
 border-radius:12px;

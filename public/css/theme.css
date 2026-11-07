@@ -538,3 +538,17 @@ html[data-theme="dark"] .room-page-head p,
 html[data-theme="dark"] .activity-meta small{color:#b7d4cb!important;border-color:#314843!important}
 html[data-theme="dark"] .room-types-grid article{background:#1c2e29!important;color:#e7f3ef!important;border-left-color:#3dbea4!important}
 html[data-theme="dark"] .form-error-box{background:#3a2422!important;color:#ffd4ce!important;border-color:#8f3a34!important}
+
+/* Dark mode contrast for the centered admin/owner notification panel. */
+html[data-theme="dark"] .notification-menu{background:#14221e!important;border-color:#35584f!important;box-shadow:0 24px 70px rgba(0,0,0,.58)!important;color:#e8f4f0!important}
+html[data-theme="dark"] .notification-menu-header{border-bottom-color:#35584f!important}
+html[data-theme="dark"] .notification-menu-header strong{color:#e8f4f0!important}
+html[data-theme="dark"] .notification-menu-header a{color:#77d6c0!important}
+html[data-theme="dark"] .notification-menu-pending{border-bottom-color:#35584f!important}
+html[data-theme="dark"] .notification-menu-pending a{background:#1b302a!important;color:#cce9df!important}
+html[data-theme="dark"] .notification-menu-pending a:hover,html[data-theme="dark"] .notification-menu-item:hover{background:#254139!important}
+html[data-theme="dark"] .notification-menu-item{color:#e2f0eb!important}
+html[data-theme="dark"] .notification-menu-item small,html[data-theme="dark"] .notification-menu-empty{color:#a9c4bb!important}
+html[data-theme="dark"] .notification-menu-dot{background:#48645b!important}
+html[data-theme="dark"] .notification-menu-dot.is-unread{background:#f3bb52!important}
+html[data-theme="dark"] .unread-notification{background:#1b302a!important}

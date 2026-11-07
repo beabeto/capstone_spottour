@@ -154,7 +154,7 @@ value="{{ $spot->cottage_price }}">
 @if($spot->image)
 
 <img
-src="{{ asset('uploads/spots/'.$spot->image) }}"
+src="{{ \App\Support\ListingImage::url($spot->image, 'spots') }}"
 style="
 width:250px;
 margin-bottom:20px;

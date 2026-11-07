@@ -33,7 +33,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
     @if($food->image)
 
     <img
-    src="{{ asset('uploads/foods/'.$food->image) }}"
+    src="{{ \App\Support\ListingImage::url($food->image, 'foods') }}"
     class="hero-image">
 
     @endif

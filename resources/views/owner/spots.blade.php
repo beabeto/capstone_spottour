@@ -63,7 +63,7 @@ class="add-btn">
 @if($spot->image)
 
 <img
-src="{{ asset('uploads/spots/'.$spot->image) }}"
+src="{{ \App\Support\ListingImage::url($spot->image, 'spots') }}"
 class="table-image">
 
 @endif

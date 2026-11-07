@@ -69,7 +69,7 @@ class="add-btn">
 @if($food->image)
 
 <img
-src="{{ asset('uploads/foods/'.$food->image) }}"
+src="{{ \App\Support\ListingImage::url($food->image, 'foods') }}"
 class="table-image">
 
 @else

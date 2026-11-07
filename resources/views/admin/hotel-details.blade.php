@@ -40,7 +40,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
     @if($hotel->image)
 
     <img
-    src="{{ asset('uploads/hotels/'.$hotel->image) }}"
+    src="{{ \App\Support\ListingImage::url($hotel->image, 'hotels') }}"
     class="hero-image">
 
     @endif

@@ -73,13 +73,13 @@ class="add-btn">
 @if($hotel->image)
 
 <img
-src="{{ asset('uploads/hotels/'.$hotel->image) }}"
+src="{{ \App\Support\ListingImage::url($hotel->image, 'hotels') }}"
 class="table-image">
 
 @else
 
 <img
-src="https://via.placeholder.com/100x80"
+src="{{ asset('images/listing-placeholder.svg') }}"
 class="table-image">
 
 @endif

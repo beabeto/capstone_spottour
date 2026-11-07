@@ -40,14 +40,14 @@
 <label>Google Maps link<input type="url" name="map_link" value="{{ old('map_link', $food->map_link) }}" placeholder="https://maps.google.com/..."></label>
 @if($food->image)
 <div class="current-image">
-<img src="{{ asset('uploads/foods/'.$food->image) }}" alt="{{ $food->name }}" style="width:200px;border-radius:12px;">
+<img src="{{ \App\Support\ListingImage::url($food->image, 'foods') }}" alt="{{ $food->name }}" style="width:200px;border-radius:12px;">
 </div>
 @endif
 <label>Replace cover image<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 @if(!empty($food->gallery_images))
 <div class="listing-gallery" style="margin:10px 0;">
 @foreach($food->gallery_images as $image)
-<img src="{{ asset('uploads/foods/'.$image) }}" alt="Gallery photo" style="width:90px;height:70px;object-fit:cover;border-radius:8px;">
+<img src="{{ \App\Support\ListingImage::url($image, 'foods') }}" alt="Gallery photo" style="width:90px;height:70px;object-fit:cover;border-radius:8px;">
 @endforeach
 </div>
 @endif
