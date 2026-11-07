@@ -9,19 +9,39 @@ return new class extends Migration
     public function up(): void
     {
         foreach (['bookings', 'hotel_bookings', 'food_bookings'] as $tableName) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->string('payment_method', 20)->nullable();
-                $table->string('payment_reference', 80)->nullable();
-            });
+            if (! Schema::hasTable($tableName)) {
+                continue;
+            }
+
+            if (! Schema::hasColumn($tableName, 'payment_method')) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->string('payment_method', 20)->nullable();
+                });
+            }
+
+            if (! Schema::hasColumn($tableName, 'payment_reference')) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->string('payment_reference', 80)->nullable();
+                });
+            }
         }
     }
 
     public function down(): void
     {
         foreach (['bookings', 'hotel_bookings', 'food_bookings'] as $tableName) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->dropColumn(['payment_method', 'payment_reference']);
-            });
+            $drops = [];
+            if (Schema::hasColumn($tableName, 'payment_method')) {
+                $drops[] = 'payment_method';
+            }
+            if (Schema::hasColumn($tableName, 'payment_reference')) {
+                $drops[] = 'payment_reference';
+            }
+            if ($drops !== []) {
+                Schema::table($tableName, function (Blueprint $table) use ($drops) {
+                    $table->dropColumn($drops);
+                });
+            }
         }
     }
 };

@@ -3,7 +3,8 @@ set -e
 
 mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache public/uploads
 
-php railway-migrate.php
+php railway-migrate.php || true
+php railway-seed-admin.php || true
 
 export PHP_CLI_SERVER_WORKERS="${PHP_CLI_SERVER_WORKERS:-4}"
 

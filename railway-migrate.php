@@ -73,7 +73,9 @@ for ($i = 0; $i < 100; $i++) {
         exit(0);
     }
 
-    $skip = str_contains($output, 'already exists') || str_contains($output, 'Duplicate column');
+    $skip = str_contains($output, 'already exists')
+        || str_contains($output, 'Duplicate column')
+        || str_contains($output, 'Unknown column');
 
     if ($skip && markMigrationRan($output)) {
         continue;
