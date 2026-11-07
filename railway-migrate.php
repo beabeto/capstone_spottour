@@ -40,6 +40,24 @@ for ($i = 0; $i < 100; $i++) {
     echo $output;
 
     if ($code === 0) {
+        try {
+            $email = env('ADMIN_EMAIL', 'admin@spottour.com');
+            $password = env('ADMIN_PASSWORD', 'Admin12345');
+
+            $admin = \App\Models\User::query()->firstOrNew(['email' => $email]);
+            $admin->name = $admin->name ?: 'SpotTour Admin';
+            $admin->role = 'admin';
+            $admin->gender = $admin->gender ?: 'prefer_not_to_say';
+            $admin->birth_date = $admin->birth_date ?: '2000-01-01';
+            if (! $admin->exists) {
+                $admin->password = $password;
+            }
+            $admin->save();
+
+            echo "Admin ready: {$email}".PHP_EOL;
+        } catch (\Throwable $e) {
+            echo 'Admin seed skipped: '.$e->getMessage().PHP_EOL;
+        }
         exit(0);
     }
 
