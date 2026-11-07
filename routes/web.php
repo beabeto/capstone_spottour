@@ -66,12 +66,12 @@ Route::get(
 Route::get(
     '/user/profile',
     [AuthController::class,'profile']
-);
+)->middleware('auth');
 
 Route::post(
     '/profile/update',
     [AuthController::class,'updateProfile']
-);
+)->middleware('auth');
 
 Route::get('/owner/profile', function () {
     return Auth::check() && Auth::user()->role === 'owner'
@@ -357,6 +357,8 @@ Route::get(
 
 Route::get('/admin/spots/create', [SpotController::class, 'create']);
 Route::post('/admin/spots/store', [SpotController::class, 'store']);
+Route::get('/admin/spots/edit/{id}', [SpotController::class, 'edit']);
+Route::post('/admin/spots/update/{id}', [SpotController::class, 'update']);
 
 Route::get(
     '/admin/spots/approve/{id}',
@@ -521,6 +523,8 @@ Route::post(
 
 Route::get('/owner/hotels/{id}/rooms', [HotelController::class, 'rooms']);
 Route::post('/owner/hotels/{id}/rooms', [HotelController::class, 'storeRoom']);
+Route::post('/owner/rooms/update/{id}', [HotelController::class, 'updateRoom']);
+Route::get('/owner/rooms/delete/{id}', [HotelController::class, 'deleteRoom']);
 
 Route::get(
     '/owner/hotels/{id}',
@@ -553,8 +557,12 @@ Route::get(
 
 Route::get('/admin/hotels/create', [HotelController::class, 'create']);
 Route::post('/admin/hotels/store', [HotelController::class, 'store']);
+Route::get('/admin/hotels/edit/{id}', [HotelController::class, 'edit']);
+Route::post('/admin/hotels/update/{id}', [HotelController::class, 'update']);
 Route::get('/admin/hotels/{id}/rooms', [HotelController::class, 'rooms'])->whereNumber('id');
 Route::post('/admin/hotels/{id}/rooms', [HotelController::class, 'storeRoom'])->whereNumber('id');
+Route::post('/admin/rooms/update/{id}', [HotelController::class, 'updateRoom']);
+Route::get('/admin/rooms/delete/{id}', [HotelController::class, 'deleteRoom']);
 
 Route::get(
     '/admin/hotels/approve/{id}',
@@ -777,6 +785,8 @@ Route::get(
 
 Route::get('/admin/foods/create', [FoodController::class, 'create']);
 Route::post('/admin/foods/store', [FoodController::class, 'store']);
+Route::get('/admin/foods/edit/{id}', [FoodController::class, 'edit']);
+Route::post('/admin/foods/update/{id}', [FoodController::class, 'update']);
 Route::get('/admin/foods/{id}/menus', [FoodController::class, 'menus'])->whereNumber('id');
 Route::get('/admin/foods/{id}/menus/create', [FoodController::class, 'createMenu'])->whereNumber('id');
 Route::post('/admin/foods/{id}/menus/store', [FoodController::class, 'storeMenu'])->whereNumber('id');

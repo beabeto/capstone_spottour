@@ -16,7 +16,7 @@
 @if(session('success'))
 <div class="toast-success">{{ session('success') }}</div>
 @endif
-<form action="/owner/foods/update/{{ $food->id }}" method="POST" enctype="multipart/form-data" class="composed-form">
+<form action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/foods/update/{{ $food->id }}" method="POST" enctype="multipart/form-data" class="composed-form">
 @csrf
 <section class="form-block">
 <h2>Restaurant details</h2>

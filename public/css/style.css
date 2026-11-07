@@ -4863,3 +4863,74 @@ white-space:nowrap!important
 background:#e8f4ff!important;
 color:#246d9a!important
 }
+
+/* Responsive business listing tables and notification cards. */
+.listing-table-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;border-radius:14px}
+.owner-listing-page .listing-table-scroll table{min-width:760px}
+.owner-listing-page .listing-table-scroll td:last-child{min-width:220px}
+.notification-page{width:min(920px,calc(100% - 36px));margin:0 auto;padding-bottom:40px}
+.notification-page .notification-card{min-width:0}
+.notification-page .notification-link{min-width:0}
+.notification-page .notification-content{min-width:0;overflow-wrap:anywhere}
+.room-types-grid article>.deletes-btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;margin-top:12px;padding:0 12px;border-radius:8px;background:#fff0ee;color:#b93830;font-size:13px;font-weight:800;text-decoration:none}
+@media(max-width:650px){
+ .owner-listing-page .page-container{width:calc(100% - 24px)}
+ .owner-listing-page .header-row{gap:10px;padding:16px}
+ .owner-listing-page .header-row h1{font-size:23px}
+ .listing-table-scroll{margin-right:-1px}
+ .notification-page{width:calc(100% - 24px)}
+ .notification-page .notification-card{border-radius:10px!important}
+ .notification-page .notification-link{padding:15px 52px 15px 13px!important}
+ .notification-page .delete-btn{right:9px!important;width:32px!important;height:32px!important}
+ .room-page-head{align-items:flex-start;flex-direction:column}
+ .room-page-head .view-btn{width:100%;text-align:center}
+}
+.room-types-grid article>.room-card-actions{display:flex!important;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,205,190,.18)}
+.room-types-grid article>.room-card-actions>a{display:inline-flex!important;align-items:center;justify-content:center;position:relative;z-index:1;min-height:34px;padding:0 12px;border:1px solid #f2aaa2;border-radius:8px;background:#fff0ee!important;color:#b42318!important;font-size:13px;font-weight:800;text-decoration:none!important;visibility:visible!important;opacity:1!important}
+.room-types-grid article>.room-card-actions>a:hover{background:#ffe4e0!important}
+.room-types-grid article>.room-card-actions{grid-column:1/-1;display:flex!important;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(160,205,190,.28)}
+.room-types-grid article>.room-card-actions>a,.room-types-grid article>.room-card-actions>.room-edit-details>summary{display:inline-flex!important;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid #f2aaa2;border-radius:8px;background:#fff0ee!important;color:#b42318!important;font-size:13px;font-weight:800;text-decoration:none!important;cursor:pointer;list-style:none}
+.room-types-grid article>.room-card-actions>.room-edit-details>summary{border-color:#b7ddd2;background:#e7f5f0!important;color:#167b69!important}
+.room-types-grid article>.room-card-actions>.room-edit-details>summary::-webkit-details-marker{display:none}
+.room-types-grid article>.room-card-actions>.room-edit-details[open]{flex:1 0 100%}
+.room-types-grid article>.room-card-actions>.room-edit-details form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;width:100%;margin-top:10px;padding:12px;border:1px solid rgba(160,205,190,.28);border-radius:9px;background:rgba(7,20,17,.22)}
+.room-types-grid article>.room-card-actions>.room-edit-details form label{display:grid;gap:5px;color:inherit;font-size:12px;font-weight:700}
+.room-types-grid article>.room-card-actions>.room-edit-details form input,.room-types-grid article>.room-card-actions>.room-edit-details form select{box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #b7cfc7;border-radius:6px;background:#fff;color:#203531;font:inherit}
+.room-types-grid article>.room-card-actions>.room-edit-details form button{justify-self:start;min-height:34px;padding:0 12px;border:0;border-radius:7px;background:#167b69;color:#fff;font-weight:800;cursor:pointer}
+.admin-listing-page .page-container{box-sizing:border-box;max-width:100%;min-width:0}
+.admin-listing-page .admin-listing-card,.admin-listing-page .admin-listing-card>*{min-width:0}
+.admin-listing-page .admin-listing-card h2,.admin-listing-page .admin-listing-card p,.admin-listing-page .admin-listing-card .listing-owner span{overflow-wrap:anywhere;word-break:break-word}
+.admin-listing-page .listing-actions{min-width:0;max-width:100%}
+@media(max-width:640px){.admin-listing-page .page-container{width:calc(100% - 24px)!important;padding-top:72px!important}.admin-listing-page .management-heading{padding:17px!important}.admin-listing-page .management-heading h1{font-size:24px}.admin-listing-page .admin-listing-card{box-sizing:border-box;width:100%;grid-template-columns:72px minmax(0,1fr);gap:10px;padding:13px}.admin-listing-page .admin-listing-card.is-organized{grid-template-columns:minmax(0,1fr)!important}.admin-listing-page .admin-listing-card>img{width:72px;height:64px}.admin-listing-page .listing-actions{grid-column:1/-1;justify-content:flex-start}.admin-listing-page .listing-actions a{min-height:36px!important}.admin-listing-page .listing-facts{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))!important;gap:10px}}
+.admin-body .notification-page{width:min(920px,calc(100% - 36px))!important;margin-left:auto!important;margin-right:auto!important}
+.admin-body .notification-page .notification-page-header{align-items:center;text-align:center}
+.admin-body .notification-page .notification-page-header>div{margin:0 auto}
+.admin-listing-page .listing-actions{display:flex!important;flex-direction:column;align-items:flex-start;justify-content:flex-start!important;gap:7px;width:100%}
+.admin-listing-page .listing-actions .listing-action-row{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:7px;width:100%;margin:0}
+.admin-listing-page .listing-actions .listing-action-row a{white-space:nowrap}
+@media(max-width:640px){.admin-body .notification-page{width:calc(100% - 24px)!important}.admin-body .notification-page .notification-page-header{align-items:center;text-align:center}.admin-listing-page .listing-actions{grid-column:1/-1}}
+/* Phone layout for admin notifications and listing actions. */
+@media(max-width:640px){
+ .admin-body .notification-page{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:560px;margin:0 auto!important;padding:64px 0 28px!important}
+ .admin-body .notification-page .notification-page-header{display:flex;align-items:center!important;flex-direction:column;gap:14px;margin:0 0 16px;padding:17px 14px;text-align:center!important}
+ .admin-body .notification-page .notification-page-header>div{width:100%;margin:0 auto}
+ .admin-body .notification-page .notification-page-header h1{font-size:25px;line-height:1.2}
+ .admin-body .notification-page .notification-page-header p{max-width:34ch;margin:0 auto;font-size:13px;line-height:1.45}
+ .admin-body .notification-page .notification-dashboard-btn{width:100%;box-sizing:border-box;text-align:center}
+ .admin-body .notification-page .notification-card{box-sizing:border-box;width:100%;margin-top:10px}
+ .admin-body .notification-page .notification-link{box-sizing:border-box;width:100%;padding:14px 52px 14px 13px!important}
+ .admin-listing-page .admin-listing-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px}
+ .admin-listing-page .admin-listing-card{grid-template-columns:64px minmax(0,1fr)!important;align-items:start;gap:10px;padding:12px!important}
+ .admin-listing-page .admin-listing-card.is-organized{grid-template-columns:minmax(0,1fr)!important}
+ .admin-listing-page .admin-listing-card>img{width:64px!important;height:58px!important}
+ .admin-listing-page .admin-listing-card .listing-primary{min-width:0}
+ .admin-listing-page .admin-listing-card .listing-owner,.admin-listing-page .admin-listing-card .listing-metric,.admin-listing-page .admin-listing-card .listing-status,.admin-listing-page .admin-listing-card .listing-facts,.admin-listing-page .admin-listing-card .listing-actions{grid-column:1/-1!important}
+ .admin-listing-page .admin-listing-card .listing-facts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .admin-listing-page .admin-listing-card .listing-actions{width:100%;gap:8px}
+ .admin-listing-page .admin-listing-card .listing-action-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+ .admin-listing-page .admin-listing-card .listing-action-row a{box-sizing:border-box;width:100%;min-height:40px!important;padding:0 7px!important;white-space:normal;text-align:center}
+}
+@media(max-width:380px){
+ .admin-listing-page .admin-listing-card .listing-action-row{grid-template-columns:minmax(0,1fr)}
+ .admin-body .notification-page .notification-link{padding-right:48px!important}
+}

@@ -52,7 +52,7 @@ class InjectTheme
             $html = str_replace('</body>', $widget.'</body>', $html);
         }
 
-        if (Auth::user()?->role === 'admin' && ! str_contains($html, 'notification-icon')) {
+        if (Auth::user()?->role === 'admin' && ! $isAuthSurface && ! str_contains($html, 'notification-icon')) {
             try {
                 $bell = view('partials.notification-menu', [
                     'notifications' => Notification::where('user_id', Auth::id())->latest()->take(6)->get(),

@@ -253,6 +253,7 @@ public function ownerShow($id)
 public function edit($id)
 {
     $spot = Spot::findOrFail($id);
+    abort_unless((int) $spot->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
 
     return view(
         'owner.edit-spot',
@@ -266,6 +267,7 @@ public function update(
 )
 {
     $spot = Spot::findOrFail($id);
+    abort_unless((int) $spot->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
 
     $imageName = $spot->image;
 
@@ -319,7 +321,7 @@ public function update(
 
     ]);
 
-    return redirect('/owner/spots')
+    return redirect(Auth::user()?->role === 'admin' ? '/admin/spots' : '/owner/spots')
         ->with(
             'success',
             'Spot updated successfully!'
@@ -332,7 +334,7 @@ public function delete($id)
 
     $spot->delete();
 
-    return redirect('/owner/spots')
+    return redirect(Auth::user()?->role === 'admin' ? '/admin/spots' : '/owner/spots')
         ->with(
             'success',
             'Spot deleted successfully!'

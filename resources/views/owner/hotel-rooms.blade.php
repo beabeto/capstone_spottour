@@ -51,6 +51,27 @@
             @if($room->gallery_images)
                 <div class="room-gallery">@foreach($room->gallery_images as $image)<img src="{{ asset('uploads/hotel-rooms/'.$image) }}" alt="{{ $room->name }} photo">@endforeach</div>
             @endif
+            <div class="room-card-actions">
+                <details class="room-edit-details">
+                    <summary>Edit</summary>
+                    <form method="POST" action="/{{ $workspace }}/rooms/update/{{ $room->id }}" enctype="multipart/form-data">
+                        @csrf
+                        <label>Room type
+                            <select name="name" required>
+                                @foreach(\App\Models\HotelRoom::types() as $label => $pax)
+                                    <option value="{{ $label }}" @selected($room->name === $label)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label>Price per night<input type="number" step="0.01" min="0" name="price_per_night" value="{{ $room->price_per_night }}" required></label>
+                        <label>Available rooms<input type="number" min="1" name="available_rooms" value="{{ $room->available_rooms }}" required></label>
+                        <label>Replace cover photo<input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp"></label>
+                        <label>Add gallery photos<input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple></label>
+                        <button type="submit">Save changes</button>
+                    </form>
+                </details>
+                <a href="/{{ $workspace }}/rooms/delete/{{ $room->id }}" onclick="return confirm('Delete this room type?')">Delete</a>
+            </div>
         </article>
     @empty
         <p class="empty-room-note">No room types added yet.</p>

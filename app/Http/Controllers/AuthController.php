@@ -22,6 +22,7 @@ use App\Models\FoodChecklist;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -166,46 +167,37 @@ class AuthController extends Controller
 }   
 
     public function profile()
-{
-    $userId = Auth::id();
+    {
+        $userId = (int) Auth::id();
 
-    $bookings =
-        Booking::where('user_id', $userId)->count() +
-        HotelBooking::where('user_id', $userId)->count() +
-        FoodBooking::where('user_id', $userId)->count();
+        $bookings = $this->profileRecordCount(Booking::class, $userId)
+            + $this->profileRecordCount(HotelBooking::class, $userId)
+            + $this->profileRecordCount(FoodBooking::class, $userId);
+        $favorites = $this->profileRecordCount(Favorite::class, $userId)
+            + $this->profileRecordCount(HotelFavorite::class, $userId)
+            + $this->profileRecordCount(FoodFavorite::class, $userId);
+        $bookmarks = $this->profileRecordCount(Bookmark::class, $userId)
+            + $this->profileRecordCount(HotelBookmark::class, $userId)
+            + $this->profileRecordCount(FoodBookmark::class, $userId);
+        $checklists = $this->profileRecordCount(Checklist::class, $userId)
+            + $this->profileRecordCount(HotelChecklist::class, $userId)
+            + $this->profileRecordCount(FoodChecklist::class, $userId);
+        $reviews = $this->profileRecordCount(SpotComment::class, $userId)
+            + $this->profileRecordCount(HotelComment::class, $userId)
+            + $this->profileRecordCount(FoodComment::class, $userId);
 
-    $favorites =
-        Favorite::where('user_id', $userId)->count() +
-        HotelFavorite::where('user_id', $userId)->count() +
-        FoodFavorite::where('user_id', $userId)->count();
+        return view('user.profile', compact('bookings', 'favorites', 'bookmarks', 'checklists', 'reviews'));
+    }
 
-    $bookmarks =
-        Bookmark::where('user_id', $userId)->count() +
-        HotelBookmark::where('user_id', $userId)->count() +
-        FoodBookmark::where('user_id', $userId)->count();
+    private function profileRecordCount(string $modelClass, int $userId): int
+    {
+        $table = (new $modelClass())->getTable();
+        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'user_id')) {
+            return 0;
+        }
 
-    $checklists =
-        Checklist::where('user_id', $userId)->count() +
-        HotelChecklist::where('user_id', $userId)->count() +
-        FoodChecklist::where('user_id', $userId)->count();
-
-    $reviews =
-        SpotComment::where('user_id', $userId)->count() +
-        HotelComment::where('user_id', $userId)->count() +
-        FoodComment::where('user_id', $userId)->count();
-
-    return view(
-        'user.profile',
-        compact(
-            'bookings',
-            'favorites',
-            'bookmarks',
-            'checklists',
-            'reviews'
-        )
-    );
-}
-
+        return DB::table($table)->where('user_id', $userId)->count();
+    }
 public function updateProfile(Request $request)
 {
     $user = Auth::user();

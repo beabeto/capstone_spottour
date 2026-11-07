@@ -38,7 +38,7 @@ class="add-btn">
 
 </div>
 
-<table>
+<div class="listing-table-scroll"><table>
 
 <thead>
 
@@ -171,7 +171,7 @@ Delete
 
 </tbody>
 
-</table>
+</table></div></div>
 
 </div>
 

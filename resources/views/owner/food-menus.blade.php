@@ -46,7 +46,7 @@ class="add-btn">
 
 @endif
 
-<table>
+<div class="listing-table-scroll"><table>
 
 <thead>
 
@@ -116,12 +116,12 @@ PHP {{ number_format($menu->price,2) }}
 
 <td>
 
-<a href="/owner/menus/edit/{{ $menu->id }}" class="edit-btn">
+<a href="/{{ $workspace }}/menus/edit/{{ $menu->id }}" class="edit-btn">
     Edit
 </a>
 
 <a
-href="/owner/menus/delete/{{ $menu->id }}"
+href="/{{ $workspace }}/menus/delete/{{ $menu->id }}"
 class="deletes-btn"
 onclick="return confirm('Delete this menu item?')">
 
@@ -149,7 +149,7 @@ No Menu Items Found
 
 </tbody>
 
-</table>
+</table></div></div>
 
 </div>
 

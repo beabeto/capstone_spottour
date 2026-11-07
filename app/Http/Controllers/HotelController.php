@@ -216,7 +216,7 @@ public function rooms($id)
 public function storeRoom(Request $request, $id)
 {
     $hotel = Hotel::findOrFail($id);
-    abort_unless($hotel->owner_id === Auth::id() || Auth::user()->role === 'admin', 403);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
     $request->validate([
         'name' => ['required', Rule::in(array_keys(HotelRoom::types()))],
         'price_per_night' => 'required|numeric|min:0',
@@ -240,6 +240,48 @@ public function storeRoom(Request $request, $id)
     return back()->with('success', 'Room type added.');
 }
 
+public function deleteRoom($id)
+{
+    $room = HotelRoom::findOrFail($id);
+    $hotel = Hotel::findOrFail($room->hotel_id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    $room->delete();
+    $this->refreshHotelRooms($hotel);
+    $workspace = Auth::user()?->role === 'admin' ? 'admin' : 'owner';
+    return redirect('/'.$workspace.'/hotels/'.$hotel->id.'/rooms')->with('success', 'Room type deleted.');
+}
+
+public function updateRoom(Request $request, $id)
+{
+    $room = HotelRoom::findOrFail($id);
+    $hotel = Hotel::findOrFail($room->hotel_id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    $data = $request->validate([
+        'name' => ['required', Rule::in(array_keys(HotelRoom::types()))],
+        'price_per_night' => 'required|numeric|min:0',
+        'available_rooms' => 'required|integer|min:1',
+        'cover_image' => 'nullable|image|max:5120',
+        'gallery_images.*' => 'nullable|image|max:5120',
+    ]);
+    if ($request->hasFile('cover_image')) {
+        $cover = time().'_'.uniqid().'_'.$request->file('cover_image')->getClientOriginalName();
+        $request->file('cover_image')->move(public_path('uploads/hotel-rooms'), $cover);
+        $data['cover_image'] = $cover;
+    }
+    if ($request->hasFile('gallery_images')) {
+        $gallery = $room->gallery_images ?? [];
+        foreach ($request->file('gallery_images', []) as $file) {
+            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/hotel-rooms'), $name);
+            $gallery[] = $name;
+        }
+        $data['gallery_images'] = $gallery;
+    }
+    $room->update($data);
+    $this->refreshHotelRooms($hotel);
+    $workspace = Auth::user()?->role === 'admin' ? 'admin' : 'owner';
+    return redirect('/'.$workspace.'/hotels/'.$hotel->id.'/rooms')->with('success', 'Room type updated.');
+}
 private function storeRoomType(Hotel $hotel, Request $request, string $index, array $room): void
 {
     $cover = null;
@@ -281,6 +323,7 @@ private function refreshHotelRooms(Hotel $hotel): void
     public function edit($id)
 {
     $hotel = Hotel::findOrFail($id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
 
     return view(
         'owner.edit-hotel',
@@ -294,6 +337,7 @@ public function update(
 )
 {
     $hotel = Hotel::findOrFail($id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
 
     $image = $hotel->image;
 
@@ -357,9 +401,7 @@ public function update(
 
     ]);
 
-    return redirect(
-        '/owner/hotels'
-    )->with(
+    return redirect(Auth::user()?->role === 'admin' ? '/admin/hotels' : '/owner/hotels')->with(
         'success',
         'Hotel updated successfully.'
     );
@@ -378,9 +420,7 @@ public function delete($id)
 
     $hotel->delete();
 
-    return redirect(
-        '/owner/hotels'
-    )->with(
+    return redirect(Auth::user()?->role === 'admin' ? '/admin/hotels' : '/owner/hotels')->with(
         'success',
         'Hotel deleted successfully.'
     );

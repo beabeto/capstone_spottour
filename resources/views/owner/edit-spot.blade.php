@@ -24,7 +24,7 @@ href="{{ asset('css/style.css') }}">
 
 <form
 method="POST"
-action="/owner/spots/update/{{ $spot->id }}"
+action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/spots/update/{{ $spot->id }}"
 enctype="multipart/form-data">
 
 @csrf

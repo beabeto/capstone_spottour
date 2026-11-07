@@ -34,7 +34,7 @@ class="add-btn">
 
 </div>
 
-<table>
+<div class="listing-table-scroll"><table>
 
 <thead>
 
@@ -172,7 +172,7 @@ onclick="return confirm('Delete this food establishment?')">
 
 </tbody>
 
-</table>
+</table></div></div>
 
 </div>
 
