@@ -577,3 +577,5 @@ html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-d
 html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form input,
 html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form select{background:#101816!important;color:#e7f3ef!important;border-color:#3d5c54!important;color-scheme:dark}
 html[data-theme="dark"] .room-types-grid article>.room-card-actions>.room-edit-details form button:hover{background:#20a68c!important}
+html[data-theme="dark"] body.owner-listing-page .listing-delete-form button{color:#ffaaa0!important;border-color:#ffaaa0!important}
+html[data-theme="dark"] body.owner-listing-page .listing-delete-form button:hover{background:rgba(255,106,93,.12)!important;color:#ffd4ce!important;border-color:#ffd4ce!important}

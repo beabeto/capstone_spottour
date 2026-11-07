@@ -4945,17 +4945,21 @@ color:#246d9a!important
 .owner-listing-page .listing-table-scroll table td:last-child .listing-menu-btn,
 .admin-listing-page .listing-actions .listing-menu-btn{color:#246d9a!important}
 .owner-listing-page .listing-table-scroll table td:last-child .deletes-btn,
+.owner-listing-page .listing-table-scroll table td:last-child .listing-delete-form button,
 .admin-listing-page .listing-actions .deletes-btn{color:#b42318!important}
+.owner-listing-page .listing-delete-form{display:inline;margin:0}
+.owner-listing-page .listing-delete-form button{box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;min-height:36px!important;margin:0!important;padding:0 12px!important;border:1px solid currentColor!important;border-radius:8px!important;background:transparent!important;color:#b42318!important;font:inherit!important;font-size:12px!important;font-weight:800!important;line-height:1.2;white-space:nowrap;cursor:pointer}
 .admin-listing-page .listing-actions .approve-btn{border-color:#167b69!important;background:transparent!important;color:#167b69!important}
 .admin-listing-page .listing-actions .reject-btn{border-color:#b42318!important;background:transparent!important;color:#b42318!important}
 .owner-listing-page .listing-table-scroll table td:last-child a:hover,
+.owner-listing-page .listing-delete-form button:hover,
 .admin-listing-page .listing-actions a:hover{background:transparent!important;filter:brightness(.82);transform:translateY(-1px)}
 .owner-listing-page .listing-table-scroll table td:last-child{min-width:245px!important;gap:8px!important;justify-content:flex-start!important;align-items:center!important}
 .owner-listing-page .listing-action-row{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:8px!important;width:100%}
 .admin-listing-page .listing-actions{align-items:flex-start!important;gap:8px!important;width:100%}
 .admin-listing-page .listing-actions .listing-action-row{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:8px!important;width:100%}
 @media(max-width:640px){
- .owner-listing-page .listing-table-scroll table td:last-child a,.admin-listing-page .listing-actions a{min-height:40px!important;padding:0 10px!important}
+ .owner-listing-page .listing-table-scroll table td:last-child a,.owner-listing-page .listing-delete-form button,.admin-listing-page .listing-actions a{min-height:40px!important;padding:0 10px!important}
  .admin-listing-page .listing-actions .listing-action-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
  .admin-listing-page .listing-actions .listing-action-row a{width:100%;white-space:normal}
  .owner-listing-page .listing-table-scroll table td:last-child{min-width:245px!important}

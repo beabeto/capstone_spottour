@@ -215,12 +215,15 @@ public function updateProfile(Request $request)
 
     if($request->hasFile('profile_image'))
     {
-        $image =
-            time().'.'.
-            $request->profile_image->extension();
+        $uploadDirectory = public_path('uploads/profile');
+        if (! is_dir($uploadDirectory)) {
+            mkdir($uploadDirectory, 0755, true);
+        }
+
+        $image = (string) Str::uuid().'.'.$request->profile_image->extension();
 
         $request->profile_image->move(
-            public_path('uploads/profile'),
+            $uploadDirectory,
             $image
         );
 

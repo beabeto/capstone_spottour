@@ -341,10 +341,10 @@ Route::post(
     [SpotController::class,'update']
 );
 
-Route::get(
+Route::post(
     '/owner/spots/delete/{id}',
     [SpotController::class,'delete']
-);
+)->middleware('auth');
 
 ///////////////////////////////////////////////////////////////
 // ADMIN SPOTS

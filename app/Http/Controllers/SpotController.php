@@ -32,7 +32,7 @@ class SpotController extends Controller
 
     public function ownerIndex()
     {
-        $spots = Spot::withoutGlobalScopes()->where(
+        $spots = Spot::where(
             'user_id',
             Auth::id()
         )->get();
@@ -341,6 +341,13 @@ public function update(
 public function delete($id)
 {
     $spot = Spot::findOrFail($id);
+
+    abort_unless(
+        Auth::user()?->role === 'admin'
+            || (int) $spot->user_id === (int) Auth::id()
+            || (int) $spot->owner_id === (int) Auth::id(),
+        403
+    );
 
     $spot->delete();
 

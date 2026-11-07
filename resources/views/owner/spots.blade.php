@@ -104,13 +104,10 @@ Edit
 
 </a>
 
-<a
-href="/owner/spots/delete/{{ $spot->id }}"
-class="deletes-btn">
-
-Delete
-
-</a>
+<form method="POST" action="/owner/spots/delete/{{ $spot->id }}" class="listing-delete-form" onsubmit="return confirm('Delete this spot?')">
+    @csrf
+    <button type="submit" class="deletes-btn">Delete</button>
+</form>
 
 </td>
 
