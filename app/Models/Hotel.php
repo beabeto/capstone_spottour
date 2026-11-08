@@ -12,7 +12,7 @@ class Hotel extends Model
 
     public static function bootSoftDeletes(): void
     {
-        if (! Schema::hasTable('hotels') || ! Schema::hasColumn('hotels', 'deleted_at')) {
+        if (! Schema::hasTable('hotels') || ! in_array('deleted_at', Schema::getColumnListing('hotels'), true)) {
             return;
         }
 

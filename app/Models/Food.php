@@ -12,7 +12,7 @@ class Food extends Model
 
     public static function bootSoftDeletes(): void
     {
-        if (! Schema::hasTable('foods') || ! Schema::hasColumn('foods', 'deleted_at')) {
+        if (! Schema::hasTable('foods') || ! in_array('deleted_at', Schema::getColumnListing('foods'), true)) {
             return;
         }
 

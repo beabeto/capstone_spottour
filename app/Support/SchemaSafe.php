@@ -12,10 +12,11 @@ class SchemaSafe
             return [];
         }
 
+        $columns = Schema::getColumnListing($table);
         $filtered = [];
 
         foreach ($data as $key => $value) {
-            if (! Schema::hasColumn($table, $key)) {
+            if (! in_array($key, $columns, true)) {
                 continue;
             }
 

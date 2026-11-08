@@ -192,7 +192,7 @@ class AuthController extends Controller
     private function profileRecordCount(string $modelClass, int $userId): int
     {
         $table = (new $modelClass())->getTable();
-        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'user_id')) {
+        if (! Schema::hasTable($table) || ! in_array('user_id', Schema::getColumnListing($table), true)) {
             return 0;
         }
 

@@ -266,7 +266,7 @@ class FoodController extends Controller
             (string) $request->location
         );
 
-        $food->update([
+        $food->update(\App\Support\SchemaSafe::only('foods', [
             'owner_id' => $isAdmin ? $request->integer('owner_id') : $food->owner_id,
             'name' => $request->name,
             'location' => $request->location,
@@ -281,7 +281,7 @@ class FoodController extends Controller
             'image' => $image,
             'gallery_images' => $gallery,
             'status' => $isAdmin ? $food->status : 'pending',
-        ]);
+        ]));
 
         if (! $isAdmin) {
             BookingNotice::admins(

@@ -12,7 +12,7 @@ class Spot extends Model
 
     public static function bootSoftDeletes(): void
     {
-        if (! Schema::hasTable('spots') || ! Schema::hasColumn('spots', 'deleted_at')) {
+        if (! Schema::hasTable('spots') || ! in_array('deleted_at', Schema::getColumnListing('spots'), true)) {
             return;
         }
 
