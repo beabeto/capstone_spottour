@@ -244,56 +244,78 @@ class FoodController extends Controller
             'owner_id' => $isAdmin ? 'required|exists:users,id,role,owner' : 'nullable',
         ]);
 
-        $image = $food->image;
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $image = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/foods'), $image);
-        }
+        try {
+            $uploadDir = public_path('uploads/foods');
+            if (! is_dir($uploadDir) && ! mkdir($uploadDir, 0775, true) && ! is_dir($uploadDir)) {
+                throw new \RuntimeException('The restaurant image folder could not be created.');
+            }
 
-        $gallery = $food->gallery_images ?? [];
-        foreach ($request->file('gallery_images', []) ?: [] as $file) {
-            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/foods'), $name);
-            $gallery[] = $name;
-        }
+            $image = $food->image;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $image = uniqid('food_', true).'.'.$file->getClientOriginalExtension();
+                $file->move($uploadDir, $image);
+            }
 
-        $coords = \App\Support\PlaceMap::locate(
-            $food->latitude,
-            $food->longitude,
-            $request->map_link,
-            (string) $request->name,
-            (string) $request->location
-        );
+            $gallery = $food->gallery_images;
+            if (is_string($gallery)) {
+                $gallery = json_decode($gallery, true);
+            }
+            $gallery = is_array($gallery) ? array_values($gallery) : [];
 
-        $food->update(\App\Support\SchemaSafe::only('foods', [
-            'owner_id' => $isAdmin ? $request->integer('owner_id') : $food->owner_id,
-            'name' => $request->name,
-            'location' => $request->location,
-            'description' => $request->description,
-            'available_tables' => $request->integer('available_tables'),
-            'venue_capacity' => $request->integer('venue_capacity'),
-            'price_per_guest' => $request->filled('price_per_guest') ? $request->input('price_per_guest') : ($food->price_per_guest ?? 0),
-            'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
-            'map_link' => $request->map_link,
-            'latitude' => $coords['latitude'] ?? $food->latitude,
-            'longitude' => $coords['longitude'] ?? $food->longitude,
-            'image' => $image,
-            'gallery_images' => $gallery,
-            'status' => $isAdmin ? $food->status : 'pending',
-        ]));
+            foreach (array_filter((array) $request->file('gallery_images', [])) as $file) {
+                $name = uniqid('food_gallery_', true).'.'.$file->getClientOriginalExtension();
+                $file->move($uploadDir, $name);
+                $gallery[] = $name;
+            }
 
-        if (! $isAdmin) {
-            BookingNotice::admins(
-                Auth::user()->name.' updated the restaurant "'.$food->name.'" and it needs review.',
-                ['food_id' => $food->id],
-                [],
-                'listing'
+            $coords = \App\Support\PlaceMap::locate(
+                $food->latitude,
+                $food->longitude,
+                $request->map_link,
+                (string) $request->name,
+                (string) $request->location
             );
-        }
 
-        return redirect($isAdmin ? '/admin/foods/'.$food->id : '/owner/foods/'.$food->id)
-            ->with('success', 'Restaurant updated successfully.');
+            $changes = \App\Support\SchemaSafe::only('foods', [
+                'owner_id' => $isAdmin ? $request->integer('owner_id') : $food->owner_id,
+                'name' => $request->name,
+                'location' => $request->location,
+                'description' => $request->description,
+                'available_tables' => $request->integer('available_tables'),
+                'venue_capacity' => $request->integer('venue_capacity'),
+                'price_per_guest' => $request->filled('price_per_guest') ? $request->input('price_per_guest') : ($food->price_per_guest ?? 0),
+                'daily_booking_limit' => $request->filled('daily_booking_limit') ? $request->integer('daily_booking_limit') : null,
+                'map_link' => $request->map_link,
+                'latitude' => $coords['latitude'] ?? $food->latitude,
+                'longitude' => $coords['longitude'] ?? $food->longitude,
+                'image' => $image,
+                'gallery_images' => $gallery,
+                'status' => $isAdmin ? $food->status : 'pending',
+            ]);
+
+            if ($changes === []) {
+                throw new \RuntimeException('The restaurant table has no editable columns.');
+            }
+
+            $food->update($changes);
+
+            if (! $isAdmin) {
+                BookingNotice::admins(
+                    Auth::user()->name.' updated the restaurant "'.$food->name.'" and it needs review.',
+                    ['food_id' => $food->id],
+                    [],
+                    'listing'
+                );
+            }
+
+            return redirect($isAdmin ? '/admin/foods/'.$food->id : '/owner/foods/'.$food->id)
+                ->with('success', 'Restaurant updated successfully.');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not update the restaurant. Please try again.');
+        }
     }
 
     public function delete($id)
