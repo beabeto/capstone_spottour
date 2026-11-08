@@ -31,6 +31,10 @@ class PaymentChoice
             $method = $request->input('payment_method');
             $number = (string) $request->input('payer_number');
 
+            if (self::hosted($method) && blank(config('services.paymongo.secret'))) {
+                $validator->errors()->add('payment_method', 'Online wallet payments are temporarily unavailable. Choose cash or bank transfer.');
+            }
+
             if ($method === 'bank' && $number !== '' && strlen($number) < 5) {
                 $validator->errors()->add('payer_number', 'Enter the account number that sent the transfer.');
             }

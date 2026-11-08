@@ -1,7 +1,9 @@
 @php
-    $selected = old('payment_method', ((float) $amount >= 100 ? 'gcash' : 'cash'));
+    $paymongoConfigured = filled(config('services.paymongo.secret'));
+    $selected = old('payment_method', (((float) $amount >= 100 && $paymongoConfigured) ? 'gcash' : 'cash'));
     $livePay = (bool) config('services.paymongo.live');
-    $walletOk = (float) $amount >= 100;
+    $walletAmountOk = (float) $amount >= 100;
+    $walletOk = $walletAmountOk && $paymongoConfigured;
     if (! $walletOk && in_array($selected, ['gcash', 'maya'], true)) {
         $selected = 'cash';
     }
@@ -11,7 +13,9 @@
     <div class="pay-alert">{{ $errors->first() }}</div>
 @endif
 
-@if(! $walletOk)
+@if(! $paymongoConfigured)
+    <div class="pay-alert is-note">GCash and Maya payments are temporarily unavailable. Choose cash or bank transfer.</div>
+@elseif(! $walletAmountOk)
     <div class="pay-alert is-note">GCash and Maya need a total of at least &#8369;100.00. This booking is &#8369;{{ number_format((float) $amount, 2) }}, so choose cash or bank transfer{{ (float) $amount <= 0 ? ', or ask the owner to set a price' : '' }}.</div>
 @endif
 
@@ -23,11 +27,11 @@
     </label>
     <label class="pay-option {{ $walletOk ? '' : 'is-disabled' }}">
         <input type="radio" name="payment_method" value="gcash" @checked($selected === 'gcash') @disabled(! $walletOk)>
-        <span><strong>GCash</strong><small>{{ $walletOk ? ($livePay ? 'Opens the GCash app and charges that account.' : 'Opens GCash through PayMongo.') : 'Needs at least ₱100.00' }}</small></span>
+        <span><strong>GCash</strong><small>{{ ! $paymongoConfigured ? 'Temporarily unavailable' : ($walletAmountOk ? ($livePay ? 'Opens the GCash app and charges that account.' : 'Opens GCash through PayMongo.') : 'Needs at least &#8369;100.00') }}</small></span>
     </label>
     <label class="pay-option {{ $walletOk ? '' : 'is-disabled' }}">
         <input type="radio" name="payment_method" value="maya" @checked($selected === 'maya') @disabled(! $walletOk)>
-        <span><strong>Maya</strong><small>{{ $walletOk ? ($livePay ? 'Opens the Maya app and charges that account.' : 'Opens Maya through PayMongo.') : 'Needs at least ₱100.00' }}</small></span>
+        <span><strong>Maya</strong><small>{{ ! $paymongoConfigured ? 'Temporarily unavailable' : ($walletAmountOk ? ($livePay ? 'Opens the Maya app and charges that account.' : 'Opens Maya through PayMongo.') : 'Needs at least &#8369;100.00') }}</small></span>
     </label>
     <label class="pay-option">
         <input type="radio" name="payment_method" value="bank" @checked($selected === 'bank')>
@@ -66,7 +70,7 @@
     <label class="receipt-field pay-account">Payment receipt<input type="file" name="receipt" accept="image/jpeg,image/png,image/webp"><span>JPG, PNG, or WEBP, up to 5 MB. The owner uses this to verify the payment.</span></label>
     @error('receipt')<p class="form-error">{{ $message }}</p>@enderror
 </div>
-<p class="pay-note">{{ $livePay ? 'GCash and Maya charge the real wallet. Cash and bank transfer stay pending until the owner verifies them.' : 'GCash and Maya are confirmed by PayMongo. Cash and bank transfer stay pending until the owner verifies them.' }}</p>
+<p class="pay-note">{{ ! $paymongoConfigured ? 'Choose cash or bank transfer. To enable GCash and Maya, the site administrator must configure PayMongo.' : ($livePay ? 'GCash and Maya charge the real wallet. Cash and bank transfer stay pending until the owner verifies them.' : 'GCash and Maya are confirmed by PayMongo. Cash and bank transfer stay pending until the owner verifies them.') }}</p>
 
 <script>
 (function () {
