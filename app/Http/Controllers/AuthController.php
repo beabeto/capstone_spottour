@@ -101,10 +101,16 @@ class AuthController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
         $email = Str::lower($request->email);
-        $user = User::where('email', $email)->first();
+        $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
 
         // Do not reveal whether an address has an account.
         if ($user) {
+            if (in_array(config('mail.default'), ['log', 'array'], true)) {
+                return back()->withInput($request->only('email'))->withErrors([
+                    'email' => 'Password reset email is not configured. Please contact the site administrator.',
+                ]);
+            }
+
             $code = (string) random_int(100000, 999999);
             DB::table('password_reset_codes')->where('email', $email)->delete();
             DB::table('password_reset_codes')->insert([
@@ -116,9 +122,18 @@ class AuthController extends Controller
                 'updated_at' => now(),
             ]);
 
-            Mail::raw("Your SpotTour password reset code is {$code}. It expires in 15 minutes. Do not share this code.", function ($message) use ($email) {
-                $message->to($email)->subject('Your SpotTour password reset code');
-            });
+            try {
+                Mail::raw("Your SpotTour password reset code is {$code}. It expires in 15 minutes. Do not share this code.", function ($message) use ($email) {
+                    $message->to($email)->subject('Your SpotTour password reset code');
+                });
+            } catch (\Throwable $e) {
+                report($e);
+                DB::table('password_reset_codes')->where('email', $email)->delete();
+
+                return back()->withInput($request->only('email'))->withErrors([
+                    'email' => 'We could not send the reset email. Please try again later or contact the site administrator.',
+                ]);
+            }
         }
 
         return redirect('/password/reset?email='.urlencode($email))
@@ -141,7 +156,12 @@ class AuthController extends Controller
             return back()->withInput($request->only('email'))->withErrors(['code' => 'The code is invalid or has expired. Request a new code and try again.']);
         }
 
-        User::where('email', $email)->update(['password' => Hash::make($request->password)]);
+        $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
+        if (! $user) {
+            DB::table('password_reset_codes')->where('email', $email)->delete();
+            return back()->withInput($request->only('email'))->withErrors(['email' => 'The account for this reset code no longer exists.']);
+        }
+        $user->update(['password' => Hash::make($request->password)]);
         DB::table('password_reset_codes')->where('email', $email)->delete();
 
         return redirect('/')->with('success', 'Password changed. You can now sign in.');
