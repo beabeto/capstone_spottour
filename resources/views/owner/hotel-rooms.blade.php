@@ -49,7 +49,7 @@
             <span>PHP {{ number_format($room->price_per_night, 2) }} / night</span>
             <small>{{ $room->available_rooms }} available</small>
             @if($room->gallery_images)
-                <div class="room-gallery">@foreach($room->gallery_images as $image)<img src="{{ asset('uploads/hotel-rooms/'.$image) }}" alt="{{ $room->name }} photo">@endforeach</div>
+                <div class="gallery-image-grid">@foreach(\App\Support\GalleryImages::normalize($room->gallery_images) as $image)<div class="gallery-image-item"><img src="{{ asset('uploads/hotel-rooms/'.$image) }}" alt="{{ $room->name }} photo"><form method="POST" action="/{{ $workspace }}/rooms/{{ $room->id }}/gallery/delete" onsubmit="return confirm('Delete this room photo?')">@csrf<input type="hidden" name="image" value="{{ $image }}"><button class="gallery-image-delete" type="submit">Delete photo</button></form></div>@endforeach</div>
             @endif
             <div class="room-card-actions">
                 <details class="room-edit-details">

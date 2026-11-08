@@ -269,10 +269,12 @@ public function updateRoom(Request $request, $id)
         $data['cover_image'] = $cover;
     }
     if ($request->hasFile('gallery_images')) {
-        $gallery = $room->gallery_images ?? [];
+        $gallery = \App\Support\GalleryImages::normalize($room->gallery_images);
+        $uploadDir = public_path('uploads/hotel-rooms');
+        if (! is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
         foreach ($request->file('gallery_images', []) as $file) {
-            $name = time().'_'.uniqid().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/hotel-rooms'), $name);
+            $name = uniqid('room_gallery_', true).'.'.$file->getClientOriginalExtension();
+            $file->move($uploadDir, $name);
             $gallery[] = $name;
         }
         $data['gallery_images'] = $gallery;
@@ -281,6 +283,21 @@ public function updateRoom(Request $request, $id)
     $this->refreshHotelRooms($hotel);
     $workspace = Auth::user()?->role === 'admin' ? 'admin' : 'owner';
     return redirect('/'.$workspace.'/hotels/'.$hotel->id.'/rooms')->with('success', 'Room type updated.');
+}
+
+public function deleteRoomGalleryImage(Request $request, $id)
+{
+    $room = HotelRoom::findOrFail($id);
+    $hotel = Hotel::findOrFail($room->hotel_id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    $request->validate(['image' => 'required|string|max:255']);
+    $images = \App\Support\GalleryImages::normalize($room->gallery_images);
+    $remaining = \App\Support\GalleryImages::remove($images, $request->string('image')->toString());
+    abort_if($remaining === null, 404);
+    $room->update(\App\Support\SchemaSafe::only('hotel_rooms', ['gallery_images' => $remaining]));
+    \App\Support\GalleryImages::deleteFile('hotel-rooms', $request->string('image')->toString());
+    $workspace = Auth::user()?->role === 'admin' ? 'admin' : 'owner';
+    return redirect('/'.$workspace.'/hotels/'.$hotel->id.'/rooms')->with('success', 'Room photo removed.');
 }
 private function storeRoomType(Hotel $hotel, Request $request, string $index, array $room): void
 {
@@ -365,7 +382,16 @@ public function update(
         (string) $request->location
     );
 
-    $hotel->update([
+    $gallery = \App\Support\GalleryImages::normalize($hotel->gallery_images);
+    $uploadDir = public_path('uploads/hotels');
+    if ($request->hasFile('gallery_images') && ! is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
+    foreach (array_filter((array) $request->file('gallery_images', [])) as $file) {
+        $name = uniqid('hotel_gallery_', true).'.'.$file->getClientOriginalExtension();
+        $file->move($uploadDir, $name);
+        $gallery[] = $name;
+    }
+
+    $hotel->update(\App\Support\SchemaSafe::only('hotels', [
 
         'name' =>
         $request->name,
@@ -396,15 +422,27 @@ public function update(
         'longitude' =>
         $coords['longitude'],
 
-        'image' =>
-        $image
+        'image' => $image,
+        'gallery_images' => $gallery,
 
-    ]);
+    ]));
 
     return redirect(Auth::user()?->role === 'admin' ? '/admin/hotels' : '/owner/hotels')->with(
         'success',
         'Hotel updated successfully.'
     );
+}
+
+public function deleteGalleryImage(Request $request, $id)
+{
+    $hotel = Hotel::findOrFail($id);
+    abort_unless((int) $hotel->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+    $request->validate(['image' => 'required|string|max:255']);
+    $remaining = \App\Support\GalleryImages::remove(\App\Support\GalleryImages::normalize($hotel->gallery_images), $request->string('image')->toString());
+    abort_if($remaining === null, 404);
+    $hotel->update(\App\Support\SchemaSafe::only('hotels', ['gallery_images' => $remaining]));
+    \App\Support\GalleryImages::deleteFile('hotels', $request->string('image')->toString());
+    return redirect(Auth::user()?->role === 'admin' ? '/admin/hotels/edit/'.$id : '/owner/hotels/edit/'.$id)->with('success', 'Hotel photo removed.');
 }
 
 public function delete($id)

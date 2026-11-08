@@ -30,6 +30,8 @@ class Hotel extends Model
 
         'image',
 
+        'gallery_images',
+
         'price_per_night',
 
         'available_rooms',
@@ -52,7 +54,7 @@ class Hotel extends Model
 
     protected function casts(): array
     {
-        return ['room_types' => 'array'];
+        return ['room_types' => 'array', 'gallery_images' => 'array'];
     }
 
     public function rooms()

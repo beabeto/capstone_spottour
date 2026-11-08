@@ -340,6 +340,7 @@ Route::post(
     '/owner/spots/update/{id}',
     [SpotController::class,'update']
 );
+Route::post('/owner/spots/{id}/gallery/delete', [SpotController::class, 'deleteGalleryImage'])->middleware('auth');
 
 Route::post(
     '/owner/spots/delete/{id}',
@@ -359,6 +360,7 @@ Route::get('/admin/spots/create', [SpotController::class, 'create']);
 Route::post('/admin/spots/store', [SpotController::class, 'store']);
 Route::get('/admin/spots/edit/{id}', [SpotController::class, 'edit']);
 Route::post('/admin/spots/update/{id}', [SpotController::class, 'update']);
+Route::post('/admin/spots/{id}/gallery/delete', [SpotController::class, 'deleteGalleryImage'])->middleware('auth');
 
 Route::get(
     '/admin/spots/approve/{id}',
@@ -524,6 +526,7 @@ Route::post(
 Route::get('/owner/hotels/{id}/rooms', [HotelController::class, 'rooms']);
 Route::post('/owner/hotels/{id}/rooms', [HotelController::class, 'storeRoom']);
 Route::post('/owner/rooms/update/{id}', [HotelController::class, 'updateRoom']);
+Route::post('/owner/rooms/{id}/gallery/delete', [HotelController::class, 'deleteRoomGalleryImage'])->middleware('auth');
 Route::get('/owner/rooms/delete/{id}', [HotelController::class, 'deleteRoom']);
 
 Route::get(
@@ -535,6 +538,7 @@ Route::get(
     '/owner/hotels/edit/{id}',
     [HotelController::class,'edit']
 );
+Route::post('/owner/hotels/{id}/gallery/delete', [HotelController::class, 'deleteGalleryImage'])->middleware('auth');
 
 Route::post(
     '/owner/hotels/update/{id}',
@@ -559,9 +563,11 @@ Route::get('/admin/hotels/create', [HotelController::class, 'create']);
 Route::post('/admin/hotels/store', [HotelController::class, 'store']);
 Route::get('/admin/hotels/edit/{id}', [HotelController::class, 'edit']);
 Route::post('/admin/hotels/update/{id}', [HotelController::class, 'update']);
+Route::post('/admin/hotels/{id}/gallery/delete', [HotelController::class, 'deleteGalleryImage'])->middleware('auth');
 Route::get('/admin/hotels/{id}/rooms', [HotelController::class, 'rooms'])->whereNumber('id');
 Route::post('/admin/hotels/{id}/rooms', [HotelController::class, 'storeRoom'])->whereNumber('id');
 Route::post('/admin/rooms/update/{id}', [HotelController::class, 'updateRoom']);
+Route::post('/admin/rooms/{id}/gallery/delete', [HotelController::class, 'deleteRoomGalleryImage'])->middleware('auth');
 Route::get('/admin/rooms/delete/{id}', [HotelController::class, 'deleteRoom']);
 
 Route::get(
@@ -734,6 +740,7 @@ Route::post(
     '/owner/foods/update/{id}',
     [FoodController::class,'update']
 );
+Route::post('/owner/foods/{id}/gallery/delete', [FoodController::class, 'deleteGalleryImage'])->middleware('auth');
 
 Route::get(
     '/owner/foods/delete/{id}',
@@ -787,6 +794,7 @@ Route::get('/admin/foods/create', [FoodController::class, 'create']);
 Route::post('/admin/foods/store', [FoodController::class, 'store']);
 Route::get('/admin/foods/edit/{id}', [FoodController::class, 'edit']);
 Route::post('/admin/foods/update/{id}', [FoodController::class, 'update']);
+Route::post('/admin/foods/{id}/gallery/delete', [FoodController::class, 'deleteGalleryImage'])->middleware('auth');
 Route::get('/admin/foods/{id}/menus', [FoodController::class, 'menus'])->whereNumber('id');
 Route::get('/admin/foods/{id}/menus/create', [FoodController::class, 'createMenu'])->whereNumber('id');
 Route::post('/admin/foods/{id}/menus/store', [FoodController::class, 'storeMenu'])->whereNumber('id');

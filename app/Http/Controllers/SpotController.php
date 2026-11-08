@@ -301,7 +301,18 @@ public function update(
         (string) $request->location
     );
 
-    $spot->update([
+    $gallery = \App\Support\GalleryImages::normalize($spot->gallery_images);
+    foreach (array_filter((array) $request->file('gallery_images', [])) as $file) {
+        $directory = public_path('uploads/spots');
+        if (! is_dir($directory)) {
+            mkdir($directory, 0775, true);
+        }
+        $name = uniqid('spot_gallery_', true).'.'.$file->getClientOriginalExtension();
+        $file->move($directory, $name);
+        $gallery[] = $name;
+    }
+
+    $spot->update(\App\Support\SchemaSafe::only('spots', [
 
         'name' => $request->name,
 
@@ -327,15 +338,35 @@ public function update(
         'cottage_price'
             => $request->cottage_price,
 
-        'image' => $imageName
+        'image' => $imageName,
+        'gallery_images' => $gallery,
 
-    ]);
+    ]));
 
     return redirect(Auth::user()?->role === 'admin' ? '/admin/spots' : '/owner/spots')
         ->with(
             'success',
             'Spot updated successfully!'
         );
+}
+
+public function deleteGalleryImage(Request $request, $id)
+{
+    $spot = Spot::findOrFail($id);
+    abort_unless(
+        Auth::user()?->role === 'admin'
+            || (int) $spot->user_id === (int) Auth::id()
+            || (int) $spot->owner_id === (int) Auth::id(),
+        403
+    );
+
+    $images = \App\Support\GalleryImages::normalize($spot->gallery_images);
+    $remaining = \App\Support\GalleryImages::remove($images, (string) $request->input('image'));
+    abort_if($remaining === null, 404);
+    $spot->update(\App\Support\SchemaSafe::only('spots', ['gallery_images' => $remaining]));
+    \App\Support\GalleryImages::deleteFile('spots', (string) $request->input('image'));
+
+    return back()->with('success', 'Gallery image deleted.');
 }
 
 public function delete($id)

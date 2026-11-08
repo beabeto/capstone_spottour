@@ -20,7 +20,7 @@ class PlaceMap
             }
         }
 
-        $url = trim((string) $mapLink);
+        $url = urldecode(trim((string) $mapLink));
 
         if ($url === '') {
             return null;

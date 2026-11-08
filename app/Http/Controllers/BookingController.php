@@ -179,7 +179,14 @@ class BookingController extends Controller
         $data['sender_id'] = $data['sender_id'] ?? Auth::id();
         $data['is_read'] = 0;
         $data['category'] = 'booking';
-        Notification::create($data);
+        try {
+            $notice = \App\Support\SchemaSafe::only('notifications', $data);
+            if (isset($notice['user_id'], $notice['message'])) {
+                Notification::create($notice);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         $links = array_filter([
             'spot_id' => $data['spot_id'] ?? null,
@@ -818,7 +825,7 @@ public function hotelStore(Request $request)
         return $response;
     }
 
-    $booking = HotelBooking::create(array_merge([
+    $booking = HotelBooking::create(\App\Support\SchemaSafe::only('hotel_bookings', array_merge([
         'user_id' => Auth::id(),
         'hotel_id' => $hotel->id,
         'check_in' => $request->check_in,
@@ -829,7 +836,7 @@ public function hotelStore(Request $request)
         'package_id' => $package?->id,
         'package_name' => $package?->name,
         'total_price' => $total,
-    ], PaymentChoice::store($request)));
+    ], PaymentChoice::store($request))));
 
     return $this->finishStoredBooking($booking, 'hotel', $hotel->owner_id, $hotel->name, [
         'hotel_id' => $hotel->id,

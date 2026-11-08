@@ -142,6 +142,9 @@ Replace Image
 type="file"
 name="image">
 
+<label>Add gallery photos</label>
+<input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple>
+
 <button
 type="submit">
 
@@ -150,6 +153,15 @@ Update Hotel
 </button>
 
 </form>
+
+@php($hotelGallery = \App\Support\GalleryImages::normalize($hotel->gallery_images))
+@if($hotelGallery)
+<div class="gallery-image-grid">
+@foreach($hotelGallery as $galleryImage)
+<div class="gallery-image-item"><img src="{{ \App\Support\ListingImage::url($galleryImage, 'hotels') }}" alt="Hotel gallery photo"><form method="POST" action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/hotels/{{ $hotel->id }}/gallery/delete" onsubmit="return confirm('Delete this gallery photo?')">@csrf<input type="hidden" name="image" value="{{ $galleryImage }}"><button class="gallery-image-delete" type="submit">Delete photo</button></form></div>
+@endforeach
+</div>
+@endif
 
 </div>
 

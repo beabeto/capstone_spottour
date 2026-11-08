@@ -172,6 +172,8 @@ name="image">
 
 </div>
 
+<div class="form-group"><label>Add gallery photos</label><input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple></div>
+
 <button
 type="submit"
 class="save-btn">
@@ -181,6 +183,15 @@ Update Spot
 </button>
 
 </form>
+
+@php($spotGallery = \App\Support\GalleryImages::normalize($spot->gallery_images))
+@if($spotGallery)
+<div class="gallery-image-grid">
+@foreach($spotGallery as $galleryImage)
+<div class="gallery-image-item"><img src="{{ \App\Support\ListingImage::url($galleryImage, 'spots') }}" alt="Spot gallery photo"><form method="POST" action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/spots/{{ $spot->id }}/gallery/delete" onsubmit="return confirm('Delete this gallery photo?')">@csrf<input type="hidden" name="image" value="{{ $galleryImage }}"><button class="gallery-image-delete" type="submit">Delete photo</button></form></div>
+@endforeach
+</div>
+@endif
 
 </div>
 

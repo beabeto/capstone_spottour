@@ -49,7 +49,7 @@
 <label>Replace cover image<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label>
 @if(!empty($food->gallery_images))
 <div class="listing-gallery" style="margin:10px 0;">
-@foreach($food->gallery_images as $image)
+@foreach(\App\Support\GalleryImages::normalize($food->gallery_images) as $image)
 <img src="{{ \App\Support\ListingImage::url($image, 'foods') }}" alt="Gallery photo" style="width:90px;height:70px;object-fit:cover;border-radius:8px;">
 @endforeach
 </div>
@@ -58,6 +58,14 @@
 </section>
 <button type="submit" class="form-save-btn">Update restaurant</button>
 </form>
+@php($foodGallery = \App\Support\GalleryImages::normalize($food->gallery_images))
+@if($foodGallery)
+<div class="gallery-image-grid">
+@foreach($foodGallery as $galleryImage)
+<div class="gallery-image-item"><img src="{{ \App\Support\ListingImage::url($galleryImage, 'foods') }}" alt="Restaurant gallery photo"><form method="POST" action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/foods/{{ $food->id }}/gallery/delete" onsubmit="return confirm('Delete this gallery photo?')">@csrf<input type="hidden" name="image" value="{{ $galleryImage }}"><button class="gallery-image-delete" type="submit">Delete photo</button></form></div>
+@endforeach
+</div>
+@endif
 <p style="margin-top:14px;color:#607772;font-size:13px;">
 Want to change dishes?
 <a href="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/foods/{{ $food->id }}/menus">Manage menus</a>

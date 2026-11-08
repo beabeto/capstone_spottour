@@ -291,7 +291,7 @@ class FoodController extends Controller
                 'longitude' => $coords['longitude'] ?? $food->longitude,
                 'image' => $image,
                 'gallery_images' => $gallery,
-                'status' => $isAdmin ? $food->status : 'pending',
+                'status' => $food->status,
             ]);
 
             if ($changes === []) {
@@ -302,7 +302,7 @@ class FoodController extends Controller
 
             if (! $isAdmin) {
                 BookingNotice::admins(
-                    Auth::user()->name.' updated the restaurant "'.$food->name.'" and it needs review.',
+                    Auth::user()->name.' updated the restaurant "'.$food->name.'".',
                     ['food_id' => $food->id],
                     [],
                     'listing'
@@ -327,6 +327,19 @@ class FoodController extends Controller
 
         return redirect(Auth::user()?->role === 'admin' ? '/admin/foods' : '/owner/foods')
             ->with('success', 'Restaurant deleted successfully.');
+    }
+
+    public function deleteGalleryImage(Request $request, $id)
+    {
+        $food = Food::findOrFail($id);
+        abort_unless((int) $food->owner_id === (int) Auth::id() || Auth::user()?->role === 'admin', 403);
+        $request->validate(['image' => 'required|string|max:255']);
+        $remaining = \App\Support\GalleryImages::remove(\App\Support\GalleryImages::normalize($food->gallery_images), $request->string('image')->toString());
+        abort_if($remaining === null, 404);
+        $food->update(\App\Support\SchemaSafe::only('foods', ['gallery_images' => $remaining]));
+        \App\Support\GalleryImages::deleteFile('foods', $request->string('image')->toString());
+        $prefix = Auth::user()?->role === 'admin' ? 'admin' : 'owner';
+        return redirect('/'.$prefix.'/foods/edit/'.$id)->with('success', 'Restaurant photo removed.');
     }
 
     public function menus($id)
