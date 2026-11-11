@@ -5061,6 +5061,9 @@ body.dashboard-body .spot-form-card .repeat-row{min-width:0}
 .admin-listing-page .listing-actions form{display:inline-flex;min-width:0;margin:0}
 .admin-listing-page .listing-actions form button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:36px;margin:0;padding:0 12px;border:1px solid #b42318;border-radius:8px;background:transparent;color:#b42318;font-size:12px;font-weight:800;line-height:1.2;white-space:nowrap;cursor:pointer}
 .admin-listing-page .listing-actions form button:hover{background:transparent;filter:brightness(.82);transform:translateY(-1px)}
+/* Keep every listing edit form's primary update action full width and uniform. */
+.spot-form-card form .form-save-btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;align-self:stretch!important;width:100%!important;min-width:0!important;min-height:42px!important;margin:18px 0 0!important;padding:0 16px!important;border:0!important;border-radius:9px!important;background:#167b69!important;color:#fff!important;font-size:13px!important;font-weight:800!important;line-height:1.2!important;text-align:center!important;box-shadow:0 5px 14px rgba(22,123,105,.18)!important}
+.spot-form-card form .form-save-btn:hover{background:#126a59!important;transform:none!important}
 @media(max-width:700px){
  .owner-listing-page .page-container{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:100%;padding-top:72px!important;padding-bottom:28px!important}
  .owner-listing-page .page-container>.header-row{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
