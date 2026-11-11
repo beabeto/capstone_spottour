@@ -5042,13 +5042,30 @@ body.dashboard-body .spot-form-card .repeat-row{min-width:0}
 .notification .notification-icon{overflow:visible}
 .notification .badge{display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:max-content;min-width:22px;height:22px;padding:0 5px!important;border:2px solid #fff;border-radius:999px!important;background:#dc2626!important;color:#fff!important;font-size:12px!important;font-weight:800;line-height:1!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;z-index:2}
 .admin-bell-float .notification .badge{top:-7px!important;right:-8px!important}
+.feedback-page{box-sizing:border-box;height:auto!important;min-height:100vh;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important}
+.feedback-page .page-container{box-sizing:border-box;height:auto!important;min-height:0;max-height:none!important;overflow:visible!important}
+.owner-listing-page .listing-table-scroll table{width:100%;min-width:980px;table-layout:fixed;border-collapse:separate;border-spacing:0;border:1px solid #d7e8e3;border-radius:14px;background:#fff;box-shadow:0 8px 22px rgba(23,71,63,.04)}
+.owner-listing-page .listing-table-scroll th{padding:13px 15px;background:#eaf6f2;color:#31564d;font-size:12px;font-weight:800;letter-spacing:.04em;text-align:left;text-transform:uppercase;white-space:nowrap}
+.owner-listing-page .listing-table-scroll td{padding:13px 15px;border-top:1px solid #edf3f0;color:#405a53;text-align:left;vertical-align:middle;overflow-wrap:normal;word-break:normal}
+.owner-listing-page .listing-table-scroll .table-image{display:block;width:76px;height:62px;max-width:none;object-fit:cover;border-radius:8px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table{width:1175px;min-width:1175px;table-layout:fixed}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(1),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(1){width:125px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(2),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(2){width:190px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(3),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(3){width:135px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(4),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(4){width:130px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(5),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(5){width:350px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th:nth-child(6),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(6){width:245px}
+.owner-listing-page .food-menu-table-scroll .food-menu-table th{white-space:nowrap;word-break:normal;overflow-wrap:normal}
+.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(2),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(3),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(4){overflow-wrap:anywhere}
+.owner-listing-page .food-menu-table-scroll .food-menu-table td:last-child a{margin:3px!important}
 @media(max-width:700px){
  .owner-listing-page .page-container{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:100%;padding-top:72px!important;padding-bottom:28px!important}
  .owner-listing-page .page-container>.header-row{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
  .owner-listing-page .page-container>.header-row h1{min-width:0;font-size:clamp(23px,6vw,30px)!important;overflow-wrap:anywhere}
  .owner-listing-page .page-container>.header-row .add-btn{justify-self:start;max-width:100%;white-space:normal}
  .owner-listing-page .listing-table-scroll{margin:0;scrollbar-width:thin}
- .owner-listing-page .listing-table-scroll table{min-width:720px}
+ .owner-listing-page .listing-table-scroll table{width:980px;min-width:980px;table-layout:fixed}
+ .owner-listing-page .food-menu-table-scroll .food-menu-table{width:1175px;min-width:1175px}
  .owner-listing-page .menu-editor-form{width:100%;padding:18px 15px;border-radius:13px}
  .owner-listing-page .menu-editor-form input,.owner-listing-page .menu-editor-form select,.owner-listing-page .menu-editor-form textarea{font-size:16px}
  .owner-listing-page .menu-editor-form>button[type=submit]{width:100%;min-height:46px}

@@ -48,7 +48,7 @@ class="add-btn">
 
 @endif
 
-<div class="listing-table-scroll"><table>
+<div class="listing-table-scroll food-menu-table-scroll"><table class="food-menu-table">
 
 <thead>
 
