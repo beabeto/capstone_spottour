@@ -140,7 +140,8 @@ type="file"
 name="image">
 
 <button
-type="submit">
+type="submit"
+class="form-save-btn">
 
 Update Hotel
 

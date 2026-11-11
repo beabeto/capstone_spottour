@@ -179,7 +179,7 @@ name="image">
 
 <button
 type="submit"
-class="save-btn">
+class="form-save-btn">
 
 Update Spot
 

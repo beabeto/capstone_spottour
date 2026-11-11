@@ -1,4 +1,6 @@
-body.account-page{background:#eef3f1!important;color:#203531!important}
+body.account-page{background:#eef3f1!important;color:#203531!important;height:auto!important;min-height:100vh;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important}
+html:has(body.account-page){height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important}
+body.account-page .favorites-container,body.account-page .page-container{height:auto!important;max-height:none!important;overflow:visible!important}
 body.account-page .back-btn{display:block!important;position:fixed!important;top:18px!important;left:18px!important;z-index:40}
 
 body.account-page .favorites-container,

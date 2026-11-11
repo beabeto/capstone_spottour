@@ -149,7 +149,8 @@ name="image">
 <input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple>
 
 <button
-type="submit">
+type="submit"
+class="form-save-btn">
 
 Update Hotel
 
