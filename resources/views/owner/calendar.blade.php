@@ -2,6 +2,8 @@
 
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Reservation Calendar</title>
 
@@ -14,6 +16,9 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 </head>
 
 <body class="{{ !empty($isAdmin) ? 'admin-body' : 'owner-body' }} reservation-calendar-page">
+@if(!empty($isAdmin))
+    @include('partials.admin-notification-float')
+@endif
 
 <div class="back-btn">
     <button type="button" onclick="window.history.back(); return false;">Back</button>
@@ -57,7 +62,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 
 <div class="calendar-navigation" id="calendarNavigation"><button type="button" data-calendar-nav="prev">Previous</button><strong id="calendarTitle"></strong><button type="button" data-calendar-nav="today">Today</button><button type="button" data-calendar-nav="next">Next</button></div>
 
-<div id="calendar"></div>
+<div class="calendar-scroll"><div id="calendar"></div></div>
 
 </div>
 

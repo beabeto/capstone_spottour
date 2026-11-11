@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Add Menu Item</title>
 
@@ -32,7 +34,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 method="POST"
 action="/{{ $workspace }}/foods/{{ $food->id }}/menus/store"
 enctype="multipart/form-data"
-class="form-card">
+class="form-card menu-editor-form">
 
 @csrf
 

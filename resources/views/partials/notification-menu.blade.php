@@ -4,7 +4,7 @@
     $noteAll = $allUrl ?? '/user/notifications';
 @endphp
 <div class="notification">
-    <button type="button" class="notification-icon" onclick="toggleNotificationMenu()" aria-label="View notifications" aria-expanded="false" aria-controls="notificationMenu">
+    <button type="button" class="notification-icon" onclick="const menu=this.parentElement.querySelector('.notification-menu');const opened=menu.classList.toggle('show-notification-menu');this.setAttribute('aria-expanded',opened?'true':'false')" aria-label="View notifications" aria-expanded="false" aria-controls="notificationMenu">
         &#128276;
         @if($noteCount > 0)
             <span class="badge">{{ $noteCount }}</span>

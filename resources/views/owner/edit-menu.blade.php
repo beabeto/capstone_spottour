@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Edit Menu</title>
 
@@ -27,7 +29,8 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 <form
 method="POST"
 action="/{{ Auth::user()->role === 'admin' ? 'admin' : 'owner' }}/menus/update/{{ $menu->id }}"
-enctype="multipart/form-data">
+enctype="multipart/form-data"
+class="form-card menu-editor-form">
 
 @csrf
 

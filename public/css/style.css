@@ -5023,3 +5023,46 @@ body.dashboard-body .spot-form-card .repeat-row{min-width:0}
  body.dashboard-body .spot-form-card .form-save-btn{width:100%!important;max-width:100%;min-height:44px;box-sizing:border-box}
  body.dashboard-body .spot-form-container>.back-btn{position:fixed!important;top:10px!important;left:10px!important;z-index:1200}
 }
+
+/* Mobile scrolling and compact forms for owner workspaces. */
+.owner-listing-page .listing-table-scroll{display:block;width:100%;max-width:100%;overflow-x:auto!important;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.owner-listing-page .listing-table-scroll table{width:100%;min-width:760px;table-layout:auto}
+.owner-listing-page .listing-table-scroll th,.owner-listing-page .listing-table-scroll td{white-space:normal;overflow-wrap:anywhere}
+.owner-listing-page .listing-table-scroll td:last-child{white-space:nowrap}
+.owner-listing-page .menu-editor-form{box-sizing:border-box;width:min(100%,680px);margin:0 auto;padding:24px;border:1px solid #d7e8e3;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(23,71,63,.06)}
+.owner-listing-page .menu-editor-form>label{display:block;margin:14px 0 6px;color:#17473f;font-size:14px;font-weight:750}
+.owner-listing-page .menu-editor-form input,.owner-listing-page .menu-editor-form select,.owner-listing-page .menu-editor-form textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin:0 0 10px;padding:11px 12px;border:1px solid #cfe1dc;border-radius:9px;background:#fff;color:#203531;font:inherit}
+.owner-listing-page .menu-editor-form textarea{resize:vertical}
+.owner-listing-page .menu-editor-form>button[type=submit]{min-height:44px;padding:0 18px;border:0;border-radius:9px;background:#167b69;color:#fff;font-weight:800}
+.reservation-calendar-page .calendar-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.reservation-calendar-page .calendar-scroll #calendar{box-sizing:border-box;width:100%;min-width:0}
+.feedback-page .feedback-form{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+.feedback-page .feedback-form input,.feedback-page .feedback-form textarea{max-width:100%;min-width:0}
+.feedback-page .feedback-form textarea{resize:vertical;overflow-wrap:anywhere}
+.notification .notification-icon{overflow:visible}
+.notification .badge{display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:max-content;min-width:22px;height:22px;padding:0 5px!important;border:2px solid #fff;border-radius:999px!important;background:#dc2626!important;color:#fff!important;font-size:12px!important;font-weight:800;line-height:1!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;z-index:2}
+.admin-bell-float .notification .badge{top:-7px!important;right:-8px!important}
+@media(max-width:700px){
+ .owner-listing-page .page-container{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:100%;padding-top:72px!important;padding-bottom:28px!important}
+ .owner-listing-page .page-container>.header-row{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ .owner-listing-page .page-container>.header-row h1{min-width:0;font-size:clamp(23px,6vw,30px)!important;overflow-wrap:anywhere}
+ .owner-listing-page .page-container>.header-row .add-btn{justify-self:start;max-width:100%;white-space:normal}
+ .owner-listing-page .listing-table-scroll{margin:0;scrollbar-width:thin}
+ .owner-listing-page .listing-table-scroll table{min-width:720px}
+ .owner-listing-page .menu-editor-form{width:100%;padding:18px 15px;border-radius:13px}
+ .owner-listing-page .menu-editor-form input,.owner-listing-page .menu-editor-form select,.owner-listing-page .menu-editor-form textarea{font-size:16px}
+ .owner-listing-page .menu-editor-form>button[type=submit]{width:100%;min-height:46px}
+ .reservation-calendar-page .calendar-container{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:100%;padding:68px 0 30px!important}
+ .reservation-calendar-page .calendar-summary{grid-template-columns:minmax(0,1fr)!important}
+ .reservation-calendar-page .calendar-status-key{display:flex;flex-wrap:wrap;gap:7px}
+ .reservation-calendar-page .calendar-navigation{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+ .reservation-calendar-page .calendar-navigation strong{grid-column:1/-1;grid-row:1;min-width:0;overflow-wrap:anywhere}
+ .reservation-calendar-page .calendar-navigation button{min-width:0;min-height:42px}
+ .reservation-calendar-page .calendar-scroll #calendar{width:700px;min-width:700px}
+ .reservation-calendar-page .fc .fc-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+ .reservation-calendar-page .fc .fc-toolbar-chunk{display:flex;flex-wrap:wrap;gap:6px}
+ .feedback-page .page-container{box-sizing:border-box;width:calc(100% - 24px)!important;padding:68px 0 30px!important}
+ .feedback-page .feedback-form,.feedback-page .feedback-card,.feedback-page .feedback-empty{padding:16px 14px}
+ .feedback-page .feedback-form button{width:100%!important;min-height:46px}
+ .admin-bell-float{top:10px!important;right:66px!important;width:42px!important}
+}
