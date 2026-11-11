@@ -413,6 +413,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 
 </div>
 
+@include('partials.admin-notification-float')
 </body>
 
 </html>

@@ -75,5 +75,6 @@
     </section>
     @endforeach
 </main>
+@include('partials.admin-notification-float')
 </body>
 </html>

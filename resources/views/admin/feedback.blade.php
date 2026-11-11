@@ -61,5 +61,6 @@
         <p class="feedback-empty">No feedback yet.</p>
     @endforelse
 </main>
+@include('partials.admin-notification-float')
 </body>
 </html>

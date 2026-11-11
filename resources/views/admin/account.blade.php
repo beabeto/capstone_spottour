@@ -80,5 +80,6 @@
         </section>
     </div>
 </main>
+@include('partials.admin-notification-float')
 </body>
 </html>

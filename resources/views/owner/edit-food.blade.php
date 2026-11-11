@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
 <body class="dashboard-body">
+@include('partials.admin-notification-float')
 <div class="back-btn"><button type="button" onclick="window.history.back(); return false;">Back</button></div>
 <div class="spot-form-container"><div class="spot-form-card">
 <h1>Edit Food Establishment</h1>

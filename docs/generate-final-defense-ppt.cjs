@@ -13,16 +13,17 @@ pptx.title = 'SpotTour Final Defense';
 pptx.subject = 'Final Defense Presentation — SpotTour';
 
 const C = {
-  teal: '0F766E',
-  tealDark: '134E4A',
-  tealSoft: 'CCFBF1',
-  tealMid: '14B8A6',
-  cream: 'F8FAF9',
+  teal: '0E8979',
+  tealDark: '103B36',
+  tealSoft: 'D8F4EC',
+  tealMid: '43C6AC',
+  cream: 'F3F8F6',
   white: 'FFFFFF',
-  ink: '1F2937',
-  muted: '4B5563',
-  line: 'D1D5DB',
-  softBg: 'ECFDF5',
+  ink: '19332F',
+  muted: '58716B',
+  line: 'D8E7E2',
+  softBg: 'E7F5F0',
+  accent: 'F2B66D',
   warnBg: 'FEF3C7',
   warnInk: '92400E',
 };
@@ -31,6 +32,10 @@ function addFooter(slide, page, total) {
   slide.addShape(pptx.shapes.RECTANGLE, {
     x: 0, y: 7.15, w: 13.333, h: 0.35,
     fill: { color: C.tealDark },
+  });
+  slide.addShape(pptx.shapes.RECTANGLE, {
+    x: 0, y: 7.15, w: 13.333, h: 0.035,
+    fill: { color: C.tealMid },
   });
   slide.addText('SpotTour  ·  Final Defense  ·  SNSU – CCIS', {
     x: 0.4, y: 7.18, w: 10, h: 0.28,
@@ -44,20 +49,37 @@ function addFooter(slide, page, total) {
 
 function sectionBanner(slide, label) {
   slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-    x: 0.45, y: 0.28, w: 3.4, h: 0.36,
-    fill: { color: C.tealSoft }, rectRadius: 0.08,
+    x: 0.45, y: 0.27, w: 3.4, h: 0.38,
+    fill: { color: C.tealSoft }, rectRadius: 0.12,
   });
   slide.addText(label, {
-    x: 0.45, y: 0.28, w: 3.4, h: 0.36,
-    fontSize: 11, color: C.tealDark, fontFace: 'Calibri', bold: true,
-    align: 'center', valign: 'middle',
+    x: 0.64, y: 0.27, w: 3.05, h: 0.38,
+    fontSize: 10, color: C.tealDark, fontFace: 'Aptos', bold: true,
+    align: 'left', valign: 'middle', charSpacing: 0.7,
+  });
+  slide.addShape(pptx.shapes.OVAL, {
+    x: 11.87, y: 0.32, w: 0.12, h: 0.12,
+    fill: { color: C.accent }, line: { color: C.accent, transparency: 100 },
+  });
+  slide.addText('SPOTTOUR  /  SURIGAO CITY', {
+    x: 9.65, y: 0.27, w: 2.1, h: 0.38,
+    fontSize: 9, color: C.muted, fontFace: 'Aptos', bold: true,
+    align: 'right', valign: 'middle', charSpacing: 0.5,
   });
 }
 
 function slideTitle(slide, title) {
   slide.addText(title, {
-    x: 0.45, y: 0.75, w: 12.4, h: 0.55,
-    fontSize: 28, color: C.tealDark, fontFace: 'Calibri', bold: true,
+    x: 0.45, y: 0.76, w: 12.4, h: 0.52,
+    fontSize: 27, color: C.tealDark, fontFace: 'Aptos Display', bold: true,
+  });
+  slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
+    x: 0.46, y: 1.34, w: 0.9, h: 0.055,
+    rectRadius: 0.02, fill: { color: C.tealMid }, line: { color: C.tealMid, transparency: 100 },
+  });
+  slide.addShape(pptx.shapes.RECTANGLE, {
+    x: 1.48, y: 1.36, w: 11.35, h: 0.025,
+    fill: { color: C.line }, line: { color: C.line, transparency: 100 },
   });
 }
 
@@ -69,7 +91,7 @@ function bullets(slide, items, opts = {}) {
   slide.addText(
     items.map((t) => ({
       text: t,
-      options: { bullet: true, breakLine: true, color: C.ink, fontSize, fontFace: 'Calibri', paraSpaceAfter: 8 },
+      options: { bullet: { indent: fontSize }, hanging: Math.max(3, fontSize * 0.22), breakLine: true, color: C.ink, fontSize, fontFace: 'Aptos', paraSpaceAfter: 11 },
     })),
     { x, y, w, h: opts.h ?? 5.2, valign: 'top' }
   );
@@ -81,27 +103,54 @@ const TOTAL = 16;
 {
   const s = pptx.addSlide();
   s.addShape(pptx.shapes.RECTANGLE, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.tealDark } });
-  s.addShape(pptx.shapes.RECTANGLE, { x: 0, y: 0, w: 0.22, h: 7.5, fill: { color: C.tealMid } });
+  s.addShape(pptx.shapes.RECTANGLE, { x: 0, y: 0, w: 0.18, h: 7.5, fill: { color: C.tealMid } });
+  s.addShape(pptx.shapes.OVAL, {
+    x: 9.45, y: 0.62, w: 3.5, h: 3.5,
+    fill: { color: C.teal, transparency: 18 }, line: { color: C.teal, transparency: 100 },
+  });
+  s.addShape(pptx.shapes.OVAL, {
+    x: 10.22, y: 1.42, w: 1.98, h: 1.98,
+    fill: { color: C.tealDark, transparency: 100 },
+    line: { color: '76E4CC', transparency: 12, width: 2.2 },
+  });
+  s.addShape(pptx.shapes.OVAL, {
+    x: 11.48, y: 4.6, w: 1.05, h: 1.05,
+    fill: { color: C.accent }, line: { color: C.accent, transparency: 100 },
+  });
+  s.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
+    x: 0.72, y: 1.1, w: 2.38, h: 0.42,
+    rectRadius: 0.12, fill: { color: '1C514A' }, line: { color: '347D70', width: 0.8 },
+  });
+  s.addText('CAPSTONE DEFENSE  /  NOVEMBER 2026', {
+    x: 0.84, y: 1.1, w: 2.16, h: 0.42,
+    fontSize: 9, color: 'B6F3E4', fontFace: 'Aptos', bold: true, align: 'center', valign: 'middle', charSpacing: 0.4,
+  });
   s.addText('FINAL DEFENSE', {
-    x: 0.7, y: 1.35, w: 12, h: 0.35,
-    fontSize: 14, color: '99F6E4', fontFace: 'Calibri', bold: true, charSpacing: 3,
+    x: 0.74, y: 1.63, w: 8.4, h: 0.3,
+    fontSize: 11, color: '99F6E4', fontFace: 'Aptos', bold: true, charSpacing: 3,
   });
   s.addText('SPOTTOUR: An Interactive Platform for\nTourism and Community Engagement', {
-    x: 0.7, y: 1.85, w: 11.5, h: 1.5,
-    fontSize: 32, color: C.white, fontFace: 'Calibri', bold: true,
+    x: 0.72, y: 2.05, w: 8.8, h: 1.45,
+    fontSize: 29, color: C.white, fontFace: 'Aptos Display', bold: true,
   });
+  s.addShape(pptx.shapes.RECTANGLE, { x: 0.74, y: 3.67, w: 1.15, h: 0.07, fill: { color: C.accent } });
   s.addText('A Capstone Project Presented to the Faculty of the\nCollege of Computing & Information Sciences\nSurigao del Norte State University', {
-    x: 0.7, y: 3.55, w: 11, h: 1.0,
-    fontSize: 15, color: 'CCFBF1', fontFace: 'Calibri',
+    x: 0.74, y: 3.94, w: 8.4, h: 0.96,
+    fontSize: 14, color: 'D4E9E3', fontFace: 'Aptos',
   });
   s.addText('Ianzel A. Morales  ·  Beatrix Coleen Beto', {
-    x: 0.7, y: 4.85, w: 11, h: 0.4,
-    fontSize: 18, color: C.white, fontFace: 'Calibri', bold: true,
+    x: 0.74, y: 5.15, w: 8.4, h: 0.4,
+    fontSize: 17, color: C.white, fontFace: 'Aptos', bold: true,
   });
-  s.addText('Bachelor of Science in Information Technology  ·  May 2026', {
-    x: 0.7, y: 5.35, w: 11, h: 0.35,
-    fontSize: 14, color: '99F6E4', fontFace: 'Calibri',
+  s.addText('Bachelor of Science in Information Technology  ·  November 2026', {
+    x: 0.74, y: 5.68, w: 8.4, h: 0.35,
+    fontSize: 12, color: '9CE8D8', fontFace: 'Aptos', bold: true,
   });
+  s.addText('SURIGAO\nCITY', {
+    x: 10.0, y: 4.96, w: 2.1, h: 0.86,
+    fontSize: 20, color: C.white, fontFace: 'Aptos Display', bold: true, align: 'center', valign: 'mid', charSpacing: 2,
+  });
+  s.addShape(pptx.shapes.RECTANGLE, { x: 0.18, y: 7.42, w: 13.153, h: 0.08, fill: { color: C.tealMid } });
 }
 
 // 2. TEAM
@@ -514,7 +563,7 @@ const TOTAL = 16;
   });
 }
 
-const out = path.join(__dirname, 'SpotTour_Final_Defense_v2.pptx');
+const out = path.join(__dirname, 'SpotTour_Final_Defense_November_2026.pptx');
 pptx.writeFile({ fileName: out }).then(() => {
   console.log('Created:', out);
 }).catch((err) => {

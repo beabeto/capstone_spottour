@@ -34,5 +34,6 @@
         <div class="empty-card"><h3>No notifications yet</h3><p>Owner submissions and traveller chats will appear here.</p></div>
     @endforelse
 </div>
+@include('partials.admin-notification-float')
 </body>
 </html>

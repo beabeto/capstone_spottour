@@ -87,5 +87,6 @@
 
 </div>
 
+@include('partials.admin-notification-float')
 </body>
 </html>

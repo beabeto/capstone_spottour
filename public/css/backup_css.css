@@ -1221,14 +1221,13 @@ table tr:hover{
         height:auto;
     }
 
-    .admin-container{
-        flex-direction:column;
+    .admin-container{ 
     }
 
     .admin-main{
         margin-left:0;
     }
-
+ 
 }
 
 /* =========================

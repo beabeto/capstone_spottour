@@ -2,6 +2,8 @@
 
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Edit Hotel</title>
 
@@ -11,6 +13,7 @@ href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) 
 </head>
 
 <body class="dashboard-body">
+@include('partials.admin-notification-float')
 
 <div class="back-btn">
     <button type="button" onclick="window.history.back(); return false;">Back</button>

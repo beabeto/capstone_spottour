@@ -616,5 +616,6 @@ function toggleReplyReply(id)
 
 </script>
 
+@include('partials.admin-notification-float')
 </body>
 </html>

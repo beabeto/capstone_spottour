@@ -152,5 +152,6 @@
     if (type) type.addEventListener('change', applyFilters);
 })();
 </script>
+@include('partials.admin-notification-float')
 </body>
 </html>

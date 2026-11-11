@@ -55,5 +55,6 @@
 </div>
 
 <script>setTimeout(() => window.location.reload(), 30000);</script>
+@include('partials.admin-notification-float')
 </body>
 </html>

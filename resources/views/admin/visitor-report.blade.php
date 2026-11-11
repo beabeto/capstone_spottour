@@ -62,5 +62,6 @@
         </table></div>
     </section>
 </main>
+@include('partials.admin-notification-float')
 </body>
 </html>
