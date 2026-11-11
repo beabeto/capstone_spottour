@@ -1,182 +1,60 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>My Food Establishments</title>
-
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Restaurants</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
-<body class="owner-listing-page">
-
-<div class="page-container">
-
-<div class="header-row">
-
-<div class="back-btn">
-    <button type="button" onclick="window.history.back(); return false;">Back</button>
-</div>
-
-<h1>
-
-    My Food Establishments
-
-</h1>
-
-<a
-href="/owner/foods/create"
-class="add-btn">
-
-    + Add Food Establishment
-
-</a>
-
-</div>
-
-<div class="listing-table-scroll"><table>
-
-<thead>
-
-<tr>
-
-<th>Image</th>
-
-<th>Name</th>
-
-<th>Location</th>
-
-<th>Tables</th>
-
-<th>Venue Capacity</th>
-
-<th>Status</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@forelse($foods as $food)
-
-<tr>
-
-<td>
-
-@if($food->image)
-
-<img
-src="{{ \App\Support\ListingImage::url($food->image, 'foods') }}"
-class="table-image">
-
-@else
-
-No Image
-
-@endif
-
-</td>
-
-<td>
-
-    {{ $food->name }}
-
-</td>
-
-<td>
-
-    {{ $food->location }}
-
-</td>
-
-<td>
-
-    {{ $food->available_tables }}
-
-</td>
-
-<td>
-
-    {{ $food->venue_capacity }}
-
-</td>
-
-<td class="listing-status-cell">
-@if($food->status == 'approved')
-<span class="status-approved">Approved</span>
-@elseif($food->status == 'rejected')
-<span class="status-rejected">Rejected</span>
-@else
-<span class="status-pending">Pending</span>
-@endif
-</td>
-
-<td>
-<div class="listing-action-row listing-action-top">
-<a
-href="/owner/foods/{{ $food->id }}"
-class="view-btn">
-
-    View
-
-</a>
-
-<a
-href="/owner/foods/{{ $food->id }}/menus"
-class="listing-menu-btn">
-
-     Menu
-
-</a>
-</div>
-
-<div class="listing-action-row listing-action-bottom">
-<a
-href="/owner/foods/edit/{{ $food->id }}"
-class="edit-btn">
-
-    Edit
-
-</a>
-
-<a
-href="/owner/foods/delete/{{ $food->id }}"
-class="deletes-btn"
-onclick="return confirm('Delete this food establishment?')">
-
-    Delete
-
-</a>
-</div>
-
-</td>
-
-</tr>
-
-@empty
-
-<tr>
-
-<td colspan="7">
-
-    No Food Establishments Found
-
-</td>
-
-</tr>
-
-@endforelse
-
-</tbody>
-
-</table></div></div>
-
-</div>
-
+<body class="owner-listing-page admin-listing-page">
+<main class="page-container">
+    <div class="back-btn"><button type="button" onclick="window.history.back(); return false;">Back</button></div>
+    <header class="management-heading">
+        <span>Owner listings</span>
+        <h1>My Food Establishments</h1>
+        <p>Manage restaurant details, menus, and booking status.</p>
+        <a class="add-btn" href="/owner/foods/create">+ Add Restaurant</a>
+    </header>
+    <section class="admin-listing-grid">
+        @forelse($foods as $food)
+            <article class="admin-listing-card">
+                <img src="{{ \App\Support\ListingImage::url($food->image, 'foods') }}" alt="{{ $food->name }}">
+                <div class="listing-primary">
+                    <span class="listing-type">Restaurant</span>
+                    <h2>{{ $food->name }}</h2>
+                    <p>{{ $food->location }}</p>
+                </div>
+                <div class="listing-owner">
+                    <small>Owner</small>
+                    <strong>{{ Auth::user()->name }}</strong>
+                    <span>{{ Auth::user()->email }}</span>
+                </div>
+                <div class="listing-metric">
+                    <small>Tables</small>
+                    <strong>{{ $food->available_tables }}</strong>
+                </div>
+                <div class="listing-metric">
+                    <small>Capacity</small>
+                    <strong>{{ $food->venue_capacity }}</strong>
+                </div>
+                <div class="listing-status">
+                    <span class="status-{{ $food->status }}">{{ ucfirst($food->status) }}</span>
+                </div>
+                <div class="listing-actions">
+                    <div class="listing-action-row">
+                        <a href="/owner/foods/{{ $food->id }}" class="view-btn">View</a>
+                        <a href="/owner/foods/{{ $food->id }}/menus" class="listing-menu-btn">Menu</a>
+                    </div>
+                    <div class="listing-action-row">
+                        <a href="/owner/foods/edit/{{ $food->id }}" class="edit-btn">Edit</a>
+                        <a href="/owner/foods/delete/{{ $food->id }}" class="deletes-btn" onclick="return confirm('Delete this restaurant?')">Delete</a>
+                    </div>
+                </div>
+            </article>
+        @empty
+            <p class="empty-card">No restaurants found.</p>
+        @endforelse
+    </section>
+</main>
 </body>
 </html>

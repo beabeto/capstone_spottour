@@ -1,182 +1,62 @@
-<!DOCTYPE html>
-
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>My Hotels</title>
-
-<link rel="stylesheet"
-href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Hotels</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
-
-<body class="owner-listing-page">
-
-<div class="page-container">
-
-<div class="header-row">
-
-<div class="back-btn">
-    <button onclick="window.history.back(); return false;">
-         Back
-    </button>
-</div>
-
-<h1>
-
-    My Hotels
-
-</h1>
-
-<a
-href="/owner/hotels/create"
-class="add-btn">
-
-    + Add Hotel
-
-</a>
-
-</div>
-
-<div class="listing-table-scroll"><table>
-
-<thead>
-
-<tr>
-
-<th>Image</th>
-
-<th>Name</th>
-
-<th>Location</th>
-
-<th>Price / Night</th>
-
-<th>Rooms</th>
-
-<th>Status</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@foreach($hotels as $hotel)
-
-<tr>
-
-<td>
-
-@if($hotel->image)
-
-<img
-src="{{ \App\Support\ListingImage::url($hotel->image, 'hotels') }}"
-class="table-image">
-
-@else
-
-<img
-src="{{ asset('images/listing-placeholder.svg') }}"
-class="table-image">
-
-@endif
-
-</td>
-
-<td>
-
-{{ $hotel->name }}
-
-</td>
-
-<td>
-
-{{ $hotel->location }}
-
-</td>
-
-<td>
-
-PHP {{ number_format(
-    $hotel->price_per_night,
-    2
-) }}
-
-</td>
-
-<td>
-
-{{ $hotel->available_rooms }}
-
-</td>
-
-<td class="listing-status-cell">
-@if($hotel->status == 'approved')
-<span class="status-approved">Approved</span>
-@elseif($hotel->status == 'pending')
-<span class="status-pending">Pending</span>
-@else
-<span class="status-rejected">Rejected</span>
-@endif
-</td>
-
-<td>
-<div class="listing-action-row listing-action-top">
-<a
-href="/owner/hotels/{{ $hotel->id }}"
-class="view-btn">
-
-View
-
-</a>
-
-<a
-href="/owner/hotels/{{ $hotel->id }}/rooms"
-class="listing-menu-btn">
-
-Rooms
-
-</a>
-</div>
-
-<div class="listing-action-row listing-action-bottom">
-<a
-href="/owner/hotels/edit/{{ $hotel->id }}"
-class="edit-btn">
-
-Edit
-
-</a>
-
-<a
-href="/owner/hotels/delete/{{ $hotel->id }}"
-class="deletes-btn"
-onclick="return confirm(
-'Are you sure you want to delete this hotel?'
-)">
-
-Delete
-
-</a>
-</div>
-
-</td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table></div></div>
-
-</div>
-
+<body class="owner-listing-page admin-listing-page">
+<main class="page-container">
+    <div class="back-btn"><button type="button" onclick="window.history.back(); return false;">Back</button></div>
+    <header class="management-heading">
+        <span>Owner listings</span>
+        <h1>My Hotels</h1>
+        <p>Manage your hotel details, rooms, and booking status.</p>
+        <a class="add-btn" href="/owner/hotels/create">+ Add Hotel</a>
+    </header>
+    <section class="admin-listing-grid">
+        @forelse($hotels as $hotel)
+            <article class="admin-listing-card is-organized">
+                <img src="{{ \App\Support\ListingImage::url($hotel->image, 'hotels') }}" alt="{{ $hotel->name }}">
+                <div class="listing-primary">
+                    <span class="listing-type">Hotel</span>
+                    <h2>{{ $hotel->name }}</h2>
+                    <p>{{ $hotel->location }}</p>
+                </div>
+                <div class="listing-facts">
+                    <div class="listing-owner">
+                        <small>Owner</small>
+                        <strong>{{ Auth::user()->name }}</strong>
+                        <span>{{ Auth::user()->email }}</span>
+                    </div>
+                    <div class="listing-metric">
+                        <small>Rate / night</small>
+                        <strong>PHP {{ number_format((float) $hotel->price_per_night, 2) }}</strong>
+                    </div>
+                    <div class="listing-metric">
+                        <small>Rooms</small>
+                        <strong>{{ $hotel->available_rooms }}</strong>
+                    </div>
+                </div>
+                <div class="listing-status">
+                    <span class="status-{{ $hotel->status }}">{{ ucfirst($hotel->status) }}</span>
+                </div>
+                <div class="listing-actions">
+                    <div class="listing-action-row">
+                        <a href="/owner/hotels/{{ $hotel->id }}" class="view-btn">View</a>
+                        <a href="/owner/hotels/{{ $hotel->id }}/rooms" class="listing-menu-btn">Rooms</a>
+                    </div>
+                    <div class="listing-action-row">
+                        <a href="/owner/hotels/edit/{{ $hotel->id }}" class="edit-btn">Edit</a>
+                        <a href="/owner/hotels/delete/{{ $hotel->id }}" class="deletes-btn" onclick="return confirm('Delete this hotel?')">Delete</a>
+                    </div>
+                </div>
+            </article>
+        @empty
+            <p class="empty-card">No hotels found.</p>
+        @endforelse
+    </section>
+</main>
 </body>
-
 </html>

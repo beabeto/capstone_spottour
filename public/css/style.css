@@ -5058,6 +5058,9 @@ body.dashboard-body .spot-form-card .repeat-row{min-width:0}
 .owner-listing-page .food-menu-table-scroll .food-menu-table th{white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(2),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(3),.owner-listing-page .food-menu-table-scroll .food-menu-table td:nth-child(4){overflow-wrap:anywhere}
 .owner-listing-page .food-menu-table-scroll .food-menu-table td:last-child a{margin:3px!important}
+.admin-listing-page .listing-actions form{display:inline-flex;min-width:0;margin:0}
+.admin-listing-page .listing-actions form button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:36px;margin:0;padding:0 12px;border:1px solid #b42318;border-radius:8px;background:transparent;color:#b42318;font-size:12px;font-weight:800;line-height:1.2;white-space:nowrap;cursor:pointer}
+.admin-listing-page .listing-actions form button:hover{background:transparent;filter:brightness(.82);transform:translateY(-1px)}
 @media(max-width:700px){
  .owner-listing-page .page-container{box-sizing:border-box;width:calc(100% - 24px)!important;max-width:100%;padding-top:72px!important;padding-bottom:28px!important}
  .owner-listing-page .page-container>.header-row{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
@@ -5082,4 +5085,6 @@ body.dashboard-body .spot-form-card .repeat-row{min-width:0}
  .feedback-page .feedback-form,.feedback-page .feedback-card,.feedback-page .feedback-empty{padding:16px 14px}
  .feedback-page .feedback-form button{width:100%!important;min-height:46px}
  .admin-bell-float{top:10px!important;right:66px!important;width:42px!important}
+ .admin-listing-page .listing-actions form{width:100%}
+ .admin-listing-page .listing-actions form button{width:100%;min-height:40px;padding:0 7px;white-space:normal}
 }
